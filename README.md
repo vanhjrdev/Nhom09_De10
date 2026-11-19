@@ -308,10 +308,10 @@ gap(%) = abs(f - f*) / f* * 100
 ### 10.4. Cấu hình cần ghi lại
 
 ```text
-CPU:                [Điền]
-RAM:                [Điền]
-Hệ điều hành:       [Điền]
-Python:             [Điền]
+CPU:                Intel i5-11400H
+RAM:                16 GB
+Hệ điều hành:       Window 11 Pro
+Python:             Python 3.12.9
 Phiên bản mã nguồn: [Commit hash]
 Ngân sách:          [Điền]
 Seed:               [Điền]
