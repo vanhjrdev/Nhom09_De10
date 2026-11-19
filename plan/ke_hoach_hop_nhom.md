@@ -55,7 +55,7 @@ Phương án để thảo luận: 4 thể hiện tự sinh nhỏ, 3 tự sinh v�
 | Mốc tối ưu cho dữ liệu nhỏ | A | Chưa chốt | Chưa hoàn thành |
 | Chạy và phân tích GA, GA lai | C | Chưa chốt | Chưa hoàn thành |
 | Script tổng hợp, biểu đồ, kiểm định | D | Chưa chốt | Chưa hoàn thành |
-| Ghép báo cáo, rà soát và demo | A phối hợp cả nhóm | Chưa chốt | Chưa hoàn thành |
+| Ghép báo cáo, rà soát và demo | Cả nhóm phối hợp | Chưa chốt | Chưa hoàn thành |
 
 ## 6. Biên bản cần điền sau họp
 
