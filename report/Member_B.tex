@@ -1,0 +1,107 @@
+% Phan cua thanh vien B: (d) Heuristic va tim kiem cuc bo, va muc Tabu Search trong (e).
+% Day la tep con (khong co preamble). Can cac goi: amsmath, algorithm, algpseudocode, booktabs.
+% Cac o [CHO SO LIEU] dien sau khi chay thuc nghiem; khong dien so chua do.
+
+\section{Heuristic xây dựng và tìm kiếm cục bộ}
+
+\subsection{Biểu diễn lời giải và cấu trúc dữ liệu}
+Lời giải là tập cột $X\subseteq\{1,\dots,n\}$, lưu bằng mảng boolean $sel[j]$. Với mỗi hàng $i$ ta duy trì
+$cnt[i]=|\{j\in X: i\in S_j\}|$ (số cột đang chọn phủ hàng $i$). Lời giải hợp lệ khi và chỉ khi $cnt[i]\ge 1$ với mọi $i$.
+Thêm hoặc bỏ cột $j$ cập nhật $cnt$ trong $O(|S_j|)$ và cập nhật chi phí trong $O(1)$.
+Bộ đọc dựng cả danh sách theo hàng ($R_i$: các cột phủ hàng $i$) và theo cột ($S_j$).
+
+\subsection{Tham lam Chvátal}
+Tại mỗi bước chọn cột chưa chọn có tỉ số $c_j/|S_j\cap U|$ nhỏ nhất, với $U$ là tập hàng chưa được phủ.
+
+\begin{algorithm}[htbp]
+\caption{Tham lam Chvátal}
+\begin{algorithmic}[1]
+\State $X\gets\emptyset$; $U\gets\{1,\dots,m\}$
+\While{$U\neq\emptyset$}
+  \State $j^*\gets\arg\min_{j\notin X,\,|S_j\cap U|>0}\; c_j/|S_j\cap U|$
+  \State $X\gets X\cup\{j^*\}$; $U\gets U\setminus S_{j^*}$
+\EndWhile
+\State \Call{XoaCotThua}{$X$}
+\State \Return $X$
+\end{algorithmic}
+\end{algorithm}
+
+Chỉ xét các cột chứa ít nhất một hàng thuộc $U$. Mỗi vòng lặp tốn $O(\sum_{j}|S_j|)$ trong trường hợp xấu nhất, và có tối đa $m$ vòng.
+Chvátal (1979) chứng minh tỉ số xấp xỉ $H(d)\le 1+\ln d$ với $d=\max_j|S_j|$.
+
+\paragraph{Xóa cột thừa.} Duyệt các cột đã chọn theo chi phí giảm dần; cột $j$ bị bỏ nếu $cnt[i]\ge 2$ với mọi $i\in S_j$
+(bỏ đi vẫn hợp lệ). Độ phức tạp $O(\sum_{j\in X}|S_j|)$.
+Trên ví dụ nhỏ của đề, tham lam cho $\{4,5,2,1\}$ chi phí 19; bước xóa cột thừa loại cột 5 và đưa về 16 (tối ưu).
+
+\subsection{Thủ tục sửa chữa}
+\textsc{SuaChua} thêm cột theo đúng tiêu chí tỉ số của Chvátal cho đến khi phủ hết các hàng còn thiếu; có tham số $forbid$ (tập cột bị cấm thêm).
+Nếu mọi ứng viên đều bị cấm, bỏ lệnh cấm để bảo đảm lời giải hợp lệ. Các ứng viên cùng tỉ số được chọn ngẫu nhiên theo seed.
+
+\subsection{Hai cấu trúc lân cận}
+\textbf{$N_1$: hoán đổi 1--1.} Bỏ cột $j\in X$ và thêm cột $k\notin X$. Gọi $T_j=\{i\in S_j: cnt[i]=1\}$ là các hàng chỉ do $j$ phủ.
+Phép hoán đổi hợp lệ khi và chỉ khi $T_j\subseteq S_k$. Mức thay đổi chi phí:
+\[
+\Delta = c_k - c_j .
+\]
+Nhờ mảng $cnt$, không phải tính lại toàn bộ lời giải: tính $T_j$ tốn $O(|S_j|)$, các ứng viên $k$ chỉ lấy từ danh sách cột của một hàng thuộc $T_j$.
+Nếu $T_j=\emptyset$ thì $j$ là cột thừa và bị bỏ.
+
+\textbf{$N_2$: bỏ cột rồi sửa chữa.} Bỏ $j$, gọi \textsc{SuaChua} với $forbid=\{j\}$, rồi xóa cột thừa.
+Mức thay đổi $\Delta=$ (chi phí mới) $-$ (chi phí cũ), tính từ giá trị chi phí được cập nhật gia tăng. Lân cận này cho phép thay một cột bằng nhiều cột rẻ hơn.
+
+\subsection{Leo đồi: first improvement và best improvement}
+Duyệt các cột đã chọn theo thứ tự ngẫu nhiên (theo seed).
+\begin{itemize}
+  \item \textbf{First improvement (\texttt{HC\_FI}):} áp dụng ngay phép di chuyển đầu tiên có $\Delta<0$.
+  \item \textbf{Best improvement (\texttt{HC\_BI}):} xét mọi $j\in X$ ở cả hai lân cận, áp dụng phép có $\Delta$ nhỏ nhất.
+\end{itemize}
+Dừng khi không còn phép di chuyển cải thiện hoặc hết ngân sách thời gian.
+Lời giải xuất phát là kết quả của tham lam Chvátal, nên mỗi lần chạy không tệ hơn lời giải xuất phát của chính nó.
+
+\paragraph{Chi phí một bước.} $N_1$: $O(|S_j|)$ để tìm $T_j$ cộng chi phí kiểm tra từng ứng viên $k$.
+$N_2$: dominated bởi \textsc{SuaChua}, tức $O(\sum_j |S_j|)$ mỗi lần; vì vậy $N_2$ đắt hơn $N_1$.
+Không dùng delta (tính lại toàn bộ) thì mỗi ứng viên tốn thêm $O(\sum_{i}|R_i|)$ để kiểm tra phủ.
+
+\paragraph{So sánh FI và BI.} [CHO SO LIEU: bảng gap\% và thời gian của \texttt{HC\_FI}, \texttt{HC\_BI} trên các thể hiện, 10 seed.]
+
+\section{Tabu Search (phần trong mục các metaheuristic)}
+
+\subsection{Nguồn gốc}
+Tìm kiếm Tabu do Glover (1986) đề xuất: luôn đi đến lân cận tốt nhất không bị cấm, dùng danh sách tabu để chặn quay lại và tiêu chí mong đợi (aspiration).
+
+\subsection{Thiết kế cho bài toán phủ tập}
+\begin{itemize}
+  \item \textbf{Biểu diễn:} tập cột hợp lệ (như trên); \emph{luôn giữ hợp lệ} bằng sửa chữa, không dùng hàm phạt.
+  \item \textbf{Lời giải đầu:} tham lam Chvátal có ngẫu nhiên hóa khi hòa.
+  \item \textbf{Lân cận:} bỏ một cột $j\in X$ rồi sửa chữa và xóa cột thừa (lân cận $N_2$). Mỗi vòng xét tối đa 40 cột chọn ngẫu nhiên từ $X$.
+  \item \textbf{Thuộc tính tabu:} cột $j$ vừa bị bỏ không được thêm lại trong $tenure+r$ vòng, với $r$ ngẫu nhiên trong $\{0,1,2\}$.
+  \item \textbf{Độ dài tabu mặc định:} $tenure=\max(5,\lfloor 0.1|X|\rfloor+3)$.
+  \item \textbf{Aspiration:} cột bị cấm chỉ được thêm lại khi không còn ứng viên nào khác để phủ hàng thiếu (nới cấm để giữ tính hợp lệ).
+  \item \textbf{Tiêu chí dừng:} hết ngân sách thời gian. Mọi lời giải báo cáo đều qua bộ kiểm tra độc lập của A.
+\end{itemize}
+
+\begin{algorithm}[htbp]
+\caption{Tabu Search cho Set Cover}
+\begin{algorithmic}[1]
+\State $X\gets$ \Call{Chvatal}{ }; $X^*\gets X$; $it\gets 0$
+\While{còn thời gian}
+  \State $it\gets it+1$; $best\gets\emptyset$
+  \For{$j\in$ mẫu tối đa 40 cột của $X$}
+    \State $X'\gets$ \Call{SuaChua}{$X\setminus\{j\}$, $forbid=\{k: tabu[k]>it\}\cup\{j\}$}; xóa cột thừa
+    \State giữ $X'$ nếu tốt hơn $best$
+  \EndFor
+  \State $X\gets best$ (kể cả khi tệ hơn $X$); $tabu[j]\gets it+tenure+r$
+  \If{$c(X)<c(X^*)$} $X^*\gets X$ \EndIf
+\EndWhile
+\State \Return $X^*$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Độ phức tạp mỗi vòng lặp}
+Mỗi vòng thử tối đa 40 phép bỏ--sửa chữa, mỗi phép $O(\sum_j|S_j|)$ trong trường hợp xấu nhất, cộng chi phí khôi phục trạng thái $O(|X|)$ lần cập nhật $cnt$.
+
+\subsection{Ý nghĩa tham số và phân tích độ nhạy}
+$tenure$ điều khiển cân bằng khai thác và khám phá: nhỏ thì dễ quay lại vùng cũ (kẹt), lớn thì cấm quá nhiều cột tốt.
+Kích thước mẫu (40) đánh đổi giữa chất lượng lân cận và số vòng lặp trong cùng ngân sách.
+[CHO SO LIEU: chạy $tenure\in\{\ldots\}$ và kích thước mẫu $\in\{\ldots\}$ trên tập thể hiện dùng để chỉnh tham số, 10 seed, cùng ngân sách; trình bày bảng và nhận xét.]
+Cần ghi rõ tập thể hiện dùng để chọn tham số, tránh dùng chính tập đánh giá cuối.
