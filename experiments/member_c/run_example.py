@@ -3,23 +3,23 @@
 import csv
 import pathlib
 import subprocess
+import sys
 import time
 
 root = pathlib.Path(__file__).resolve().parents[2]
 out = root / 'results/member_c'
 out.mkdir(parents=True, exist_ok=True)
-solver, checker = out / 'solver_C', out / 'kiemtra'
-for src, exe in [('src/main_C.cpp', solver), ('src/kiemtra.cpp', checker)]:
-    subprocess.run(['g++', '-std=c++17', '-O2', str(root / src), '-o', str(exe)], check=True)
+solver = root / 'src/main_C.py'
+checker = root / 'src/kiemtra.py'
 rows = []
 for algo in ('GA', 'GA_LS'):
     for seed in range(1, 11):
         stem = f'vidu_{algo}_s{seed}'
         sol, log = out / (stem + '.sol'), out / (stem + '_conv.csv')
         start = time.perf_counter()
-        subprocess.run([str(solver), str(root / 'data/vidu/vidu.txt'), algo, str(sol), str(seed), '0.1', str(log)], check=True, capture_output=True, text=True)
+        subprocess.run([sys.executable, str(solver), str(root / 'data/vidu/vidu.txt'), algo, str(sol), str(seed), '0.1', str(log)], check=True, capture_output=True, text=True)
         elapsed = time.perf_counter() - start
-        check = subprocess.run([str(checker), str(root / 'data/vidu/vidu.txt'), str(sol)], check=True, capture_output=True, text=True).stdout.strip()
+        check = subprocess.run([sys.executable, str(checker), str(root / 'data/vidu/vidu.txt'), str(sol)], check=True, capture_output=True, text=True).stdout.strip()
         if not check.startswith('HOP LE |'):
             raise RuntimeError(f'{stem}: {check}')
         cost = int(sol.read_text().split()[0])
