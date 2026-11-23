@@ -12,7 +12,7 @@ nhưng phải giữ thống nhất định dạng dữ liệu, giao diện chạ
 | A  | `Phan Việt Anh` | Bộ đọc, bộ kiểm tra, thuật toán chính xác, SA | Bài toán, NP-khó, thuật toán chính xác, SA, ghép báo cáo |
 | B | `Hoàng Duy Khánh` | Tham lam Chvátal, xóa cột thừa, tìm kiếm cục bộ, TS, bộ sinh dữ liệu | Heuristic, tìm kiếm cục bộ, Tabu Search |
 | C | `Huỳnh Xuân Huy` | GA và GA lai tìm kiếm cục bộ | Genetic Algorithm và thuật toán lai |
-| D | `Nguyễn Thanh Mai` | ACO hoặc GRASP, script thực nghiệm, biểu đồ, kiểm định | Thực nghiệm, phân tích thống kê, kết luận |
+| D | `Phạm Nhật Mai Thành` | ACO hoặc GRASP, script thực nghiệm, biểu đồ, kiểm định | Thực nghiệm, phân tích thống kê, kết luận |
 
 ## 2. Phát biểu bài toán
 
