@@ -1,4 +1,6 @@
 % Phần thành viên C: ghép vào báo cáo chung; cần gói amsmath, amssymb.
+% !TeX root = main.tex
+
 \section{Giải thuật di truyền và giải thuật lai}
 \subsection{Biểu diễn và xử lý ràng buộc}
 Mỗi cá thể là véc-tơ nhị phân $x\in\{0,1\}^n$, trong đó $x_j=1$ khi chọn camera $j$. Chi phí và số camera phủ nút $i$ là
@@ -42,3 +44,19 @@ Không suy diễn ưu thế thuật toán trước khi có kết quả thực ng
 
 \subsection{Kiểm thử ban đầu trên ví dụ của đề}
 Trên thể hiện 7 hàng và 6 cột trong đề, chạy mỗi thuật toán với 10 seed từ 1 đến 10, ngân sách 0,1 giây cho mỗi lần, quần thể 40 và xác suất đột biến $1/6$. Cả 20 lời giải đều được bộ kiểm tra chấp nhận và đạt chi phí tối ưu $16$; do đó chi phí tốt nhất và trung bình của mỗi thuật toán là $16$, độ lệch chuẩn và gap đều bằng $0$, tỉ lệ đạt tối ưu là $10/10$. Thời gian đo trung bình gồm khởi động tiến trình lần lượt khoảng $0{,}2574$ giây cho GA và $0{,}2502$ giây cho GA lai. Thử nghiệm dùng Python 3.14.7 trên Windows; tệp kết quả và log hội tụ được lưu trong \texttt{results/member\_c}. Ví dụ này quá nhỏ để kết luận về chất lượng tương đối hoặc độ nhạy tham số; cần thực nghiệm trên các thể hiện và ngân sách do nhóm thống nhất.
+
+\subsection{Kiểm thử chéo trên dữ liệu tự sinh nhỏ}
+Sau khi thành viên B bổ sung dữ liệu tự sinh, chạy kiểm thử chéo trên bốn thể hiện nhỏ với 10 seed từ 1 đến 10, ngân sách 0,05 giây, $P=40$ và $p_m=1/n$. Cả 80 lời giải của GA và \texttt{GA\_LS} đều được bộ kiểm tra độc lập chấp nhận. Kết quả chi phí như sau:
+\begin{center}
+\begin{tabular}{lrrrrr}
+\hline
+Thể hiện & Đối chiếu & GA best & GA avg & GA\_LS best & GA\_LS avg \\
+\hline
+\texttt{nho\_10x20\_s101} & 65  & 65  & 65  & 65  & 65 \\
+\texttt{nho\_15x25\_s102} & 136 & 136 & 136 & 136 & 136 \\
+\texttt{nho\_20x28\_s103} & 212 & 212 & 212 & 212 & 212 \\
+\texttt{nho\_25x30\_s104} & 133 & 133 & 133 & 133 & 133 \\
+\hline
+\end{tabular}
+\end{center}
+Độ lệch chuẩn bằng 0 ở cả tám tổ hợp thể hiện--thuật toán. Các giá trị đối chiếu do thành viên B cung cấp; chỉ xem là tối ưu chính thức sau khi thuật toán chính xác của thành viên A xác nhận. Đây là kiểm thử chức năng với ngân sách rất ngắn, không dùng để kết luận GA và GA lai có chất lượng tương đương trên dữ liệu lớn. Script \texttt{experiments/member\_c/run\_tusinh.py} tái lập phép kiểm thử và ghi CSV theo schema kết quả thô của nhóm.
