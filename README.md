@@ -4,7 +4,7 @@ Bài toán phủ tập có trọng số (Weighted Set Cover).
 
 ## 1. Thông tin nhóm và phân công
 
-| Thành viên | Họ tên — MSSV | Phần code | Phần báo cáo |
+| Thành viên | Họ tên | Phần code | Phần báo cáo |
 |---|---|---|---|
 | A | Phan Việt Anh | Bộ đọc, bộ kiểm tra, thuật toán chính xác, SA | Phát biểu bài toán, NP-khó, thuật toán chính xác, SA, ghép báo cáo |
 | B | Hoàng Duy Khánh | Tham lam Chvátal, xóa cột thừa, tìm kiếm cục bộ, TS, bộ sinh dữ liệu | Heuristic, tìm kiếm cục bộ, Tabu Search |
