@@ -28,11 +28,12 @@
 - [ ] Xác nhận `kiemtra.py` trả về `HOP LE | Tong chi phi: 16`.
 
 ### B (Hoàng Duy Khánh) — Chvátal, xóa thừa, 2 lân cận, TS, sinh dữ liệu
-- [ ] `src/greedy.py`: tham lam Chvátal + xóa cột thừa.
-- [ ] `src/local_search.py`: lân cận 1 (bỏ 1 cột sửa chữa), lân cận 2 (đổi 1 cột), FI và BI.
-- [ ] `src/tabu.py`: Tabu Search (tenure, aspiration, tiêu chí dừng).
+- [x] `src/greedy.py`: tham lam Chvátal + xóa cột thừa.
+- [x] `src/local_search.py`: HC_FI, HC_BI.
+- [x] `src/tabu.py`: Tabu Search.
 - [ ] `data/tusinh/`: chương trình sinh dữ liệu + instance (ghi seed, m, n, khoảng chi phí, mật độ).
 - [ ] `data/chuan/`: dữ liệu chuẩn OR-Library hoặc ít nhất `LINKS.txt`.
+- [ ] Chạy GREEDY/HC_FI/HC_BI/TS trên dữ liệu chuẩn và tự sinh.
 
 ### D (Phạm Nhật Mai Thành) — ACO/GRASP, script thực nghiệm, biểu đồ, kiểm định
 - [ ] `src/aco_or_grasp.py`: ACO hoặc GRASP (chọn 1).

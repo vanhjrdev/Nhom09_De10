@@ -69,29 +69,39 @@ Phương án để thảo luận: 4 thể hiện tự sinh nhỏ, 3 tự sinh v�
 
 ## 7. Công việc còn thiếu theo thành viên (theo bai_tap_lon.tex đề 10)
 
-### A — Bộ đọc, kiểm tra, chính xác, SA
-- [ ] Chạy EXACT trên data/vidu/vidu.txt, phải ra 16 / 1 2 4.
-- [ ] Tạo data/vidu/vidu.sol (`16` / `1 2 4`).
-- [ ] Xác nhận kiemtra.py trả về `HOP LE | Tong chi phi: 16`.
+### A — Bộ đọc, kiểm tra, chính xác, SA (code đã có)
+- [x] `src/scp_core.py`: mô hình dữ liệu + bộ đọc OR-Library.
+- [x] `src/kiemtra.py`: bộ kiểm tra độc lập.
+- [x] `src/main_A.py`: `ExactSolver` (nhánh cận) + `SASolver`.
+- [ ] Chạy EXACT trên `data/vidu/vidu.txt`, phải ra 16 / 1 2 4.
+- [ ] Tạo `data/vidu/vidu.sol` (`16` / `1 2 4`).
+- [ ] Xác nhận `kiemtra.py` trả về `HOP LE | Tong chi phi: 16`.
+- [ ] Viết phần báo cáo: phát biểu bài toán, NP-khó, thuật toán chính xác, SA.
 
-### B — Chvátal, xóa thừa, 2 lân cận, TS, sinh dữ liệu
-- [ ] src/greedy.py: tham lam Chvátal + xóa cột thừa.
-- [ ] src/local_search.py: lân cận 1, lân cận 2, FI và BI.
-- [ ] src/tabu.py: Tabu Search.
-- [ ] data/tusinh/: chương trình sinh dữ liệu + instance (ghi seed).
-- [ ] data/chuan/: OR-Library hoặc LINKS.txt.
+### B — Chvátal, xóa thừa, 2 lân cận, TS, sinh dữ liệu (code đã có)
+- [x] `src/greedy.py`: tham lam Chvátal + xóa cột thừa.
+- [x] `src/local_search.py`: HC_FI, HC_BI.
+- [x] `src/tabu.py`: Tabu Search.
+- [ ] `data/tusinh/`: chương trình sinh dữ liệu + instance (ghi seed, m, n, khoảng chi phí, mật độ phủ).
+- [ ] `data/chuan/`: OR-Library hoặc ít nhất `LINKS.txt`.
+- [ ] Chạy GREEDY/HC_FI/HC_BI/TS trên dữ liệu chuẩn và tự sinh.
+- [ ] Viết phần báo cáo: heuristic, tìm kiếm cục bộ, Tabu Search.
 
-### C — GA và GA_LS (đã có)
-- [ ] data/tusinh/ có file .txt để chạy run_tusinh.py.
-- [ ] Chạy run_tusinh.py sinh results/raw/GA.csv và results/raw/GA_LS.csv.
+### C — GA và GA_LS (code đã có)
+- [x] `src/main_C.py`: GA (tournament 3, lai ghép từng bit, mutation 1/n, elitism) + GA_LS.
+- [x] `experiments/member_c/run_tusinh.py`: xuất `results/raw/GA.csv`, `results/raw/GA_LS.csv`.
+- [ ] `data/tusinh/` có file `.txt` để chạy `run_tusinh.py`.
+- [ ] Chạy `run_tusinh.py` sinh `results/raw/GA.csv` và `results/raw/GA_LS.csv`.
 - [ ] Phân tích độ nhạy tham số GA (population, mutation_rate).
-- [ ] Xác nhận GA_LS ra 16 trên data/vidu/vidu.txt trong budget 0.1s.
+- [ ] Xác nhận GA_LS ra 16 trên `data/vidu/vidu.txt` trong budget 0.1s.
+- [ ] Viết phần báo cáo: Genetic Algorithm và thuật toán lai.
 
-### D — ACO/GRASP, script thực nghiệm, biểu đồ, kiểm định
-- [ ] src/aco_or_grasp.py: ACO hoặc GRASP.
-- [ ] experiments/run_all.py: chạy toàn bộ thực nghiệm.
-- [ ] experiments/summarize.py, plot.py, statistics.py.
-- [ ] results/raw/<thuật toán>.csv cho mỗi thuật toán.
+### D — ACO/GRASP, script thực nghiệm, biểu đồ, kiểm định (chưa có code)
+- [ ] `src/aco_or_grasp.py`: ACO hoặc GRASP (chọn 1).
+- [ ] `experiments/run_all.py`: chạy toàn bộ thực nghiệm (tất cả thuật toán, instance, seed 1–10).
+- [ ] `experiments/summarize.py`, `plot.py`, `statistics.py`: bảng, biểu đồ hội tụ/boxplot, Wilcoxon/Friedman.
+- [ ] `results/raw/<thuật toán>.csv` cho mỗi thuật toán.
+- [ ] Viết phần báo cáo: thực nghiệm, phân tích thống kê, kết luận.
 
 ### Cộng đồng
 - [ ] 4 metaheuristic (SA, TS, GA, ACO/GRASP) + ít nhất 1 thuật toán lai (GA_LS đã có).
