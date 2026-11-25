@@ -73,9 +73,9 @@ Phương án để thảo luận: 4 thể hiện tự sinh nhỏ, 3 tự sinh v�
 - [x] `src/scp_core.py`: mô hình dữ liệu + bộ đọc OR-Library.
 - [x] `src/kiemtra.py`: bộ kiểm tra độc lập.
 - [x] `src/main_A.py`: `ExactSolver` (nhánh cận) + `SASolver`.
-- [ ] Chạy EXACT trên `data/vidu/vidu.txt`, phải ra 16 / 1 2 4.
-- [ ] Tạo `data/vidu/vidu.sol` (`16` / `1 2 4`).
-- [ ] Xác nhận `kiemtra.py` trả về `HOP LE | Tong chi phi: 16`.
+- [x] Chạy EXACT trên `data/vidu/vidu.txt`, phải ra 16 / 1 2 4.
+- [x] Tạo `data/vidu/vidu.sol` (`16` / `1 2 4`).
+- [x] Xác nhận `kiemtra.py` trả về `HOP LE | Tong chi phi: 16`.
 - [ ] Viết phần báo cáo: phát biểu bài toán, NP-khó, thuật toán chính xác, SA.
 
 ### B — Chvátal, xóa thừa, 2 lân cận, TS, sinh dữ liệu (code đã có)
