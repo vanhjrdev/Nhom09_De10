@@ -9,7 +9,7 @@ Bài toán phủ tập có trọng số (Weighted Set Cover).
 | A | Phan Việt Anh | Bộ đọc, bộ kiểm tra, thuật toán chính xác, SA | Phát biểu bài toán, NP-khó, thuật toán chính xác, SA, ghép báo cáo |
 | B | Hoàng Duy Khánh | Tham lam Chvátal, xóa cột thừa, tìm kiếm cục bộ, TS, bộ sinh dữ liệu | Heuristic, tìm kiếm cục bộ, Tabu Search |
 | C | Huỳnh Xuân Huy | GA và GA_LS (GA + tìm kiếm cục bộ) | Genetic Algorithm và thuật toán lai |
-| D | Phạm Nhật Mai Thành | ACO hoặc GRASP, script thực nghiệm, biểu đồ, kiểm định | Thực nghiệm, phân tích thống kê, kết luận |
+| D | Phạm Nhật Mai Thành | GRASP, script thực nghiệm, biểu đồ, kiểm định | Thực nghiệm, phân tích thống kê, kết luận |
 
 Đề: Đề 10 — Đặt camera giám sát giao thông: bài toán phủ tập (Set Cover), mức độ Khá.
 
@@ -26,6 +26,7 @@ Bài toán phủ tập có trọng số (Weighted Set Cover).
 ```
 python src\main_A.py <tep_vao> <EXACT|SA> <tep_ra> [seed] [budget_sec] [conv_csv]
 python src\main_C.py <tep_vao> <GA|GA_LS> <tep_ra> [seed] [budget_sec] [conv_csv] [population] [mutation_rate]
+python src\aco_or_grasp.py <tep_vao> GRASP <tep_ra> [seed] [budget_sec] [conv_csv] [alpha]
 ```
 
 | Tham số | Ý nghĩa | Mặc định |
@@ -78,7 +79,19 @@ python experiments\member_c\run_tusinh.py [--budget 1.0] [--seeds 1 2 3 4 5 6 7 
 - Log hội tụ: `results/conv/<thể hiện>_<thuật toán>_s<seed>_conv.csv`.
 - Thời gian ước tính: tuỳ số instance và ngân sách (mặc định 1.0 giây/lần chạy).
 
-Script tổng hợp chung, biểu đồ và kiểm định thống kê (của thành viên D) chưa hoàn thiện; khi hoàn thiện sẽ thêm lệnh tại đây.
+Script tổng hợp chung, biểu đồ và kiểm định thống kê (thành viên D):
+
+```
+python experiments\run_all.py [--include-exact] [--budget 0.3] [--seeds 1 2 3 4 5 6 7 8 9 10]
+python experiments\summarize.py
+python experiments\statistics.py
+python experiments\plot.py
+```
+
+- `run_all.py`: chạy toàn bộ thuật toán (`GREEDY`, `HC_FI`, `HC_BI`, `TS`, `SA`, `GA`, `GA_LS`, `GRASP`, và `EXACT` cho instance nhỏ), kiểm tra từng nghiệm bằng `src/kiemtra.py`, xuất `results/raw/<thuật toán>.csv`, `results/solutions/`, `results/conv/`.
+- `summarize.py`: tổng hợp `results/summary.csv` và `results/summary.md`.
+- `statistics.py`: kiểm định Friedman và Wilcoxon signed-rank (kèm hiệu chỉnh Holm) xuất `results/statistics.csv` và `results/statistics.md`.
+- `plot.py`: vẽ biểu đồ hội tụ, boxplot và so sánh gap (SVG) vào `results/figures/`.
 
 ## 6. Tham số mặc định của từng metaheuristic
 
@@ -88,4 +101,4 @@ Script tổng hợp chung, biểu đồ và kiểm định thống kê (của th
 | TS | B | Chưa cài đặt |
 | GA | C | seed=42, budget=10.0s, population=40, mutation_rate=1/n, tournament size=3, lai ghép từng bit (chọn từ cha A hoặc B, 1/2 mỗi bit), elitism (giữ cá thể tốt nhất) |
 | GA_LS | C | Tương tự GA; sau mỗi sự sinh, chạy tìm kiếm cục bộ: thay camera đã chọn bằng camera chưa chọn rẻ hơn phủ mọi nút chỉ được camera đó phủ, nếu chi phí thấp hơn |
-| ACO/GRASP | D | Chưa chọn thuật toán |
+| GRASP | D | seed=42, budget=10.0s, alpha=0.0 ở vòng 1 sau đó ngẫu nhiên đều trong [0.02, 0.12], xóa cột thừa + tìm kiếm cục bộ (hoán đổi 1-1 và phá hủy 1 - sửa chữa tham lam) |

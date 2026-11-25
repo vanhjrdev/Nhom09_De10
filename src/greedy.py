@@ -30,6 +30,7 @@ def is_valid(inst, sol):
 
 
 
+class State:
     def __init__(self, inst):
         self.m, self.n, self.c, self.rows, self.cols = inst
         self.colset = [set(c) for c in self.cols]
@@ -88,6 +89,7 @@ def is_valid(inst, sol):
                 self.add(j)
 
 
+def _pick(st, unc, rng=None, forbid=None):
     cand = set()
     for i in unc:
         cand.update(st.rows[i])
@@ -140,6 +142,7 @@ def greedy_chvatal(inst, rng=None):
     return st
 
 
+def run_cli(runners, doc):
     args = sys.argv[1:]
     if len(args) < 3:
         print(doc)

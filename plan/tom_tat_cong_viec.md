@@ -35,13 +35,13 @@
 - [ ] `data/chuan/`: dữ liệu chuẩn OR-Library hoặc ít nhất `LINKS.txt`.
 - [ ] Chạy GREEDY/HC_FI/HC_BI/TS trên dữ liệu chuẩn và tự sinh.
 
-### D (Phạm Nhật Mai Thành) — ACO/GRASP, script thực nghiệm, biểu đồ, kiểm định
-- [ ] `src/aco_or_grasp.py`: ACO hoặc GRASP (chọn 1).
-- [ ] `experiments/run_all.py`: chạy toàn bộ thực nghiệm (tất cả thuật toán, instance, seed 1–10).
-- [ ] `experiments/summarize.py`, `plot.py`, `statistics.py`: bảng, biểu đồ hội tụ/boxplot, Wilcoxon/Friedman.
-- [ ] `results/raw/<thuật toán>.csv` cho mỗi thuật toán.
+### D (Phạm Nhật Mai Thành) — GRASP, script thực nghiệm, biểu đồ, kiểm định
+- [x] `src/aco_or_grasp.py`: GRASP.
+- [x] `experiments/run_all.py`: chạy toàn bộ thực nghiệm (tất cả thuật toán, instance, seed 1–10).
+- [x] `experiments/summarize.py`, `plot.py`, `statistics.py`: bảng, biểu đồ hội tụ/boxplot/gap, Wilcoxon/Friedman.
+- [x] `results/raw/<thuật toán>.csv` cho mỗi thuật toán và `results/member_d/` riêng cho GRASP.
 
 ## Cộng đồng
-- [ ] 4 metaheuristic (SA, TS, GA, ACO/GRASP) + ít nhất 1 thuật toán lai (GA_LS đã có) → đáp yêu cầu nhóm 4.
-- [ ] Thống nhất ngân sách và seed (1–10) trước khi chạy đánh giá cuối.
+- [x] 4 metaheuristic (SA, TS, GA, GRASP) + ít nhất 1 thuật toán lai (GA_LS đã có) → đáp yêu cầu nhóm 4.
+- [x] Thống nhất seed chạy `1–10` (tách biệt seed sinh dữ liệu `101–104`, `201–203`). Chờ bổ sung `data/chuan/` để chạy đánh giá cuối với ngân sách lớn hơn.
 - [ ] Báo cáo PDF 20–40 trang, slide, demo (mục 12–13 README).

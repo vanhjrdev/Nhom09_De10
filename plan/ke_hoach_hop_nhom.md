@@ -9,7 +9,7 @@ Thống nhất dữ liệu, cách thực nghiệm, đầu việc và thời hạ
 - **A:** Bộ đọc, bộ kiểm tra, thuật toán chính xác, SA; phát biểu bài toán, độ phức tạp và ghép báo cáo.
 - **B:** Tham lam Chvátal, xóa cột thừa, tìm kiếm cục bộ, Tabu Search và bộ sinh dữ liệu.
 - **C:** GA, GA lai tìm kiếm cục bộ; báo cáo và slide cho hai thuật toán.
-- **D:** ACO hoặc GRASP, script thực nghiệm, biểu đồ, kiểm định thống kê và tổng hợp kết quả.
+- **D:** GRASP, script thực nghiệm, biểu đồ, kiểm định thống kê và tổng hợp kết quả.
 - Xác nhận đầu mối, thời hạn bàn giao và cách xử lý khi một phần phụ thuộc phần khác.
 - Thống nhất phương án bốn metaheuristic và thuật toán lai; hỏi giảng viên xác nhận cách tính theo yêu cầu nhóm bốn người.
 
@@ -96,14 +96,14 @@ Phương án để thảo luận: 4 thể hiện tự sinh nhỏ, 3 tự sinh v�
 - [ ] Xác nhận GA_LS ra 16 trên `data/vidu/vidu.txt` trong budget 0.1s.
 - [ ] Viết phần báo cáo: Genetic Algorithm và thuật toán lai.
 
-### D — ACO/GRASP, script thực nghiệm, biểu đồ, kiểm định (chưa có code)
-- [ ] `src/aco_or_grasp.py`: ACO hoặc GRASP (chọn 1).
-- [ ] `experiments/run_all.py`: chạy toàn bộ thực nghiệm (tất cả thuật toán, instance, seed 1–10).
-- [ ] `experiments/summarize.py`, `plot.py`, `statistics.py`: bảng, biểu đồ hội tụ/boxplot, Wilcoxon/Friedman.
-- [ ] `results/raw/<thuật toán>.csv` cho mỗi thuật toán.
-- [ ] Viết phần báo cáo: thực nghiệm, phân tích thống kê, kết luận.
+### D — GRASP, script thực nghiệm, biểu đồ, kiểm định (đã hoàn thành code & thực nghiệm trên tự sinh)
+- [x] `src/aco_or_grasp.py`: GRASP (RCL Chvátal + xóa thừa + local search hoán đổi 1-1 & destroy-1/repair).
+- [x] `experiments/run_all.py`: chạy toàn bộ thực nghiệm (tất cả thuật toán, instance, seed 1–10).
+- [x] `experiments/summarize.py`, `plot.py`, `statistics.py`: bảng, biểu đồ hội tụ/boxplot/gap (SVG), Wilcoxon/Friedman.
+- [x] `results/raw/<thuật toán>.csv` cho mỗi thuật toán và `results/member_d/` riêng cho GRASP.
+- [x] Viết phần báo cáo: `report/thanh_vien_D.tex` (thực nghiệm, phân tích thống kê, kết luận).
 
 ### Cộng đồng
-- [ ] 4 metaheuristic (SA, TS, GA, ACO/GRASP) + ít nhất 1 thuật toán lai (GA_LS đã có).
-- [ ] Thống nhất ngân sách và seed 1–10 trước khi chạy đánh giá cuối.
+- [x] 4 metaheuristic (SA, TS, GA, GRASP) + ít nhất 1 thuật toán lai (GA_LS).
+- [x] Thống nhất seed chạy `1–10` (tách biệt với seed sinh dữ liệu `101–104`, `201–203`) và chạy đánh giá trên `data/tusinh/` (còn chờ bổ sung `data/chuan/`).
 - [ ] Báo cáo PDF 20–40 trang, slide, demo.

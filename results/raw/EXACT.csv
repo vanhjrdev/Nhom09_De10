@@ -1,0 +1,5 @@
+instance,n,algorithm,params,seed,run,best_value,time_s,time_to_best_s,evaluations,feasible
+nho_10x20_s101,20,EXACT,budget_sec=60.0,1,1,65,0.038534,0.038534,0,1
+nho_15x25_s102,25,EXACT,budget_sec=60.0,1,1,136,0.041781,0.041781,0,1
+nho_20x28_s103,28,EXACT,budget_sec=60.0,1,1,212,0.034455,0.034455,0,1
+nho_25x30_s104,30,EXACT,budget_sec=60.0,1,1,133,0.033964,0.033964,0,1

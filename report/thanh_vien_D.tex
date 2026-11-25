@@ -1,0 +1,61 @@
+% Phần thành viên D: ghép vào báo cáo chung; cần gói amsmath, amssymb.
+% !TeX root = main.tex
+
+\section{Thuật toán GRASP, Thực nghiệm và Phân tích Thống kê}
+
+\subsection{Thuật toán GRASP}
+GRASP (Greedy Randomized Adaptive Search Procedure) là metaheuristic lặp hai pha gồm \emph{xây dựng nghiệm tham lam ngẫu nhiên} (RCL) và \emph{tìm kiếm cục bộ} (Local Search).
+\begin{enumerate}
+ \item \textbf{Pha xây dựng (RCL Chvátal):} Tại mỗi bước, tính tỉ số $s_j = c_j / g_j$ với $g_j$ là số nút chưa phủ mà camera $j$ phủ được. Gọi $s_{\min} = \min_j s_j$ và $s_{\max} = \max_j s_j$, danh sách ứng viên hạn chế là
+ \[
+  \mathrm{RCL} = \{ j : s_j \le s_{\min} + \alpha (s_{\max} - s_{\min}) \}.
+ \]
+ Chọn ngẫu nhiên một camera trong $\mathrm{RCL}$ cho tới khi mọi nút đều được phủ, sau đó xóa các camera dư thừa theo thứ tự chi phí giảm dần. Ở vòng lặp đầu tiên đặt $\alpha = 0$ để thu ngay nghiệm tham lam chuẩn; các vòng tiếp theo chọn $\alpha \sim \mathcal{U}(0.02, 0.12)$.
+ \item \textbf{Pha tìm kiếm cục bộ:} Kết hợp hai lân cận: (i) \emph{hoán đổi 1--1} thay camera $j$ đang chọn bằng camera $k$ chưa chọn rẻ hơn phủ toàn bộ các nút chỉ do $j$ phủ; (ii) \emph{phá hủy 1 -- sửa chữa tham lam} (destroy-1 & repair) trên tối đa 30 camera có chi phí cao nhất, kèm xóa cột dư thừa.
+\end{enumerate}
+
+\subsection{Thiết kế thực nghiệm}
+\begin{itemize}
+ \item \textbf{Tập dữ liệu:} 7 thể hiện tự sinh trong \texttt{data/tusinh/} gồm 4 thể hiện nhỏ ($m \in [10, 25], n \in [20, 30]$) và 3 thể hiện vừa ($m \in [100, 200], n \in [400, 1000]$). (Thư mục \texttt{data/chuan/} chưa có thể hiện OR-Library nên chưa đưa vào lượt chạy này.)
+ \item \textbf{Thuật toán đối sánh:} \texttt{EXACT} (chỉ chạy cho $n \le 30$), \texttt{GREEDY}, \texttt{HC\_FI}, \texttt{HC\_BI}, \texttt{TS}, \texttt{SA}, \texttt{GA}, \texttt{GA\_LS}, và \texttt{GRASP}.
+ \item \textbf{Ngân sách và seed:} Mỗi thuật toán chạy độc lập 10 lần với \texttt{seed = 1..10}, ngân sách thời gian $0{,}3$ giây/lần chạy trên Python 3.12.9 (Windows). Toàn bộ nghiệm đều được kiểm tra hợp lệ bằng \texttt{src/kiemtra.py}.
+\end{itemize}
+
+\subsection{Kết quả tổng hợp}
+Trên 4 thể hiện nhỏ, các metaheuristic (\texttt{TS}, \texttt{SA}, \texttt{GA}, \texttt{GA\_LS}, \texttt{GRASP}) và \texttt{HC\_FI}, \texttt{HC\_BI} đều đạt tối ưu tuyệt đối $100\%$ số lần chạy (lần lượt $65, 136, 212, 133$), trong khi \texttt{GREEDY} bị lệch ở \texttt{nho\_20x28\_s103} ($216$ so với tối ưu $212$, gap $1{,}89\%$).
+
+Bảng tổng hợp trên 3 thể hiện cỡ vừa (tham chiếu theo \texttt{BKS\_nhom} là nghiệm tốt nhất tìm được trong thực nghiệm, không gọi là tối ưu):
+\begin{center}
+\begin{tabular}{llrrrr}
+\hline
+Thể hiện & Thuật toán & Best & Mean $\pm$ Std & Gap Mean (\%) & Time TB (s) \\
+\hline
+\texttt{vua\_100x400\_s201} (BKS: 204) & \texttt{GRASP} & 204 & $204{,}00 \pm 0{,}00$ & $0{,}00\%$ & $0{,}3569$ \\
+ & \texttt{GA\_LS} & 204 & $207{,}40 \pm 1{,}35$ & $1{,}67\%$ & $0{,}3688$ \\
+ & \texttt{SA} & 204 & $209{,}60 \pm 2{,}95$ & $2{,}75\%$ & $0{,}3435$ \\
+ & \texttt{GA} & 208 & $210{,}70 \pm 5{,}33$ & $3{,}28\%$ & $0{,}3997$ \\
+ & \texttt{TS} & 211 & $211{,}00 \pm 0{,}00$ & $3{,}43\%$ & $0{,}3352$ \\
+\hline
+\texttt{vua\_150x600\_s202} (BKS: 261) & \texttt{TS} & 261 & $261{,}00 \pm 0{,}00$ & $0{,}00\%$ & $0{,}3374$ \\
+ & \texttt{GRASP} & 261 & $262{,}70 \pm 2{,}11$ & $0{,}65\%$ & $0{,}3575$ \\
+ & \texttt{GA\_LS} & 261 & $266{,}40 \pm 4{,}58$ & $2{,}07\%$ & $0{,}3693$ \\
+ & \texttt{SA} & 268 & $269{,}80 \pm 0{,}63$ & $3{,}37\%$ & $0{,}3412$ \\
+ & \texttt{GA} & 261 & $276{,}00 \pm 6{,}67$ & $5{,}75\%$ & $0{,}3667$ \\
+\hline
+\texttt{vua\_200x1000\_s203} (BKS: 316) & \texttt{TS} & 316 & $316{,}00 \pm 0{,}00$ & $0{,}00\%$ & $0{,}3373$ \\
+ & \texttt{HC\_BI} & 316 & $316{,}00 \pm 0{,}00$ & $0{,}00\%$ & $0{,}1193$ \\
+ & \texttt{SA} & 316 & $317{,}20 \pm 1{,}40$ & $0{,}38\%$ & $0{,}3539$ \\
+ & \texttt{GA\_LS} & 317 & $318{,}70 \pm 1{,}06$ & $0{,}85\%$ & $0{,}3822$ \\
+ & \texttt{GRASP} & 316 & $321{,}30 \pm 4{,}11$ & $1{,}68\%$ & $0{,}3620$ \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Phân tích thống kê (Friedman và Wilcoxon)}
+\begin{itemize}
+ \item \textbf{Kiểm định Friedman} trên 7 thể hiện với 8 thuật toán (\texttt{GREEDY}, \texttt{HC\_FI}, \texttt{HC\_BI}, \texttt{TS}, \texttt{SA}, \texttt{GA}, \texttt{GA\_LS}, \texttt{GRASP}): $\chi^2_F = 12{,}9564$ ($\mathrm{df}=7$), $p = 0{,}0732$. Hạng trung bình Friedman tốt nhất thuộc về \texttt{TS} ($3{,}714$), tiếp theo là \texttt{GA\_LS} ($3{,}929$) và \texttt{GRASP} ($3{,}929$).
+ \item \textbf{Kiểm định Wilcoxon signed-rank} ghép cặp theo từng $(\text{instance}, \text{seed})$ kèm hiệu chỉnh Holm ($\alpha = 0{,}05$): \texttt{GRASP} (mean chung $190{,}57$) và \texttt{TS} ($190{,}57$) vượt trội có ý nghĩa thống kê so với \texttt{GREEDY} ($195{,}00$, $p_{\mathrm{Holm}} < 10^{-6}$) và \texttt{GA} ($193{,}27$, $p_{\mathrm{Holm}} \le 0{,}0059$). Chênh lệch giữa cặp \texttt{TS}, \texttt{GRASP} và \texttt{GA\_LS} chưa có ý nghĩa thống kê ở ngân sách $0{,}3$ giây ($p_{\mathrm{Holm}} \ge 0{,}53$).
+\end{itemize}
+
+\subsection{Kết luận}
+Các thuật toán metaheuristic kết hợp tìm kiếm cục bộ (\texttt{TS}, \texttt{GRASP}, \texttt{GA\_LS}) cho chất lượng nghiệm vượt trội so với tham lam thuần túy và \texttt{GA} cơ bản. Khi bổ sung các thể hiện chuẩn OR-Library vào \texttt{data/chuan/}, chỉ cần chạy lại \texttt{experiments/run\_all.py} với ngân sách lớn hơn (ví dụ $30$ giây) để cập nhật toàn bộ bảng tổng hợp, biểu đồ và kiểm định.
