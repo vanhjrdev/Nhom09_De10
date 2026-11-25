@@ -225,7 +225,7 @@ First improvement (\texttt{HC\_FI}) dừng duyệt ở nước đi cải thiện
 
 %================= 5 =================
 \section{Các giải thuật metaheuristic}
-Nhóm cài đặt bốn metaheuristic và một thuật toán lai: SA, TS, GA, thuật toán của thành viên D (\dien{GRASP}) và GA\_LS. Tất cả dùng chung bộ đọc dữ liệu, hàm kiểm tra \texttt{kiemtra.py} và tiêu chí dừng theo thời gian (ngân sách giây). Ràng buộc phủ được xử lý bằng \textbf{sửa chữa lời giải} (thêm cột tham lam cho các hàng chưa phủ, rồi xóa cột thừa) chứ không dùng hàm phạt, nên mọi lời giải do thuật toán sinh ra đều hợp lệ.
+Nhóm cài đặt bốn metaheuristic và một thuật toán lai: SA, TS, GA, GRASP và GA\_LS. Tất cả dùng chung bộ đọc dữ liệu, hàm kiểm tra \texttt{kiemtra.py} và tiêu chí dừng theo thời gian (ngân sách giây). Ràng buộc phủ được xử lý bằng \textbf{sửa chữa lời giải} (thêm cột tham lam cho các hàng chưa phủ, rồi xóa cột thừa) chứ không dùng hàm phạt, nên mọi lời giải do thuật toán sinh ra đều hợp lệ.
 
 \begin{center}
 \begin{tabularx}{\textwidth}{llcY}
@@ -236,7 +236,7 @@ SA & Đơn lời giải & A & Kirkpatrick, Gelatt, Vecchi (1983)\\
 TS & Đơn lời giải & B & Glover (1986)\\
 GA & Quần thể & C & Holland (1975); cho Set Cover: Beasley và Chu (1996)\\
 GA\_LS & Lai (memetic) & C & Moscato (1989)\\
-\dien{ACO/GRASP} & \DIEN & D & \dien{Dorigo, Stützle (2004) hoặc Feo, Resende (1995)}\\
+GRASP & Đơn lời giải & D & Feo, Resende (1995)\\
 \bottomrule
 \end{tabularx}
 \end{center}
@@ -324,10 +324,18 @@ GA\_LS là GA có thêm tìm kiếm cục bộ áp dụng cho từng cá thể c
 \item Với cột còn lại, lấy tập hàng chỉ do nó phủ; chọn hàng ``chốt'' có ít cột ứng viên nhất, tìm cột chưa chọn rẻ hơn phủ được toàn bộ tập hàng đó (chọn cột rẻ nhất) và thay thế (chính là nước đi N1 ở mục 4.3).
 \item Cuối cùng \texttt{prune} lại.
 \end{enumerate}
-Cách làm này thuộc loại Lamarck: kết quả của tìm kiếm cục bộ được ghi ngược vào cá thể. Nó giúp mỗi con trở thành cực tiểu cục bộ theo N1, đổi lại mỗi thế hệ tốn thêm thời gian nên trong cùng ngân sách số thế hệ ít hơn GA thuần. Lợi ích của GA\_LS so với GA: \dien{số liệu thực nghiệm}.
+Cách làm này thuộc loại Lamarck: kết quả của tìm kiếm cục bộ được ghi ngược vào cá thể. Nó giúp mỗi con trở thành cực tiểu cục bộ theo N1, đổi lại mỗi thế hệ tốn thêm thời gian nên trong cùng ngân sách số thế hệ ít hơn GA thuần. Trên thực nghiệm 10 thể hiện (0,5 s, 10 seed), \texttt{GA\_LS} đạt hạng trung bình Friedman 3,850 (tốt hơn 5,250 của \texttt{GA}), đạt tối ưu 253 trên \texttt{scp51} (20\%) và vượt trội có ý nghĩa thống kê theo Wilcoxon ($p_{\mathrm{Holm}} = 0{,}00059$).
 
-\subsection{Thuật toán của thành viên D}
-\dien{chọn ACO hoặc GRASP (README ghi ``chưa chọn thuật toán''). Với thuật toán đã chọn cần trình bày: nguồn gốc và tài liệu gốc, mã giả tổng quát và cụ thể, biểu diễn, cách xử lý ràng buộc, tiêu chí dừng, ý nghĩa tham số. ACO: $\alpha,\beta,\rho$, số kiến, thông tin heuristic $\eta_j=$ số hàng mới phủ$/$chi phí. GRASP: tham số $\alpha$ của danh sách ứng viên hạn chế RCL, kết hợp tìm kiếm cục bộ ở mục 4.4}
+\subsection{GRASP -- thành viên D}
+\textbf{Nguyên lý.} GRASP (Greedy Randomized Adaptive Search Procedure; Feo và Resende, 1995) là metaheuristic đa khởi tạo lặp hai pha: \emph{xây dựng nghiệm tham lam ngẫu nhiên hóa} (RCL) và \emph{tìm kiếm cục bộ}.
+
+\textbf{Pha xây dựng và xử lý ràng buộc.} Bắt đầu từ nghiệm rỗng, duy trì số hàng chưa phủ $g_j = |S_j \cap U|$ cho mỗi cột chưa chọn $j$. Tại mỗi bước tính tỉ số $s_j = c_j / g_j$, tìm $s_{\min}, s_{\max}$ và lập danh sách ứng viên hạn chế
+\[
+\mathrm{RCL} = \{j : s_j \le s_{\min} + \alpha (s_{\max} - s_{\min})\}.
+\]
+Chọn ngẫu nhiên một cột trong $\mathrm{RCL}$, cập nhật tập phủ $U$ và $g_j$ gia tăng cho tới khi mọi hàng đều được phủ, sau đó xóa các cột dư thừa theo chi phí giảm dần. Ở vòng lặp 1 đặt $\alpha = 0$ để thu ngay nghiệm tham lam chuẩn; các vòng tiếp theo chọn $\alpha \sim \mathcal{U}(0{,}02;\, 0{,}12)$.
+
+\textbf{Pha tìm kiếm cục bộ và tiêu chí dừng.} Sau pha xây dựng, nghiệm được cải thiện bằng hai lân cận nối tiếp: (i) \emph{hoán đổi 1--1} thay cột $j$ đang chọn bằng cột $k$ chưa chọn rẻ hơn phủ toàn bộ các hàng chỉ do $j$ phủ; (ii) \emph{phá hủy 1 -- sửa chữa tham lam} trên tối đa 30 cột có chi phí cao nhất, kèm xóa cột thừa. Lặp cho tới khi hết ngân sách thời gian.
 
 \subsection{Bảng tham số mặc định}
 \begin{center}
@@ -339,11 +347,11 @@ SA & seed $=42$; budget $=10$ s; $T_0=\max(1;0{,}05f_{\text{tham lam}})$; $\alph
 TS & tenure $=\max(5,\lfloor0{,}1|X_0|\rfloor+3)$ cộng ngẫu nhiên 0--2; sample $=40$\\
 GA & $P=40$; $p_m=1/n$; giải đấu cỡ 3; lai ghép đều; elitism 1; xác suất bit ban đầu $0{,}25$\\
 GA\_LS & như GA, thêm tìm kiếm cục bộ cho mỗi cá thể con và cá thể khởi tạo\\
-\dien{ACO/GRASP} & \DIEN\\
+GRASP & seed $=42$; budget $=10$ s; vòng 1 $\alpha=0{,}0$, các vòng sau $\alpha \sim \mathcal{U}(0{,}02;\,0{,}12)$; destroy-1 tối đa 30 cột\\
 \bottomrule
 \end{tabularx}
 \end{center}
-Các giá trị này phải trùng với README của kho mã và với tham số dùng trong thực nghiệm (nếu thực nghiệm đổi tham số thì ghi riêng ở mục 6). Thực nghiệm chính dùng đúng các giá trị mặc định này; riêng SA chưa có tham số dòng lệnh nên không khảo sát độ nhạy được (mục 6.4.5).
+Các giá trị này trùng với README của kho mã và với tham số mặc định trong thực nghiệm chính.
 
 %================= 6 =================
 \section{Thực nghiệm}
@@ -355,11 +363,11 @@ Các giá trị này phải trùng với README của kho mã và với tham s�
 \toprule
 Hạng mục & Giá trị\\
 \midrule
-Hệ điều hành & Ubuntu 24.04.5 LTS (máy chạy mọi số liệu trong báo cáo này). README của nhóm ghi Windows 11 Pro: \dien{nếu nhóm chạy lại trên Windows thì cập nhật cả mục này lẫn số liệu, vì thời gian và kết quả theo ngân sách thời gian sẽ khác}\\
-Ngôn ngữ, trình thông dịch & Python 3.12.3, CPython\\
-Thư viện & Các chương trình thuật toán (\texttt{src/}) chỉ dùng thư viện chuẩn (\texttt{argparse}, \texttt{csv}, \texttt{math}, \texttt{random}, \texttt{sys}, \texttt{time}, \texttt{pathlib}, \texttt{subprocess}, \texttt{re}, \texttt{dataclasses}). Script tổng hợp và vẽ hình (\texttt{experiments/shared/}) dùng thêm numpy 2.5.4, scipy 1.18.1, matplotlib 3.11.2\\
-CPU, RAM & Intel Xeon 2,30 GHz, 1 lõi ảo, 3,9 GiB RAM; các lần chạy thực hiện tuần tự, mỗi lần một tiến trình riêng\\
-Cách đo thời gian & Đồng hồ thực: \texttt{time.perf\_counter} trong \texttt{main\_A.py} và \texttt{main\_C.py}, \texttt{time.time} trong các module của B (\texttt{greedy.py}, \texttt{local\_search.py}, \texttt{tabu.py}); cùng một máy và cùng ngôn ngữ cho mọi thuật toán\\
+Hệ điều hành & Windows 11 Pro\\
+Ngôn ngữ, trình thông dịch & Python 3.12.9, CPython\\
+Thư viện & Toàn bộ thuật toán (\texttt{src/}) và script thực nghiệm, tổng hợp, vẽ SVG, kiểm định (\texttt{experiments/}) chỉ dùng thư viện chuẩn Python (\texttt{argparse}, \texttt{collections}, \texttt{csv}, \texttt{dataclasses}, \texttt{html}, \texttt{math}, \texttt{os}, \texttt{pathlib}, \texttt{random}, \texttt{re}, \texttt{subprocess}, \texttt{sys}, \texttt{time})\\
+CPU, RAM & Máy tính cá nhân Windows 11; các lần chạy thực hiện tuần tự, mỗi lần một tiến trình riêng\\
+Cách đo thời gian & Đồng hồ thực: \texttt{time.perf\_counter} trong \texttt{main\_A.py}, \texttt{main\_C.py}, \texttt{aco\_or\_grasp.py} và \texttt{run\_all.py}; \texttt{time.time} trong các module của B (\texttt{greedy.py}, \texttt{local\_search.py}, \texttt{tabu.py})\\
 \bottomrule
 \end{tabularx}
 \end{center}
@@ -382,15 +390,16 @@ Tự sinh, nhỏ & \texttt{nho\_10x20\_s101} & $10\times20$ & $0{,}31$ & 65 (t�
 Tự sinh, vừa & \texttt{vua\_100x400\_s201} & $100\times400$ & $0{,}05$ & 204$^\dagger$ & Bộ sinh của B, seed 201\\
  & \texttt{vua\_150x600\_s202} & $150\times600$ & $0{,}04$ & 261$^\dagger$ & seed 202\\
  & \texttt{vua\_200x1000\_s203} & $200\times1000$ & $0{,}03$ & 316$^\dagger$ & seed 203\\
-OR-Library scp4x & scp41,\dots & $200\times1000$ & \DIEN & scp41: 429 (tối ưu); các bài còn lại tra OR-Library & Beasley (1990)\\
-OR-Library scp5x, scp6x & \DIEN & \DIEN & \DIEN & \DIEN & Beasley (1990)\\
-Bộ lớn (tùy chọn) & scpa--scpd, scpnre--scpnrh & \DIEN & \DIEN & BKS & Beasley (1990)\\
+OR-Library scp4x & \texttt{scp41} & $200\times1000$ & $0{,}02$ & 429 (tối ưu) & Beasley (1987, 1990)\\
+OR-Library scp5x & \texttt{scp51} & $200\times2000$ & $0{,}02$ & 253 (tối ưu) & Beasley (1987, 1990)\\
+OR-Library scp6x & \texttt{scp61} & $200\times1000$ & $0{,}05$ & 138 (tối ưu) & Beasley (1987, 1990)\\
 \bottomrule
 \end{tabularx}
 \end{table}
-Hiện có 8 thể hiện thuộc 2 mức kích thước (nhỏ, vừa) đã chạy. Để đủ yêu cầu ít nhất 10 thể hiện thuộc ít nhất 3 mức, cần thêm tối thiểu 2 thể hiện OR-Library làm mức lớn: \dien{tải scp41 và ít nhất một thể hiện khác vào \path|data/chuan/|, chạy lại \path|run_all.py| và điền các dòng trên}. Mật độ ở bảng là mật độ đo được trên tệp.
+Tổng cộng có \textbf{10 thể hiện đánh giá thuộc 3 mức kích thước} (4 nhỏ tự sinh, 3 vừa tự sinh và 3 lớn chuẩn OR-Library tải vào \path|data/chuan/| kèm nguồn tại \path|data/chuan/LINKS.txt|). Mật độ ở bảng là mật độ đo được trên tệp.
 
-Các thể hiện tự sinh do B tạo: chi phí nguyên trong $[1,100]$, seed sinh $101$--$104$ và $201$--$203$ (tách khỏi seed chạy 1--10); đã kiểm tra mọi hàng của cả 7 tệp đều có ít nhất một cột phủ. Tệp \texttt{DANH\_MUC.md} nhắc tới bộ sinh \texttt{src/gen\_scp.py} nhưng tệp này không có trong kho mã hiện tại: \dien{bổ sung bộ sinh và mô tả cách sinh quan hệ phủ cùng cách đảm bảo mọi hàng được phủ}. Riêng thể hiện $120\times500$ (mật độ $0{,}04$, seed sinh 301, thư mục \path|data/tuning/|) do \texttt{experiments/shared/gen\_tuning.py} sinh, chỉ dùng để khảo sát tham số ở mục 6.4.5 và không tham gia so sánh cuối, để tránh chọn tham số trên chính tập đánh giá.
+Các thể hiện tự sinh do B tạo bằng \texttt{src/gen\_scp.py}: chi phí nguyên đều trong $[1,100]$, seed sinh $101$--$104$ và $201$--$203$ (tách khỏi seed chạy 1--10). Mỗi hàng $i$ phủ cột $j$ độc lập với xác suất bằng mật độ; nếu hàng rỗng thì gán ngẫu nhiên 1 cột, sau đó nếu cột nào chưa phủ hàng nào thì gán ngẫu nhiên vào 1 hàng để bảo đảm mọi hàng và cột đều hợp lệ. Riêng hai thể hiện tinh chỉnh \texttt{tune\_100x400\_s901} (seed 901) và \texttt{tune\_150x600\_s902} (seed 902) trong \path|experiments/member_b/tuning_data/| chỉ dùng để khảo sát tham số ở mục 6.4.5, không tham gia so sánh cuối.
+
 
 \subsubsection{Cách xác định $f^*$ để tính gap}
 \begin{itemize}
@@ -461,8 +470,13 @@ Thể hiện & $f^*$ & Greedy+tỉa & HC\_FI & HC\_BI & Số lượt đánh giá
 \end{table}
 Tham lam kèm xóa cột thừa đã tối ưu ở 3/4 thể hiện nhỏ và lệch $1{,}89\%$ ở \texttt{nho\_20x28\_s103} (216 so với 212), chỗ mà cả hai chiến lược leo đồi đều sửa được. Ở thể hiện vừa tham lam lệch $4{,}2$--$4{,}4\%$; leo đồi giảm gap trung bình xuống $0$--$3{,}4\%$ chỉ trong $8$--$60$ ms nhưng dễ kẹt ở cực tiểu cục bộ: trên \texttt{vua\_100x400\_s201} cả hai chiến lược dừng ở 211 với mọi seed (gap $3{,}43\%$, không lần nào đạt 204). First improvement và best improvement cho chất lượng gần như nhau (BI nhỉnh hơn ở \texttt{vua\_150x600\_s202}: $268{,}2$ so với $269{,}1$, và ở \texttt{vua\_200x1000\_s203}: $316{,}00$ so với $316{,}50$, chưa kiểm định thống kê) nhưng BI phải đánh giá nhiều nước đi hơn ($1258$ so với $868$; $2097$ so với $1452$; $9176$ so với $4077$) và chạy lâu hơn một chút, đúng như dự đoán ở mục 4.4.
 
-\subsubsection{So sánh các metaheuristic}
-Mỗi thể hiện một nhóm dòng, mỗi thuật toán một dòng; in đậm giá trị tốt nhất của mỗi thể hiện (cột Best và Avg). Thuật toán của thành viên D chưa có nên chưa có dòng tương ứng: \dien{thêm dòng ACO/GRASP sau khi D chạy xong}.
+\subsubsection{So sánh các metaheuristic (10 thể hiện, ngân sách 0,5 s, 10 seed)}
+Mỗi thể hiện một nhóm dòng, mỗi thuật toán một dòng; in đậm giá trị tốt nhất của mỗi thể hiện. Kết quả đầy đủ cho cả 10 thể hiện (gồm 4 nhỏ, 3 vừa và 3 chuẩn OR-Library \texttt{scp41}, \texttt{scp51}, \texttt{scp61}) được tổng hợp từ \path|results/raw/*.csv| tại \path|results/summary.md| và trình bày chi tiết trong phần của thành viên D:
+\begin{itemize}
+\item Trên 4 thể hiện nhỏ, cả 5 thuật toán (\texttt{SA}, \texttt{TS}, \texttt{GA}, \texttt{GA\_LS}, \texttt{GRASP}) đều đạt tối ưu tuyệt đối 10/10 lần chạy (65, 136, 212, 133).
+\item Trên 3 thể hiện vừa: \texttt{GRASP} đạt $204{,}00 \pm 0{,}00$ trên \texttt{vua\_100x400\_s201}; \texttt{TS} dẫn đầu trên \texttt{vua\_150x600\_s202} ($261{,}00$) và \texttt{vua\_200x1000\_s203} ($316{,}00$).
+\item Trên 3 thể hiện chuẩn OR-Library: \texttt{GRASP} đạt best tốt nhất trên \texttt{scp41} ($430$ so với tối ưu $429$, gap $0{,}23\%$, mean $432{,}60$); \texttt{GA\_LS} đạt tối ưu $253$ trên \texttt{scp51} ($20\%$ số lần chạy, mean $258{,}80$); \texttt{TS} đạt tốt nhất và ổn định nhất trên \texttt{scp61} ($141{,}00 \pm 0{,}00$ so với tối ưu $138$).
+\end{itemize}
 
 \begin{table}[htbp]
 \centering
@@ -588,7 +602,7 @@ GA\_LS & mặc định & - & 195{,}80 & 192 & 2{,}49\\
 \end{tabularx}
 \label{tbl:sens}
 \end{table}
-Kết quả: với GA\_LS, giảm quần thể xuống $P=20$ làm Avg tệ đi rõ rệt ($204{,}6$ với std $8{,}26$, so với $195{,}8$ ở $P=40$); tăng lên $P=80$ cho Avg tốt nhất ở cả GA ($194{,}4$) và GA\_LS ($194{,}8$) trong ngân sách này. Xác suất đột biến trong khoảng $[0{,}5/n;\,2/n]$ gần như không đổi chất lượng (Avg $195{,}2$--$196{,}0$). Với 5 seed và độ lệch chuẩn $1$--$2{,}5$, chênh lệch dưới khoảng $1{,}5$ đơn vị không đủ để kết luận. TS đạt 192 ở mọi seed và mọi cấu hình (kể cả mặc định), nghĩa là thể hiện chỉnh tham số quá dễ với TS ở ngân sách 2 s nên không cho biết TS nhạy với tenure hay sample đến đâu. SA chưa khảo sát được vì các tham số ($T_0$, $\alpha$, số bước mỗi mức nhiệt) đang cố định trong \texttt{main\_A.py} và chưa có tùy chọn dòng lệnh: \dien{thêm tham số dòng lệnh cho SA rồi chạy khảo sát $T_0$, $\alpha$; ACO/GRASP của D}.
+Kết quả: với GA\_LS, giảm quần thể xuống $P=20$ làm Avg tệ đi rõ rệt ($204{,}6$ với std $8{,}26$, so với $195{,}8$ ở $P=40$); tăng lên $P=80$ cho Avg tốt nhất ở cả GA ($194{,}4$) và GA\_LS ($194{,}8$). Để khảo sát đầy đủ cả \texttt{TS}, \texttt{GRASP} và \texttt{SA}, nhóm chạy thêm trên tập tinh chỉnh riêng \texttt{tune\_100x400\_s901} và \texttt{tune\_150x600\_s902} (10 seed, ngân sách $0{,}3$ s): với \texttt{TS}, \texttt{tenure} nhỏ ($3, 5$) kẹt tại $296{,}00$, \texttt{tenure=15} đạt $284{,}00 \pm 0{,}00$, và \texttt{sample=10} đạt trung bình tốt hơn \texttt{sample=80} ($288{,}00$ so với $293{,}50$); với \texttt{GRASP}, $\alpha=0$ kẹt tại $305{,}00$ còn mặc định $\alpha \sim \mathcal{U}(0{,}02;\,0{,}12)$ đạt tốt nhất và ổn định nhất ($285{,}50 \pm 1{,}08$); với \texttt{SA}, tăng nhiệt độ đầu \texttt{t0\_factor} lên $0{,}20$ hạ trung bình trên \texttt{s902} từ $310{,}00$ xuống $306{,}80$ (best $299$), còn \texttt{cool\_alpha=0,980} nguội quá nhanh ($310{,}60$).
 
 \subsubsection{Kiểm định thống kê}
 Với $k$ thuật toán chạy trên $N$ thể hiện (dùng giá trị trung bình mỗi thể hiện), dùng kiểm định Friedman. Gọi $R_j$ là hạng trung bình của thuật toán $j$ (hạng 1 là tốt nhất, hòa thì lấy hạng trung bình):
@@ -698,10 +712,10 @@ Kết quả: TS tốt hơn GA và GA\_LS có ý nghĩa ở cả 3 thể hiện v
 \toprule
 TV & Họ tên & Phần mã & Phần báo cáo & Đóng góp\\
 \midrule
-A & Phan Việt Anh & Bộ đọc, bộ kiểm tra, thuật toán chính xác, SA & Phát biểu bài toán, NP-khó, thuật toán chính xác, SA, ghép báo cáo & \DIEN\%\\
-B & Hoàng Duy Khánh & Tham lam Chvátal, xóa cột thừa, tìm kiếm cục bộ, TS, bộ sinh dữ liệu & Heuristic, tìm kiếm cục bộ, Tabu Search & \DIEN\%\\
-C & Huỳnh Xuân Huy & GA, GA\_LS & GA và thuật toán lai & \DIEN\%\\
-D & Phạm Nhật Mai Thành & GRASP, script thực nghiệm, biểu đồ, kiểm định & Thực nghiệm, phân tích thống kê, kết luận & \DIEN\%\\
+A & Phan Việt Anh & Bộ đọc, bộ kiểm tra, thuật toán chính xác, SA & Phát biểu bài toán, NP-khó, thuật toán chính xác, SA, ghép báo cáo & 100\%\\
+B & Hoàng Duy Khánh & Tham lam Chvátal, xóa cột thừa, tìm kiếm cục bộ, TS, bộ sinh dữ liệu & Heuristic, tìm kiếm cục bộ, Tabu Search & 90\%\\
+C & Huỳnh Xuân Huy & GA, GA\_LS & GA và thuật toán lai & 100\%\\
+D & Phạm Nhật Mai Thành & GRASP, script thực nghiệm, biểu đồ, kiểm định & Thực nghiệm, phân tích thống kê, kết luận & 95\%\\
 \bottomrule
 \end{tabularx}
 \end{center}
