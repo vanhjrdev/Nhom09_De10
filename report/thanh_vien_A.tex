@@ -8,6 +8,8 @@
 \setlist[itemize]{label=-}
 \usepackage{amsmath, amssymb}
 \usepackage{booktabs}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 \usepackage{hyperref}
 
 \title{\textbf{BÁO CÁO ĐỀ TÀI 10: ĐẶT CAMERA GIÁM SÁT GIAO THÔNG (BÀI TOÁN PHỦ TẬP HỢP -- SET COVER)}\\
@@ -49,6 +51,14 @@ Xét thực thể ví dụ của Đề 10 gồm $m = 7$ nút giao và $n = 6$ v�
 \end{itemize}
 Duyệt toàn bộ $2^6 = 64$ cấu hình cho thấy nghiệm tối ưu duy nhất là $J^* = \{1, 2, 4\}$ với $S_1 \cup S_2 \cup S_4 = \{1, 2, 3, 4, 5, 6, 7\} = U$ và tổng chi phí tối thiểu $Z^* = c_1 + c_2 + c_4 = 7 + 5 + 4 = 16$. Trong khi đó, giải thuật tham lam Chvátal lần lượt chọn cột $4$ (tỷ số $4/4$), cột $5$ ($3/1$), cột $2$ ($5/1$) và cột $1$ ($7/1$) cho tổng chi phí $19$; sau bước tỉa cột dư thừa (loại bỏ cột $5$ do nút $4$ đã được cột $1$ phủ), nghiệm thu về $J = \{1, 2, 4\}$ đạt chi phí $16$.
 
+\subsection{Tổ chức dữ liệu và Xử lý định dạng chuẩn OR-Library}
+Trong định dạng chuẩn OR-Library của Beasley (1990), dữ liệu đầu vào được lưu dưới dạng văn bản thuần với các số nguyên phân tách bởi khoảng trắng hoặc ký tự xuống dòng tùy ý. Bộ đọc dữ liệu (\texttt{SCPInstance.load\_from\_file}) đọc toàn bộ tệp theo luồng từ tố (token stream) để tránh phụ thuộc vào số lượng phần tử trên mỗi dòng:
+\begin{itemize}
+    \item Đọc hai số đầu tiên là số hàng $m$ và số cột $n$, tiếp theo là $n$ giá trị chi phí $c_1, \dots, c_n$.
+    \item Với từng hàng $i = 1, \dots, m$, đọc số lượng cột bao phủ hàng $i$, sau đó đọc danh sách chỉ số các cột đó để lưu vào danh sách kề theo hàng \texttt{row\_cols}[$i$], đồng thời xây dựng ngược lại tập hợp các hàng bị bao phủ theo từng cột \texttt{col\_rows}[$j$] ($S_j$). Việc lưu trữ song song hai cấu trúc biểu diễn này giúp truy xuất hàng chưa phủ và cập nhật trạng thái phủ trong thời gian $\mathcal{O}(|S_j|)$.
+    \item Chương trình kiểm tra độc lập (\texttt{kiemtra.py}) đọc lại tệp dữ liệu gốc và tệp lời giải (\texttt{.sol}), xác minh tính hợp lệ của chỉ số cột ($1 \le j \le n$), kiểm tra điều kiện $\bigcup_{j \in J} S_j = U$ và đối chiếu tổng chi phí $\sum_{j \in J} c_j$ với giá trị báo cáo.
+\end{itemize}
+
 \section{Tính chất NP-khó và hệ quả thuật toán}
 
 \subsection{Chứng minh tính NP-đầy đủ}
@@ -89,6 +99,52 @@ LB = C_{\text{curr}} + \left\lceil \sum_{i \in U_{\text{rem}}} \min_{j : i \in S
 \]
 Nếu tồn tại một hàng $i \in U_{\text{rem}}$ không còn cột khả dụng nào phủ được, nhánh hiện tại vô nghiệm và bị loại ngay. Ngược lại, nếu $LB \ge \text{best\_cost}$ (hoặc vượt quá giới hạn thời gian \texttt{time\_limit\_sec}), thuật toán thực hiện cắt tỉa nhánh ngay lập tức.
 
+\subsection{Mã giả và Phân tích độ phức tạp của ExactSolver}
+Quy trình giải chính xác của lớp \texttt{ExactSolver} được mô tả trong Thuật toán~\ref{alg:exact}.
+
+\begin{algorithm}[htbp]
+\caption{Thuật toán Nhánh cận giải chính xác SCP (\texttt{ExactSolver})}
+\label{alg:exact}
+\begin{algorithmic}[1]
+\Require Thực thể $(m, n, c, \{S_j\}, \{R_i\})$, giới hạn thời gian $T_{\max} = 600\text{s}$
+\Ensure Chi phí tối ưu $Z^*$ và tập cột tối ưu $J^*$
+\State Khởi tạo $Z^* \leftarrow +\infty$, $J^* \leftarrow \emptyset$, $\text{dominated}[1..n] \leftarrow \text{False}$, $\text{cov\_cnt}[1..m] \leftarrow 0$
+\For{$j_1 = 1 \dots n$} \Comment{Loại bỏ cột rỗng và cột bị trội}
+    \If{$S_{j_1} = \emptyset$ \textbf{or} $\exists j_2 \ne j_1 : c_{j_2} \le c_{j_1} \land S_{j_1} \subseteq S_{j_2}$}
+        \State $\text{dominated}[j_1] \leftarrow \text{True}$
+    \EndIf
+\EndFor
+\State $C_{\text{base}} \leftarrow 0$, $J_{\text{forced}} \leftarrow \emptyset$
+\While{$\exists i \in \{1..m\} : \text{cov\_cnt}[i] = 0$ và chỉ có đúng 1 cột $c \in R_i$ chưa bị loại}
+    \State $J_{\text{forced}} \leftarrow J_{\text{forced}} \cup \{c\}$, $\text{dominated}[c] \leftarrow \text{True}$, $C_{\text{base}} \leftarrow C_{\text{base}} + c_c$
+    \For{$r \in S_c$} $\text{cov\_cnt}[r] \leftarrow \text{cov\_cnt}[r] + 1$ \EndFor
+\EndWhile
+\Procedure{DFS}{$C_{\text{curr}}, k_{\text{cov}}, \text{cov\_cnt}, J_{\text{curr}}$}
+    \If{thời gian chạy $> T_{\max}$ \textbf{or} $C_{\text{curr}} \ge Z^*$} \Return \EndIf
+    \If{$k_{\text{cov}} = m$}
+        \State $Z^* \leftarrow C_{\text{curr}}$, $J^* \leftarrow J_{\text{curr}}$; \Return
+    \EndIf
+    \State Tính $LB = C_{\text{curr}} + \left\lceil \sum_{i : \text{cov\_cnt}[i]=0} \min_{c \in R_i, \neg\text{dominated}[c]} (c_c / |S_c|) \right\rceil$
+    \If{$LB \ge Z^*$} \Return \EndIf
+    \State Chọn hàng $i^*$ ($\text{cov\_cnt}[i^*] = 0$) có số cột khả dụng ít nhất (MRV)
+    \State Sắp xếp các cột ứng viên $C_{\text{cand}} = \{c \in R_{i^*} \mid \neg\text{dominated}[c]\}$ theo $c_c$ tăng dần
+    \For{$c \in C_{\text{cand}}$}
+        \State Cập nhật $\text{cov\_cnt}[r] \leftarrow \text{cov\_cnt}[r] + 1$ với mọi $r \in S_c$ và đếm số hàng mới phủ $\Delta_{\text{cov}}$
+        \State \Call{DFS}{$C_{\text{curr}} + c_c,\; k_{\text{cov}} + \Delta_{\text{cov}},\; \text{cov\_cnt},\; J_{\text{curr}} \cup \{c\}$}
+        \State Hoàn tác $\text{cov\_cnt}[r] \leftarrow \text{cov\_cnt}[r] - 1$ với mọi $r \in S_c$
+    \EndFor
+\EndProcedure
+\State \Call{DFS}{$C_{\text{base}}, |\{i : \text{cov\_cnt}[i] > 0\}|, \text{cov\_cnt}, J_{\text{forced}}$}
+\State \Return $(Z^*, J^*)$
+\end{algorithmic}
+\end{algorithm}
+
+\textbf{Đánh giá độ phức tạp:}
+\begin{itemize}
+    \item \textbf{Giai đoạn tiền xử lý:} Kiểm tra tính trội giữa các cặp cột tốn thời gian $\mathcal{O}(n^2 \cdot m)$; vòng lặp cố định cột bắt buộc tốn tối đa $\mathcal{O}(m^2 \cdot n)$.
+    \item \textbf{Giai đoạn tìm kiếm DFS:} Tại mỗi nút, việc tính hàm cận dưới $LB$ và chọn hàng theo MRV duyệt qua các hàng chưa phủ và danh sách cột tương ứng với chi phí $\mathcal{O}(\sum_{i=1}^m |R_i|)$. Trong trường hợp xấu nhất khi không cắt tỉa được nhánh nào, độ phức tạp thời gian là hàm mũ $\mathcal{O}(2^{n'} \cdot m \cdot n)$ với $n'$ là số cột khả dụng sau rút gọn (do đó thuật toán chỉ khả thi trên các thực thể kích thước nhỏ trong ngân sách $T_{\max} = 600$ giây); độ phức tạp không gian lưu trữ ngăn xếp đệ quy và mảng trạng thái là $\mathcal{O}(n + m)$.
+\end{itemize}
+
 \section{Thuật toán gần đúng: Simulated Annealing (SA)}
 
 Lớp \texttt{SASolver} cài đặt thuật toán Luyện kim mô phỏng theo nguyên lý của Kirkpatrick và cộng sự (1983), duy trì tính hợp lệ của lời giải sau mỗi bước di chuyển thông qua cơ chế sửa chữa và loại bỏ dư thừa.
@@ -125,5 +181,58 @@ Gọi $\Delta = \text{Cost}(J') - \text{Cost}(J)$ là chênh lệch chi phí gi�
     \item \textbf{Lịch giảm nhiệt độ:} Sau mỗi chuỗi $L$ bước lặp, nhiệt độ được cập nhật theo quy luật cấp số nhân có chặn dưới: $T \leftarrow \max(0{,}01,\; 0{,}995 \cdot T)$.
     \item \textbf{Tiêu chí dừng:} Thuật toán chạy liên tục và dừng khi thời gian thực thi chạm ngưỡng ngân sách thời gian \texttt{budget\_sec} được cấp phát.
 \end{itemize}
+
+\subsection{Mã giả và Phân tích độ phức tạp của SASolver}
+Quy trình thực thi của giải thuật Simulated Annealing cho bài toán Phủ tập hợp được trình bày chi tiết trong Thuật toán~\ref{alg:sa}.
+
+\begin{algorithm}[htbp]
+\caption{Thuật toán Simulated Annealing giải SCP (\texttt{SASolver})}
+\label{alg:sa}
+\begin{algorithmic}[1]
+\Require Thực thể $(m, n, c, \{S_j\}, \{R_i\})$, hạt giống \texttt{seed}, ngân sách thời gian $B_{\text{sec}}$
+\Ensure Nghiệm tốt nhất $J_{\text{best}}$ và chi phí $Z_{\text{best}}$
+\State Khởi tạo bộ sinh ngẫu nhiên với \texttt{seed}; xây dựng nghiệm tham lam Chvátal $(J, \text{cov\_cnt}, Z)$
+\State Loại bỏ các cột dư thừa trong $J$ theo thứ tự $c_j$ giảm dần; cập nhật $(J, \text{cov\_cnt}, Z)$
+\State $J_{\text{best}} \leftarrow J$, $Z_{\text{best}} \leftarrow Z$
+\State $T \leftarrow \max(1{,}0,\; 0{,}05 \cdot Z)$, $\alpha \leftarrow 0{,}995$, $L \leftarrow \max(20, \lfloor n / 5 \rfloor)$
+\While{thời gian đã chạy $< B_{\text{sec}}$}
+    \For{$\text{step} = 1 \dots L$}
+        \State Sao chép trạng thái $(J', \text{cov}', Z') \leftarrow (J, \text{cov\_cnt}, Z)$
+        \State Chọn số lượng đảo $k \leftarrow 1$ với xác suất $0{,}7$, ngược lại $k \leftarrow 2$
+        \For{$t = 1 \dots k$}
+            \State Chọn ngẫu nhiên $c \in \{1..n\}$ và đảo trạng thái chọn của $c$ trong $J'$, cập nhật $\text{cov}', Z'$
+        \EndFor
+        \For{$i = 1 \dots m$ \textbf{với} $\text{cov}'[i] = 0$} \Comment{Sửa chữa tham lam}
+            \State Chọn $c^* = \arg\min_{c \in R_i} \big(c_c / \max(1, |\{r \in S_c \mid \text{cov}'[r] = 0\}|)\big)$
+            \State Thêm $c^*$ vào $J'$, cập nhật $\text{cov}'$ và $Z' \leftarrow Z' + c_{c^*}$
+        \EndFor
+        \State Duyệt các cột $c \in J'$ theo $c_c$ giảm dần; nếu $\forall r \in S_c, \text{cov}'[r] \ge 2$ thì loại bỏ $c$ khỏi $J'$
+        \State $\Delta \leftarrow Z' - Z$
+        \If{$\Delta \le 0$ \textbf{or} $\text{rand}(0, 1) < \exp(-\Delta / T)$}
+            \State $(J, \text{cov\_cnt}, Z) \leftarrow (J', \text{cov}', Z')$
+            \If{$Z < Z_{\text{best}}$}
+                \State $J_{\text{best}} \leftarrow J$, $Z_{\text{best}} \leftarrow Z$; ghi nhận mốc hội tụ vào tệp CSV
+            \EndIf
+        \EndIf
+    \EndFor
+    \State $T \leftarrow \max(0{,}01,\; \alpha \cdot T)$
+\EndWhile
+\State \Return $(Z_{\text{best}}, J_{\text{best}})$
+\end{algorithmic}
+\end{algorithm}
+
+\textbf{Đánh giá độ phức tạp mỗi vòng lặp:}
+\begin{itemize}
+    \item \textbf{Khởi tạo ban đầu:} Mỗi bước chọn cột tham lam duyệt tối đa $n$ cột và đếm số hàng chưa phủ, tổng chi phí khởi tạo là $\mathcal{O}(\min(m, n) \cdot \sum_{j=1}^n |S_j|)$.
+    \item \textbf{Mỗi bước di chuyển láng giềng:} Thao tác đảo 1--2 cột tốn $\mathcal{O}(m)$; pha sửa chữa tham lam và tỉa cột thừa tốn tối đa $\mathcal{O}(n \log n + \sum_{j=1}^n |S_j|)$. Nhờ duy trì mảng đếm \texttt{cov\_cnt}, việc đánh giá độ thay đổi chi phí $\Delta$ và kiểm tra tính hợp lệ được thực hiện trực tiếp theo kiểu gia tăng mà không cần quét lại toàn bộ ma trận phủ.
+\end{itemize}
+
+\begin{thebibliography}{9}
+\bibitem{karp1972} R. M. Karp, ``Reducibility among combinatorial problems,'' in \textit{Complexity of Computer Computations}, Springer, 1972, pp. 85--103.
+\bibitem{chvatal1979} V. Chvátal, ``A greedy heuristic for the set-covering problem,'' \textit{Mathematics of Operations Research}, vol. 4, no. 3, pp. 233--235, 1979.
+\bibitem{kirkpatrick1983} S. Kirkpatrick, C. D. Gelatt Jr., and M. P. Vecchi, ``Optimization by simulated annealing,'' \textit{Science}, vol. 220, no. 4598, pp. 671--680, 1983.
+\bibitem{beasley1990} J. E. Beasley, ``OR-Library: Distributing test problems by electronic mail,'' \textit{Journal of the Operational Research Society}, vol. 41, no. 11, pp. 1069--1072, 1990.
+\bibitem{dinur2014} I. Dinur and D. Steurer, ``Analytical approach to parallel repetition,'' in \textit{Proceedings of the 46th Annual ACM Symposium on Theory of Computing (STOC)}, 2014, pp. 624--633.
+\end{thebibliography}
 
 \end{document}
