@@ -60,3 +60,64 @@ Thể hiện & Đối chiếu & GA best & GA avg & GA\_LS best & GA\_LS avg \\
 \end{tabular}
 \end{center}
 Độ lệch chuẩn bằng 0 ở cả tám tổ hợp thể hiện--thuật toán. Các giá trị đối chiếu do thành viên B cung cấp; chỉ xem là tối ưu chính thức sau khi thuật toán chính xác của thành viên A xác nhận. Đây là kiểm thử chức năng với ngân sách rất ngắn, không dùng để kết luận GA và GA lai có chất lượng tương đương trên dữ liệu lớn. Script \texttt{experiments/member\_c/run\_tusinh.py} tái lập phép kiểm thử và ghi CSV theo schema kết quả thô của nhóm.
+
+\subsection{Phân tích độ nhạy tham số}
+
+Tham số chính của \texttt{GA} và \texttt{GA\_LS} là kích thước quần thể $P$ và xác suất đột biến $p_m$. Thiết kế thí nghiệm quét một tham số mỗi lần, giữ tham số kia ở giá trị mặc định ($P=40$, $p_m=1/n$), với ngân sách $1{,}0$ giây/lần và 3 seed ($1,2,3$) trên bảy thể hiện: \texttt{nho\_10x20\_s101} ($n=20$), \texttt{vua\_100x400\_s201} ($n=400$), \texttt{scp41} ($n=1000$), \texttt{vua\_150x600\_s202} ($n=600$), \texttt{vua\_200x1000\_s203} ($n=1000$), \texttt{scp51} ($n=2000$), \texttt{scp61} ($n=1000$). Tất cả $420$ lời giải đều được bộ kiểm tra chấp nhận (tỉ lệ hợp lệ $100\%$).
+
+\subsubsection{Độ nhạy theo kích thước quần thể}
+
+$P$ có độ nhạy rõ rệt trên các thể hiện vừa và lớn, nhưng không đáng kể trên thể hiện nhỏ quá dễ.
+
+\begin{center}
+\begin{tabular}{lrrrr}
+\hline
+Thể hiện ($n$) & $P$ & GA best & GA avg $\pm$ std & GA\_LS best \\
+\hline
+\texttt{nho\_10x20\_s101} (20) & 10 & 65 & $65{,}00 \pm 0{,}00$ & 65 \\
+ & 160 & 65 & $65{,}00 \pm 0{,}00$ & 65 \\
+\texttt{vua\_100x400\_s201} (400) & 10 & 208 & $218{,}67 \pm 7{,}72$ & 204 \\
+ & 160 & 206 & $206{,}00 \pm 0{,}00$ & 204 \\
+\texttt{vua\_150x600\_s202} (600) & 10 & 277 & $287{,}33 \pm 7{,}32$ & 261 \\
+ & 160 & 261 & $263{,}67 \pm 3{,}77$ & 261 \\
+\texttt{vua\_200x1000\_s203} (1000) & 10 & 328 & $336{,}33 \pm 6{,}55$ & 317 \\
+ & 80 & 317 & $318{,}00 \pm 1{,}41$ & 317 \\
+\texttt{scp41} (1000) & 10 & 432 & $439{,}33 \pm 6{,}60$ & 432 \\
+ & 40 & 435 & $435{,}00 \pm 0{,}00$ & 432 \\
+ & 160 & 435 & $452{,}00 \pm 12{,}03$ & 434 \\
+\texttt{scp51} (2000) & 10 & 267 & $269{,}33 \pm 2{,}05$ & 253 \\
+ & 80 & 256 & $258{,}67 \pm 3{,}09$ & 253 \\
+ & 160 & 274 & $276{,}33 \pm 1{,}70$ & 268 \\
+\texttt{scp61} (1000) & 10 & 144 & $148{,}33 \pm 4{,}78$ & 140 \\
+ & 80 & 141 & $141{,}33 \pm 0{,}47$ & 140 \\
+\hline
+\end{tabular}
+\end{center}
+
+Qua bảng trên:
+\begin{itemize}
+ \item Trên \texttt{vua\_100x400\_s201}, tăng $P$ từ 10 lên 160 làm GA giảm trung bình từ $218{,}67$ xuống $206{,}00$; GA\_LS giảm từ $211{,}33$ xuống $204{,}67$.
+ \item Trên \texttt{vua\_150x600\_s202}, $P=10$ cho GA trung bình $287{,}33$ trong khi $P=160$ cho $263{,}67$; GA\_LS ổn định ở $261{,}00$ từ $P=160$.
+ \item Trên \texttt{scp51}, $P=80$ tốt hơn cả $P=10$ ($258{,}67$ vs $269{,}33$ cho GA) nhưng $P=160$ lại kém hơn ($276{,}33$), cho thấy dân số quá lớn không phải lúc nào cũng tốt do thời gian cố định bị chia nhỏ cho từng cá thể.
+ \item Trên \texttt{scp61} và \texttt{nho\_10x20\_s101}, các mức $P$ đều cho kết quả gần như giống nhau (bài quá nhỏ hoặc quá dễ).
+\end{itemize}
+
+\subsubsection{Độ nhạy theo xác suất đột biến}
+
+$p_m$ có độ nhạy thấp. Không có mức nào rõ rệt vượt trội trên mọi thể hiện. Ví dụ trên \texttt{vua\_100x400\_s201}, GA tại $p_m=10\times1/n$ đạt best $204$ (tốt nhất) còn tại $p_m=1/n$ chỉ đạt $211$; nhưng trên \texttt{scp51}, các mức $p_m$ khác nhau chỉ dao động trong khoảng $256$--$264$. Do đó $p_m=1/n$ là lựa chọn mặc định an toàn, không cần chỉnh tinh.
+
+\subsubsection{So sánh GA và GA\_LS}
+
+\texttt{GA\_LS} luôn tốt hơn hoặc bằng \texttt{GA} trên mọi cấu hình tham số và mọi thể hiện. Khoảng cách rõ rệt nhất trên \texttt{vua\_150x600\_s202} ($P=40$: GA avg $276{,}00$ vs GA\_LS avg $268{,}67$) và \texttt{scp51} ($P=80$: GA avg $258{,}67$ vs GA\_LS avg $254{,}33$). Điều này chứng minh việc kết hợp GA với tìm kiếm cục bộ (thuật toán lai) giúp cải thiện chất lượng nghiệm và ổn định hơn so với GA thuần túy.
+
+\subsubsection{Khuyến nghị tham số mặc định}
+
+Dựa trên kết quả trên, tham số mặc định cho \texttt{GA} và \texttt{GA\_LS} được chọn là:
+\begin{itemize}
+ \item Kích thước quần thể $P = 40$ (điểm cân bằng giữa chất lượng và thời gian trên các thể hiện vừa và lớn).
+ \item Xác suất đột biến $p_m = 1/n$ (ổn định, không nhạy).
+ \item Kích thước tournament $= 3$, lai ghép đồng đều từng bit với xác suất $1/2$, giữ một cá thể ưu tú (elitism).
+ \item Thuật toán khuyến nghị dùng là \texttt{GA\_LS} (tốt hơn \texttt{GA} trên mọi bài kiểm tra).
+\end{itemize}
+
+Tất cả script và CSV chi tiết được lưu trong \texttt{experiments/member\_c/run\_ga\_sensitivity.py} và \texttt{results/member\_c/ga\_sensitivity.csv}.

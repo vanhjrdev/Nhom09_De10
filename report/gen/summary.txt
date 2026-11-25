@@ -1,0 +1,64 @@
+vidu: f*=16 (tối ưu)
+  GREEDY 16
+  HC_FI: best 16 avg 16.00 std 0.00 hit 10/10 T 0.00 Tbest 0.00
+  HC_BI: best 16 avg 16.00 std 0.00 hit 10/10 T 0.00 Tbest 0.00
+  SA: best 16 avg 16.00 std 0.00 hit 10/10 T 0.20 Tbest 0.00
+  TS: best 16 avg 16.00 std 0.00 hit 10/10 T 0.20 Tbest 0.00
+  GA: best 16 avg 16.00 std 0.00 hit 10/10 T 0.20 Tbest 0.00
+  GA_LS: best 16 avg 16.00 std 0.00 hit 10/10 T 0.20 Tbest 0.00
+nho_10x20_s101: f*=65 (tối ưu)
+  GREEDY 65
+  HC_FI: best 65 avg 65.00 std 0.00 hit 10/10 T 0.00 Tbest 0.00
+  HC_BI: best 65 avg 65.00 std 0.00 hit 10/10 T 0.00 Tbest 0.00
+  SA: best 65 avg 65.00 std 0.00 hit 10/10 T 0.50 Tbest 0.00
+  TS: best 65 avg 65.00 std 0.00 hit 10/10 T 0.50 Tbest 0.00
+  GA: best 65 avg 65.00 std 0.00 hit 10/10 T 0.50 Tbest 0.00
+  GA_LS: best 65 avg 65.00 std 0.00 hit 10/10 T 0.50 Tbest 0.00
+nho_15x25_s102: f*=136 (tối ưu)
+  GREEDY 136
+  HC_FI: best 136 avg 136.00 std 0.00 hit 10/10 T 0.00 Tbest 0.00
+  HC_BI: best 136 avg 136.00 std 0.00 hit 10/10 T 0.00 Tbest 0.00
+  SA: best 136 avg 136.00 std 0.00 hit 10/10 T 0.50 Tbest 0.00
+  TS: best 136 avg 136.00 std 0.00 hit 10/10 T 0.50 Tbest 0.00
+  GA: best 136 avg 136.00 std 0.00 hit 10/10 T 0.50 Tbest 0.00
+  GA_LS: best 136 avg 136.00 std 0.00 hit 10/10 T 0.50 Tbest 0.00
+nho_20x28_s103: f*=212 (tối ưu)
+  GREEDY 216
+  HC_FI: best 212 avg 212.00 std 0.00 hit 10/10 T 0.00 Tbest 0.00
+  HC_BI: best 212 avg 212.00 std 0.00 hit 10/10 T 0.00 Tbest 0.00
+  SA: best 212 avg 212.00 std 0.00 hit 10/10 T 0.50 Tbest 0.00
+  TS: best 212 avg 212.00 std 0.00 hit 10/10 T 0.50 Tbest 0.00
+  GA: best 212 avg 212.00 std 0.00 hit 10/10 T 0.50 Tbest 0.00
+  GA_LS: best 212 avg 212.00 std 0.00 hit 10/10 T 0.50 Tbest 0.00
+nho_25x30_s104: f*=133 (tối ưu)
+  GREEDY 133
+  HC_FI: best 133 avg 133.00 std 0.00 hit 10/10 T 0.00 Tbest 0.00
+  HC_BI: best 133 avg 133.00 std 0.00 hit 10/10 T 0.00 Tbest 0.00
+  SA: best 133 avg 133.00 std 0.00 hit 10/10 T 0.50 Tbest 0.00
+  TS: best 133 avg 133.00 std 0.00 hit 10/10 T 0.50 Tbest 0.00
+  GA: best 133 avg 133.00 std 0.00 hit 10/10 T 0.50 Tbest 0.00
+  GA_LS: best 133 avg 133.00 std 0.00 hit 10/10 T 0.50 Tbest 0.00
+vua_100x400_s201: f*=204 (tốt nhất trong thực nghiệm)
+  GREEDY 213
+  HC_FI: best 211 avg 211.00 std 0.00 hit 0/10 T 0.01 Tbest 0.01
+  HC_BI: best 211 avg 211.00 std 0.00 hit 0/10 T 0.01 Tbest 0.01
+  SA: best 204 avg 207.20 std 3.49 hit 5/10 T 3.00 Tbest 0.85
+  TS: best 204 avg 204.60 std 1.35 hit 8/10 T 3.00 Tbest 1.85
+  GA: best 208 avg 210.70 std 5.33 hit 0/10 T 3.00 Tbest 0.04
+  GA_LS: best 204 avg 207.40 std 1.35 hit 1/10 T 3.00 Tbest 0.04
+vua_150x600_s202: f*=261 (tốt nhất trong thực nghiệm)
+  GREEDY 272
+  HC_FI: best 261 avg 269.10 std 2.85 hit 1/10 T 0.02 Tbest 0.01
+  HC_BI: best 261 avg 268.20 std 3.79 hit 2/10 T 0.02 Tbest 0.02
+  SA: best 263 avg 268.70 std 2.11 hit 0/10 T 3.00 Tbest 1.02
+  TS: best 261 avg 261.00 std 0.00 hit 10/10 T 3.00 Tbest 0.02
+  GA: best 261 avg 275.10 std 6.57 hit 1/10 T 3.00 Tbest 0.19
+  GA_LS: best 261 avg 265.70 std 4.83 hit 4/10 T 3.00 Tbest 0.11
+vua_200x1000_s203: f*=316 (tốt nhất trong thực nghiệm)
+  GREEDY 330
+  HC_FI: best 316 avg 316.50 std 1.58 hit 9/10 T 0.04 Tbest 0.03
+  HC_BI: best 316 avg 316.00 std 0.00 hit 10/10 T 0.06 Tbest 0.05
+  SA: best 316 avg 317.10 std 1.45 hit 3/10 T 3.00 Tbest 0.08
+  TS: best 316 avg 316.00 std 0.00 hit 10/10 T 3.00 Tbest 0.06
+  GA: best 318 avg 320.10 std 1.45 hit 0/10 T 3.00 Tbest 0.37
+  GA_LS: best 317 avg 318.30 std 1.06 hit 0/10 T 3.00 Tbest 0.26

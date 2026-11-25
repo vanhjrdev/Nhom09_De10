@@ -1,0 +1,734 @@
+% Báo cáo bài tập lớn - Nhóm 09 - Đề 10: Đặt camera giám sát giao thông (Set Cover)
+% Biên dịch bằng XeLaTeX: xelatex bao_cao_nhom09_de10.tex (chạy 2 lần để có mục lục).
+% Mọi chỗ chữ ĐỎ dạng [ĐIỀN ...] là chỗ nhóm phải bổ sung số liệu/thông tin thật.
+% Các hình nằm trong thư mục figures/ (cùng cấp với tệp này).
+% Bảng/hình thực nghiệm được sinh từ results/raw/*.csv bằng experiments/shared/summarize.py (bảng nằm ở report/gen/).
+\documentclass[a4paper,12pt]{article}
+\usepackage{fontspec}
+\setmainfont{Liberation Serif}
+\setmonofont[Scale=0.85]{DejaVu Sans Mono}
+\usepackage[margin=25mm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{tabularx,booktabs,array,enumitem}
+\usepackage{fvextra}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage[font=small]{caption}
+\captionsetup[table]{name=Bảng,labelfont=bf,labelsep=period}
+\captionsetup[figure]{name=Hình,labelfont=bf,labelsep=period}
+\usepackage{fancyhdr}
+\usepackage[hidelinks,unicode]{hyperref}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\linespread{1.1}
+\emergencystretch=3em
+\setlist{itemsep=2pt,topsep=2pt}
+
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\renewcommand{\arraystretch}{1.2}
+
+% Đánh dấu chỗ cần điền
+\newcommand{\dien}[1]{\textcolor{red}{[ĐIỀN: #1]}}
+\newcommand{\DIEN}{\textcolor{red}{[ĐIỀN]}}
+
+\newcommand{\FriedN}{7}\newcommand{\FriedK}{4}
+\newcommand{\FriedChi}{8{,}20}\newcommand{\FriedP}{0{,}0421}
+\newcommand{\FriedChiMid}{8{,}20}\newcommand{\FriedPMid}{0{,}0421}
+\newcommand{\RankRow}{2{,}43 & 1{,}86 & 3{,}14 & 2{,}57}
+\newcommand{\RankRowMid}{2{,}33 & 1{,}00 & 4{,}00 & 2{,}67}
+
+% Khối mã giả
+\fvset{fontsize=\footnotesize,breaklines=true,breakanywhere=true,frame=single,framesep=2mm}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small Phân tích thiết kế giải thuật}
+\fancyhead[R]{\small Nhóm 09 -- Đề 10: Weighted Set Cover}
+\fancyfoot[C]{\thepage}
+\setlength{\headheight}{15pt}
+
+\begin{document}
+
+%================= TRANG BÌA =================
+\begin{titlepage}
+\centering
+{\Large\bfseries TRƯỜNG ĐẠI HỌC GIAO THÔNG VẬN TẢI\\THÀNH PHỐ HỒ CHÍ MINH\par}
+\vspace{0.4cm}{\large Ngành Công nghệ thông tin\par}
+\vspace{2.5cm}{\LARGE\bfseries BÁO CÁO BÀI TẬP LỚN\par}
+\vspace{0.4cm}{\Large\bfseries HỌC PHẦN: PHÂN TÍCH THIẾT KẾ GIẢI THUẬT\par}
+\vspace{1.2cm}{\large\bfseries Đề 10: Đặt camera giám sát giao thông\\
+Bài toán phủ tập có trọng số (Weighted Set Cover)\par}
+\vspace{1.5cm}
+{\bfseries Nhóm 09}\\[4pt]
+\begingroup\small\begin{tabular}{llll}
+\toprule
+Thành viên & Họ tên & MSSV & Phụ trách chính\\
+\midrule
+A & Phan Việt Anh & \DIEN & Bộ đọc, bộ kiểm tra, thuật toán chính xác, SA\\
+B & Hoàng Duy Khánh & \DIEN & Tham lam, tìm kiếm cục bộ, TS, bộ sinh dữ liệu\\
+C & Huỳnh Xuân Huy & \DIEN & GA, GA\_LS\\
+D & Phạm Nhật Mai Thành & \DIEN & \dien{ACO/GRASP}, thực nghiệm, thống kê\\
+\bottomrule
+\end{tabular}\endgroup\\[10pt]
+Giảng viên: \dien{tên giảng viên}
+\vfill Thành phố Hồ Chí Minh -- Năm học 2026--2027
+\end{titlepage}
+
+\renewcommand{\contentsname}{Mục lục}
+\tableofcontents
+\clearpage
+
+\section*{Tóm tắt}
+\addcontentsline{toc}{section}{Tóm tắt}
+Báo cáo mô hình hóa việc chọn vị trí đặt camera giám sát giao thông thành bài toán phủ tập có trọng số (NP-khó), cài đặt thuật toán chính xác (nhánh cận kèm giảm cỡ dữ liệu), heuristic tham lam Chvátal, hai chiến lược leo đồi (first/best improvement), ba metaheuristic (SA, TS, GA) và thuật toán lai GA\_LS. Thực nghiệm dùng 8 thể hiện (ví dụ của đề, 4 thể hiện tự sinh nhỏ với $n\le30$, 3 thể hiện tự sinh vừa với $n=400$--$1000$), mỗi cặp (thuật toán, thể hiện) chạy 10 seed với ngân sách $0{,}5$ s (nhỏ) và $3$ s (vừa); toàn bộ 496 nghiệm đều qua bộ kiểm tra độc lập.
+
+Kết quả chính: (i) trên thể hiện nhỏ mọi thuật toán đều tìm được lời giải tối ưu ở 10/10 lần chạy, nên các thể hiện này không phân biệt được thuật toán; (ii) trên thể hiện vừa TS cho chất lượng tốt nhất và ổn định nhất (độ lệch trung bình so với $f^*$ không quá $0{,}29\%$), GA\_LS tốt hơn GA có ý nghĩa thống kê ở 2/3 thể hiện, GA kém nhất; (iii) thuật toán chính xác không kết thúc được ở $n\ge400$ trong 30 s và nghiệm tạm thời của nó còn kém cả tham lam. Các hạn chế quan trọng (chưa có thể hiện OR-Library, chưa có thuật toán của thành viên D, ngân sách ngắn, $f^*$ của thể hiện vừa chỉ là giá trị tốt nhất tìm được) được nêu ở mục 6 và 7.
+
+\noindent\textit{Ghi chú: các mục đánh dấu \DIEN{} màu đỏ là chỗ nhóm phải bổ sung thông tin thật mà người soạn không có (MSSV, giảng viên, thuật toán của thành viên D, thể hiện OR-Library, \dots). Mọi số liệu thực nghiệm trong báo cáo đều lấy từ các lần chạy thật (tệp \path|results/raw/*.csv|); không có số liệu giả.}
+
+%================= 1 =================
+\section{Phát biểu bài toán}
+\subsection{Bối cảnh}
+Cơ quan quản lý giao thông đô thị cần lắp camera để giám sát mọi nút giao trọng điểm của một quận. Các vị trí lắp đặt ứng viên (cột đèn, giá long môn, nóc tòa nhà) có chi phí khác nhau; mỗi vị trí quan sát được một số nút giao lân cận. Yêu cầu: chọn tập vị trí có tổng chi phí nhỏ nhất sao cho mọi nút giao đều được ít nhất một camera quan sát. Cùng một mô hình còn áp dụng cho việc đặt trạm phát sóng hay trạm cứu hỏa.
+
+\subsection{Mô hình toán học}
+Cho $m$ nút giao (hàng) và $n$ vị trí đặt camera (cột). Vị trí $j$ có chi phí $c_j\ge 0$ và phủ tập nút $S_j\subseteq\{1,\dots,m\}$. Ký hiệu $R_i=\{\,j: i\in S_j\,\}$ là tập các vị trí phủ được nút $i$ và $a_{ij}=1$ nếu $i\in S_j$, ngược lại bằng $0$. Biến quyết định $x_j=1$ nếu chọn vị trí $j$.
+\[
+\min\ f(x)=\sum_{j=1}^{n}c_jx_j
+\quad\text{với}\quad
+\sum_{j\in R_i}x_j\ge 1\ \ (i=1,\dots,m),\qquad x_j\in\{0,1\}\ \ (j=1,\dots,n).
+\]
+Một lời giải hợp lệ (khả thi) là tập cột $X=\{j:x_j=1\}$ thỏa $\bigcup_{j\in X}S_j=\{1,\dots,m\}$; lời giải tối ưu là lời giải hợp lệ có $f$ nhỏ nhất. Bài toán có lời giải khi và chỉ khi mọi hàng có ít nhất một cột phủ ($R_i\neq\emptyset$).
+
+\subsection{Dữ liệu vào/ra}
+Dùng định dạng OR-Library (Beasley, 1990): dòng đầu là \texttt{m n}; tiếp theo là $n$ chi phí $c_1,\dots,c_n$; sau đó với mỗi hàng $i=1,\dots,m$ là số cột phủ hàng $i$ rồi danh sách các cột đó (đánh số từ 1). Tệp được đọc theo từ tố nên số lần xuống dòng tùy ý. Vì tệp cho theo hàng, chương trình dựng đồng thời hai cấu trúc: danh sách $R_i$ theo hàng (\texttt{row\_cols}) và $S_j$ theo cột (\texttt{col\_rows}). Lời giải gồm dòng 1 là tổng chi phí, dòng 2 là các vị trí được chọn theo thứ tự tăng dần.
+
+\subsection{Ví dụ nhỏ}
+Ví dụ của đề có $m=7$ nút giao và $n=6$ vị trí.
+
+\begin{center}
+\begin{tabular}{lcccccc}
+\toprule
+Vị trí $j$ & 1 & 2 & 3 & 4 & 5 & 6\\
+\midrule
+Chi phí $c_j$ & 7 & 5 & 9 & 4 & 3 & 7\\
+$S_j$ & \{1,4,7\} & \{5,6\} & \{2,3,5,7\} & \{2,3,6,7\} & \{4,6\} & \{1,3,6,7\}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Lời giải tối ưu duy nhất là $X=\{1,2,4\}$ với chi phí $7+5+4=16$, vì $S_1\cup S_2\cup S_4=\{1,\dots,7\}$. Vét cạn cả $2^6=64$ tập con cho thấy có 24 tập hợp lệ và tập tốt nhì có chi phí 19, nên 16 là tối ưu duy nhất.
+
+Tham lam Chvátal (chọn cột có tỉ số chi phí trên số nút mới phủ nhỏ nhất) diễn ra như sau: chọn cột 4 (tỉ số $4/4=1$), các nút chưa phủ còn $\{1,4,5\}$; chọn cột 5 ($3/1=3$); còn $\{1,5\}$, chọn cột 2 ($5/1=5$); còn $\{1\}$, cột 1 và cột 6 cùng tỉ số $7$ nên chọn cột có chỉ số nhỏ hơn là cột 1. Tổng chi phí $4+3+5+7=19$, lệch $18{,}75\%$ so với tối ưu. Bước xóa cột thừa loại cột 5 (nút 4 và nút 6 đã được các cột 1, 2, 4 phủ), đưa chi phí về $16$. Ví dụ này cũng là bộ kiểm thử bắt buộc: mọi thuật toán của nhóm phải đạt 16 trên tệp \path|data/vidu/vidu.txt|. Kết quả thực nghiệm: cả 8 thuật toán hoặc biến thể (EXACT, GREEDY, HC\_FI, HC\_BI, SA, TS, GA, GA\_LS) đều đạt 16 ở mọi seed 1--10 và đều được \texttt{kiemtra.py} xác nhận.
+
+%================= 2 =================
+\section{Độ phức tạp của bài toán}
+\subsection{Phiên bản quyết định}
+SET-COVER-DEC: cho $(m,n,\{S_j\},\{c_j\})$ và ngưỡng $k$, có tồn tại tập cột phủ mọi hàng với tổng chi phí $\le k$ hay không?
+
+\subsection{NP-đầy đủ}
+Bài toán thuộc NP: chứng chỉ là tập $X$; kiểm tra $X$ phủ mọi hàng và tổng chi phí $\le k$ mất thời gian $O\bigl(\sum_{j\in X}|S_j|+n\bigr)$, tức đa thức theo kích thước đầu vào.
+
+Bài toán là NP-khó bằng phép quy dẫn từ Vertex Cover (Karp, 1972). Cho đồ thị $G=(V,E)$ và số $k$: đặt các ``nút giao'' là các cạnh ($m=|E|$); mỗi đỉnh $v\in V$ ứng với một ``vị trí'' có $S_v$ là tập cạnh liên thuộc với $v$ và chi phí $c_v=1$. Một tập đỉnh là phủ đỉnh khi và chỉ khi các cột tương ứng phủ mọi cạnh, nên $G$ có phủ đỉnh cỡ $\le k$ khi và chỉ khi bài toán phủ tập có chi phí $\le k$. Phép biến đổi chạy trong thời gian đa thức, do đó SET-COVER-DEC là NP-đầy đủ; bản tối ưu (có trọng số) là NP-khó vì chứa trường hợp riêng này.
+
+\subsection{Xấp xỉ}
+Thuật toán tham lam Chvátal đạt tỉ số xấp xỉ $H(d)\le 1+\ln d$ với $d=\max_j|S_j|$ (Chvátal, 1979). Về cận dưới, không có thuật toán đa thức nào đạt tỉ số $(1-\varepsilon)\ln m$ với $\varepsilon>0$ bất kỳ trừ khi P $=$ NP (Dinur và Steurer, 2014). Như vậy tham lam gần như là tốt nhất có thể về mặt bảo đảm lý thuyết, nhưng trên dữ liệu thực nó thường còn cách tối ưu vài phần trăm, tạo chỗ cho tìm kiếm cục bộ và metaheuristic.
+
+\subsection{Không gian tìm kiếm}
+Mỗi lời giải là một vectơ nhị phân độ dài $n$ nên không gian có $2^n$ phần tử. Với ví dụ nhỏ ($n=6$) là $2^6=64$ tập con, vét cạn được ngay. Với scp41 ($n=1000$) là $2^{1000}\approx 1{,}07\times10^{301}$, không thể vét cạn. Hệ quả đối với việc chọn thuật toán: thuật toán chính xác (nhánh cận kèm giảm cỡ dữ liệu) chỉ khả thi với dữ liệu nhỏ và nhiều cấu trúc để cắt tỉa; với thể hiện lớn phải dùng heuristic và metaheuristic để có lời giải tốt trong thời gian chấp nhận được, đổi lại không có bảo đảm tối ưu.
+
+%================= 3 =================
+\section{Thuật toán chính xác: nhánh cận với giảm cỡ dữ liệu}
+Thuật toán nằm trong \texttt{main\_A.py} (lớp \texttt{ExactSolver}), gồm ba thành phần: giảm cỡ dữ liệu, cận dưới và phân nhánh theo hàng ít lựa chọn nhất.
+
+\subsection{Giảm cỡ dữ liệu}
+\textbf{Loại cột bị trội.} Cột $j_1$ bị trội bởi cột $j_2$ ($j_2\ne j_1$) nếu $c_{j_2}\le c_{j_1}$ và $S_{j_1}\subseteq S_{j_2}$. Mọi lời giải dùng $j_1$ đều có thể thay bằng $j_2$ mà không tăng chi phí và vẫn hợp lệ, nên có thể bỏ $j_1$. Khi hai cột giống hệt nhau (cùng tập phủ và chi phí), thuật toán chỉ loại một cột nhờ bỏ qua các cột đã bị đánh dấu trội khi dò, nên không loại nhầm cả hai. Cột phủ rỗng cũng bị loại. Độ phức tạp bước này là $O(n^2)$ lần kiểm tra tập con.
+
+\textbf{Hàng chỉ có một cột phủ.} Nếu một hàng chưa được phủ chỉ còn đúng một cột không bị trội thì cột đó bắt buộc phải nằm trong lời giải. Thuật toán chọn cột đó, cập nhật mảng đếm phủ và lặp cho đến khi không còn thay đổi (điểm bất động). Chi phí của các cột bắt buộc là \texttt{base\_cost} của gốc cây tìm kiếm.
+
+\subsection{Cận dưới}
+Tại một nút có tập hàng chưa phủ $U$, cận dưới của chi phí cần thêm là
+\[
+LB(U)=\Bigl\lceil\sum_{i\in U}\ \min_{\substack{j\in R_i\\ j\ \text{không bị trội}}}\frac{c_j}{|S_j|}\Bigr\rceil .
+\]
+Cận này hợp lệ vì với mọi tập cột bổ sung $X'$ phủ $U$ ta có
+\[
+\sum_{j\in X'}c_j=\sum_{j\in X'}\sum_{i\in S_j}\frac{c_j}{|S_j|}\ \ge\ \sum_{i\in U}\min_{j\in R_i}\frac{c_j}{|S_j|},
+\]
+do mỗi hàng $i\in U$ được ít nhất một cột trong $X'$ phủ. Nếu có hàng chưa phủ mà mọi cột đều bị loại thì nhánh vô nghiệm và bị cắt ngay. Tính $LB$ mất $O\bigl(\sum_{i\in U}|R_i|\bigr)$.
+
+\subsection{Phân nhánh và mã giả}
+Tại mỗi nút, chọn hàng chưa phủ có ít cột hợp lệ nhất (MRV: minimum remaining values) và thử lần lượt từng cột phủ hàng đó theo thứ tự chi phí tăng dần. Mọi lời giải đều phải chứa một cột phủ hàng đã chọn nên cách phân nhánh này không bỏ sót nghiệm.
+
+\begin{Verbatim}
+EXACT(I, T_max):
+    giam co du lieu (loai cot troi, chon cot bat buoc)  ->  base_cost, cnt[.]
+    best <- +inf
+    DFS(cost = base_cost, covered, cnt, cur):
+        neu het thoi gian T_max: dat co timeout; return
+        neu cost >= best: return                       # cat theo can tren
+        neu covered = m: best <- cost; luu cur; return
+        neu cost + LB(cnt) >= best: return             # cat theo can duoi
+        i* <- hang chua phu co it cot hop le nhat
+        neu i* khong con cot hop le: return
+        voi moi cot c trong R_{i*} (tang dan theo c_c):
+            neu cost + c_c >= best: continue
+            them c (cap nhat cnt); DFS(cost + c_c, ...); bo c
+    tra ve best, loi giai tuong ung, co timeout
+\end{Verbatim}
+
+\subsection{Độ phức tạp và giới hạn}
+Gọi $f=\max_i|R_i|$ là số cột tối đa phủ một hàng và $h\le\min(m,n)$ là độ sâu tối đa. Trong trường hợp xấu nhất thuật toán duyệt $O(f^h)$ nút, mỗi nút tốn $O(m+nnz)$ cho việc tính cận và chọn hàng ($nnz$ là số phần tử khác 0 của ma trận). Hiệu quả thực tế phụ thuộc vào mức cắt tỉa: giảm cỡ dữ liệu giúp nhiều trên ma trận thưa, còn cận $LB$ theo tỉ số chi phí đơn vị khá lỏng nên cây tìm kiếm tăng nhanh theo $n$. Khi hết thời gian, thuật toán dừng và gắn nhãn \texttt{TIMEOUT}; lời giải trả về chỉ là lời giải tốt nhất đã tìm được, không còn được bảo đảm tối ưu.
+
+Các hạn chế đã biết: (1) cận trên ban đầu là $+\infty$ nên nhánh cận phải tự tìm nghiệm đầu tiên trước khi cắt tỉa được, có thể cải thiện bằng cách khởi tạo bằng nghiệm tham lam; (2) khi phân nhánh chưa loại trừ các cột đã thử ở nhánh anh em nên có thể duyệt trùng; (3) cận dưới chưa dùng nới lỏng Lagrange; (4) nếu hết thời gian khi chưa tìm được nghiệm nào thì \texttt{best\_cost} vẫn là $+\infty$ và lệnh \texttt{int(...)} trong \texttt{main\_A.py} sẽ báo lỗi \texttt{OverflowError}, cần xử lý riêng trường hợp này.
+
+Kích thước lớn nhất giải được (kết quả ở mục 6.4.1, Bảng~\ref{tbl:exact}): trong thực nghiệm này thuật toán kết thúc với chứng nhận tối ưu ở mọi thể hiện nhỏ, lớn nhất là $m=25$ hàng, $n=30$ cột (mật độ $0{,}21$), mỗi thể hiện chưa đến 1 ms; ở $n=400$, $m=100$ (mật độ $0{,}05$) thuật toán chưa kết thúc sau 30 s. Phép thử đúng yêu cầu của đề (giới hạn 10 phút, các cỡ trung gian $30<n<400$): \dien{chạy EXACT với giới hạn 600 s trên các thể hiện trung gian rồi ghi $n_{\max}$, $m$, mật độ, máy}.
+
+%================= 4 =================
+\section{Heuristic xây dựng và tìm kiếm cục bộ}
+\subsection{Biểu diễn lời giải và đánh giá gia tăng}
+Một lời giải được biểu diễn bằng mảng nhị phân \texttt{sel[j]} (cột nào được chọn), mảng đếm \texttt{cnt[i]} (số cột đang chọn phủ hàng $i$) và \texttt{value} là tổng chi phí. Thêm hoặc bớt cột $j$ chỉ cần cập nhật \texttt{cnt[i]} cho các $i\in S_j$ và \texttt{value}, tốn $O(|S_j|)$ thay vì tính lại toàn bộ $O(nnz)$. Mảng \texttt{cnt} cho phép kiểm tra $O(1)$ một cột có thừa hay không (mọi $i\in S_j$ có $\texttt{cnt}[i]\ge2$) và xác định các hàng chỉ do cột $j$ phủ ($\texttt{cnt}[i]=1$). Lớp \texttt{State} còn có nhật ký thao tác (\texttt{trail}) với \texttt{mark}/\texttt{rollback}: thử một nước đi, đo \texttt{value}, rồi hoàn tác về trạng thái cũ mà không phải sao chép lời giải.
+
+\subsection{Tham lam Chvátal và xóa cột thừa}
+\begin{Verbatim}
+GREEDY_CHVATAL(I):
+    U <- tap hang chua phu;  X <- {}
+    trong khi U khac rong:
+        chon j khong thuoc X minimizing  c_j / |S_j giao U|   (chi xet |S_j giao U| > 0; hoa thi lay chi so nho nhat)
+        X <- X + {j};  U <- U \ S_j
+    REMOVE_REDUNDANT(X)
+
+REMOVE_REDUNDANT(X):
+    duyet j thuoc X theo chi phi giam dan (hoa thi theo chi so):
+        neu moi i thuoc S_j co cnt[i] >= 2: loai j khoi X, cap nhat cnt
+\end{Verbatim}
+Duyệt theo chi phí giảm dần để ưu tiên loại các cột đắt trước. Mỗi bước chọn xét các cột ứng viên (những cột phủ ít nhất một hàng chưa phủ) và đếm số hàng mới phủ, nên toàn bộ phần xây dựng tốn $O(K\cdot nnz)$ với $K$ là số cột được chọn; \texttt{REMOVE\_REDUNDANT} tốn $O\bigl(\sum_{j\in X}|S_j|\bigr)$. Trên ví dụ nhỏ, hai bước này cho chi phí 19 rồi 16 (mục 1.4). Hàm \texttt{repair(st, rng, forbid)} chính là phần lặp của Chvátal áp dụng cho các hàng chưa phủ hiện tại và có thể cấm một số cột (dùng bởi tìm kiếm cục bộ và TS); khi có \texttt{rng} thì các cột hòa nhau được chọn ngẫu nhiên.
+
+\subsection{Hai cấu trúc lân cận}
+\textbf{N1 -- Hoán đổi (swap).} Thay một cột đang chọn $j$ bằng một cột chưa chọn $k$ rẻ hơn mà phủ được mọi hàng chỉ do $j$ phủ. Gọi $need=\{i\in S_j:\texttt{cnt}[i]=1\}$; $k$ hợp lệ khi $need\subseteq S_k$ và $c_k<c_j$, độ biến thiên $\Delta=c_k-c_j<0$. Ứng viên $k$ được duyệt từ $R_{i_0}$ với $i_0$ là một hàng trong $need$, và kiểm tra tập con tốn $O(|need|)$. Khi $need=\emptyset$ thì cột $j$ thừa và đã được \texttt{REMOVE\_REDUNDANT} xóa. Bước đánh giá không cần cập nhật \texttt{cnt}, tức là delta evaluation đúng nghĩa.
+
+\textbf{N2 -- Bỏ một cột rồi sửa chữa (drop-and-repair).} Bỏ cột $j$, gọi \texttt{repair} (thêm cột tham lam cho các hàng chưa phủ, cấm lại cột $j$), rồi \texttt{REMOVE\_REDUNDANT}. Độ biến thiên là $\Delta=\texttt{value}_{\text{mới}}-\texttt{value}_{\text{cũ}}$. Nước đi được thực hiện thật trên \texttt{State} rồi \texttt{rollback} nếu không cải thiện, nên chi phí mỗi lần đánh giá tỉ lệ với số cột bị thay đổi chứ không phải toàn bộ lời giải; tuy nhiên bước \texttt{repair} vẫn phải quét tập hàng chưa phủ nên đây là đánh giá gia tăng một phần, không phải $O(1)$.
+
+\subsection{Leo đồi: first improvement và best improvement}
+\begin{Verbatim}
+HILL_CLIMB(X, chien_luoc):
+    lap cho den khi khong cai thien duoc hoac het thoi gian:
+        REMOVE_REDUNDANT(X)
+        xao tron ngau nhien thu tu cac cot j thuoc X
+        voi moi j:
+            thu N1 (hoan doi) voi j  -> neu Delta < 0 va chien_luoc = FI: ap dung ngay, bat dau vong moi
+            thu N2 (bo j + sua chua) -> neu Delta < 0 va chien_luoc = FI: ap dung ngay, bat dau vong moi
+            (chien_luoc = BI: ghi nho nuoc di co Delta nho nhat, ap dung sau khi duyet xong moi j)
+\end{Verbatim}
+First improvement (\texttt{HC\_FI}) dừng duyệt ở nước đi cải thiện đầu tiên nên mỗi bước rẻ nhưng cần nhiều bước; best improvement (\texttt{HC\_BI}) duyệt hết lân cận để chọn nước tốt nhất nên mỗi bước đắt hơn nhưng thường ít bước hơn. Cả hai đều xuất phát từ nghiệm Chvátal, dừng ở cực tiểu cục bộ đối với N1 và N2 nên thường kết thúc trước khi hết ngân sách thời gian. Số liệu thực nghiệm của hai chiến lược (gap, số lượt đánh giá, thời gian) nằm ở mục 6.4.2, Bảng~\ref{tbl:ls}.
+
+%================= 5 =================
+\section{Các giải thuật metaheuristic}
+Nhóm cài đặt bốn metaheuristic và một thuật toán lai: SA, TS, GA, thuật toán của thành viên D (\dien{GRASP}) và GA\_LS. Tất cả dùng chung bộ đọc dữ liệu, hàm kiểm tra \texttt{kiemtra.py} và tiêu chí dừng theo thời gian (ngân sách giây). Ràng buộc phủ được xử lý bằng \textbf{sửa chữa lời giải} (thêm cột tham lam cho các hàng chưa phủ, rồi xóa cột thừa) chứ không dùng hàm phạt, nên mọi lời giải do thuật toán sinh ra đều hợp lệ.
+
+\begin{center}
+\begin{tabularx}{\textwidth}{llcY}
+\toprule
+Thuật toán & Nhóm & Phụ trách & Tài liệu gốc\\
+\midrule
+SA & Đơn lời giải & A & Kirkpatrick, Gelatt, Vecchi (1983)\\
+TS & Đơn lời giải & B & Glover (1986)\\
+GA & Quần thể & C & Holland (1975); cho Set Cover: Beasley và Chu (1996)\\
+GA\_LS & Lai (memetic) & C & Moscato (1989)\\
+\dien{ACO/GRASP} & \DIEN & D & \dien{Dorigo, Stützle (2004) hoặc Feo, Resende (1995)}\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection{Tôi luyện mô phỏng (SA) -- thành viên A}
+\textbf{Nguyên lý.} SA chấp nhận nghiệm lân cận xấu hơn (tăng chi phí $\Delta>0$) với xác suất $e^{-\Delta/T}$; nhiệt độ $T$ giảm dần nên ban đầu thuật toán khám phá rộng, về sau chuyển sang khai thác vùng tốt (Kirkpatrick và cộng sự, 1983).
+
+\textbf{Biểu diễn và lân cận.} Lời giải là mảng bool chọn cột cùng mảng đếm phủ và tổng chi phí; khởi tạo bằng tham lam Chvátal cộng xóa cột thừa. Nước đi: lật ngẫu nhiên 1 cột (xác suất $0{,}7$) hoặc 2 cột (xác suất $0{,}3$), sau đó \texttt{REPAIR} (duyệt các hàng theo chỉ số, hàng nào chưa phủ thì thêm cột có $c/\text{số hàng mới phủ}$ nhỏ nhất) rồi \texttt{REMOVE\_REDUNDANT}.
+
+\begin{Verbatim}
+SA(I, seed, budget):
+    X <- GREEDY_CHVATAL(I);  X* <- X;  T <- max(1; 0,05 * f(X))
+    trong khi chua het budget:
+        lap steps_per_temp lan:
+            X' <- ban sao X;  lat 1 cot (p=0,7) hoac 2 cot (p=0,3) ngau nhien
+            REPAIR(X');  REMOVE_REDUNDANT(X')
+            Delta <- f(X') - f(X)
+            neu Delta <= 0 hoac rand() < exp(-Delta / T): X <- X'
+            neu f(X) < f(X*): X* <- X
+        T <- max(0,01; alpha * T)
+    tra ve X*
+\end{Verbatim}
+
+\textbf{Tham số.} $T_0=\max(1;\,0{,}05\times\text{chi phí nghiệm tham lam})$: đủ lớn để chấp nhận bước xấu vài đơn vị lúc đầu; hệ số nguội $\alpha=0{,}995$; số bước mỗi mức nhiệt $\max(20,\lfloor n/5\rfloor)$ tăng theo kích thước bài toán; nhiệt độ sàn $0{,}01$ (khi đó SA gần như leo đồi). Tăng $T_0$ hoặc $\alpha$ làm thuật toán khám phá nhiều hơn nhưng hội tụ chậm hơn.
+
+\textbf{Độ phức tạp mỗi bước.} $O(n+m)$ cho sao chép lời giải, cộng chi phí \texttt{REPAIR} (quét $m$ hàng và đếm số hàng mới phủ của các cột ứng viên) và \texttt{REMOVE\_REDUNDANT} $O(\sum|S_j|)$. Việc sao chép toàn bộ nghiệm là chi phí chính của SA và là điểm có thể cải thiện bằng delta evaluation.
+
+\textbf{Nhận xét thiết kế.} Lịch nguội hiện theo số bước chứ không theo thời gian còn lại, nên với ngân sách ngắn trên thể hiện lớn nhiệt độ có thể chưa kịp hạ. Phương án tốt hơn: đặt $T$ theo tỉ lệ thời gian đã dùng trên ngân sách.
+
+\subsection{Tìm kiếm Tabu (TS) -- thành viên B}
+\textbf{Nguyên lý.} TS luôn đi tới lân cận tốt nhất không bị cấm, kể cả khi xấu hơn nghiệm hiện tại, và dùng danh sách tabu để chặn quay lại ngay nghiệm vừa rời (Glover, 1986). Tiêu chí mong đợi (aspiration) cho phép bỏ qua lệnh cấm nếu nước đi cho nghiệm tốt hơn nghiệm tốt nhất toàn cục.
+
+\textbf{Thiết kế cho bài toán.} Lân cận là ``bỏ một cột $j$ rồi sửa chữa'' (đúng N2 ở mục 4.3). Do số cột được chọn có thể lớn, mỗi vòng chỉ lấy mẫu ngẫu nhiên tối đa \texttt{sample} cột để thử bỏ. Thuộc tính tabu là chỉ số cột vừa bị bỏ: cột đó không được thêm lại trong \texttt{tenure}\,$+\,$\texttt{randint(0,2)} vòng lặp.
+
+\begin{Verbatim}
+TS(I, tenure, sample):
+    X <- GREEDY_CHVATAL(I);  X* <- X;  tabu_until <- {}
+    voi moi vong it = 1, 2, ...:
+        cand <- toi da `sample` cot lay ngau nhien tu X
+        voi moi j thuoc cand:
+            X' <- X \ {j};  REPAIR(X', cam j);  REMOVE_REDUNDANT(X')
+            neu X' dung cot dang tabu va f(X') >= f(X*):      # khong thoa aspiration
+                lam lai REPAIR voi tap cam = tabu + {j}
+        chon X' tot nhat trong cac ung vien (ke ca xau hon X)
+        X <- X';  tabu_until[j*] <- it + tenure + randint(0,2)
+        neu f(X) < f(X*): X* <- X
+    tra ve X*
+\end{Verbatim}
+
+\textbf{Tham số.} \texttt{tenure} mặc định $\max(5,\lfloor0{,}1\cdot|X_0|\rfloor+3)$ với $|X_0|$ là số cột của nghiệm tham lam ban đầu; tenure ngắn khai thác mạnh nhưng dễ lặp vòng, tenure dài khám phá nhiều nhưng có thể bỏ lỡ nghiệm tốt. \texttt{sample} mặc định 40 cân bằng chất lượng lân cận với thời gian một vòng.
+
+\textbf{Độ phức tạp mỗi vòng.} $O(\texttt{sample}\times C_{\text{move}})$ với $C_{\text{move}}$ là chi phí một lần xóa, sửa chữa và tỉa, đều được hoàn tác bằng \texttt{rollback} nên không sao chép nghiệm. Cấm là ``mềm'': nếu mọi cột ứng viên đều bị cấm thì \texttt{REPAIR} được phép dùng lại cột bị cấm, nhờ đó thuật toán không bị kẹt, nhưng lệnh cấm đôi khi bị vi phạm.
+
+\subsection{Giải thuật di truyền (GA) -- thành viên C}
+\textbf{Nguyên lý.} GA duy trì một quần thể lời giải, chọn lọc cá thể tốt làm cha mẹ, lai ghép và đột biến để sinh con (Holland, 1975). Cách mã hóa nhị phân cho Set Cover được Beasley và Chu (1996) nghiên cứu; nhóm áp dụng lai ghép đều và thủ tục sửa chữa tham lam.
+
+\textbf{Biểu diễn.} Mỗi cá thể là vectơ nhị phân độ dài $n$ kèm mảng đếm phủ và chi phí; chi phí cá thể là hàm thích nghi (cực tiểu hóa).
+
+\begin{Verbatim}
+GA(I, seed, budget, P, p_m):
+    quan the: ca the 0 tu vector rong (sau REPAIR gan nhu la tham lam);
+              P-1 ca the con lai: moi bit = 1 voi xac suat 0,25, roi REPAIR + prune
+    best <- ca the tot nhat
+    trong khi chua het budget:
+        moi <- [best]                                       # elitism
+        trong khi |moi| < P:
+            A, B <- chon giai dau (co 3) hai lan
+            voi moi bit j: lay bit tu A hoac B (xac suat 1/2); lat bit voi xac suat p_m
+            C <- REPAIR(C) roi tia cot thua (prune)
+            cap nhat best;  moi <- moi + [C]
+        quan the <- moi
+    tra ve best
+\end{Verbatim}
+
+\textbf{Xử lý ràng buộc.} \texttt{REPAIR} quét các hàng chưa phủ theo chỉ số, mỗi hàng chọn cột có $c/\text{số hàng mới phủ}$ nhỏ nhất (hòa thì chọn ngẫu nhiên); \texttt{prune} bỏ cột thừa theo chi phí giảm dần (hòa thì ngẫu nhiên). Nhờ đó cá thể luôn hợp lệ và không cần hàm phạt.
+
+\textbf{Tham số.} Quần thể $P=40$; xác suất đột biến mỗi bit $p_m=1/n$ (trung bình một bit lật mỗi con); kích thước giải đấu 3 (áp lực chọn lọc vừa phải); lai ghép đều (mỗi bit từ A hoặc B với xác suất $1/2$); giữ 1 cá thể ưu tú. Tăng $P$ hoặc $p_m$ tăng khám phá và giảm tốc độ hội tụ.
+
+\textbf{Độ phức tạp mỗi thế hệ.} $P\times\bigl(O(n)\text{ cho lai ghép và đột biến}+\text{chi phí REPAIR và prune}\bigr)$.
+
+\subsection{Thuật toán lai GA\_LS (memetic) -- thành viên C}
+GA\_LS là GA có thêm tìm kiếm cục bộ áp dụng cho từng cá thể con trước khi đưa vào quần thể (Moscato, 1989). Tìm kiếm cục bộ gồm ba bước:
+\begin{enumerate}
+\item Duyệt các cột đang chọn theo thứ tự ngẫu nhiên; cột nào không còn hàng nào chỉ do nó phủ (thừa) thì loại.
+\item Với cột còn lại, lấy tập hàng chỉ do nó phủ; chọn hàng ``chốt'' có ít cột ứng viên nhất, tìm cột chưa chọn rẻ hơn phủ được toàn bộ tập hàng đó (chọn cột rẻ nhất) và thay thế (chính là nước đi N1 ở mục 4.3).
+\item Cuối cùng \texttt{prune} lại.
+\end{enumerate}
+Cách làm này thuộc loại Lamarck: kết quả của tìm kiếm cục bộ được ghi ngược vào cá thể. Nó giúp mỗi con trở thành cực tiểu cục bộ theo N1, đổi lại mỗi thế hệ tốn thêm thời gian nên trong cùng ngân sách số thế hệ ít hơn GA thuần. Lợi ích của GA\_LS so với GA: \dien{số liệu thực nghiệm}.
+
+\subsection{Thuật toán của thành viên D}
+\dien{chọn ACO hoặc GRASP (README ghi ``chưa chọn thuật toán''). Với thuật toán đã chọn cần trình bày: nguồn gốc và tài liệu gốc, mã giả tổng quát và cụ thể, biểu diễn, cách xử lý ràng buộc, tiêu chí dừng, ý nghĩa tham số. ACO: $\alpha,\beta,\rho$, số kiến, thông tin heuristic $\eta_j=$ số hàng mới phủ$/$chi phí. GRASP: tham số $\alpha$ của danh sách ứng viên hạn chế RCL, kết hợp tìm kiếm cục bộ ở mục 4.4}
+
+\subsection{Bảng tham số mặc định}
+\begin{center}
+\begin{tabularx}{\textwidth}{lY}
+\toprule
+Thuật toán & Tham số mặc định\\
+\midrule
+SA & seed $=42$; budget $=10$ s; $T_0=\max(1;0{,}05f_{\text{tham lam}})$; $\alpha=0{,}995$; bước/mức nhiệt $=\max(20,\lfloor n/5\rfloor)$; $T_{\min}=0{,}01$; xác suất lật 1 cột $0{,}7$\\
+TS & tenure $=\max(5,\lfloor0{,}1|X_0|\rfloor+3)$ cộng ngẫu nhiên 0--2; sample $=40$\\
+GA & $P=40$; $p_m=1/n$; giải đấu cỡ 3; lai ghép đều; elitism 1; xác suất bit ban đầu $0{,}25$\\
+GA\_LS & như GA, thêm tìm kiếm cục bộ cho mỗi cá thể con và cá thể khởi tạo\\
+\dien{ACO/GRASP} & \DIEN\\
+\bottomrule
+\end{tabularx}
+\end{center}
+Các giá trị này phải trùng với README của kho mã và với tham số dùng trong thực nghiệm (nếu thực nghiệm đổi tham số thì ghi riêng ở mục 6). Thực nghiệm chính dùng đúng các giá trị mặc định này; riêng SA chưa có tham số dòng lệnh nên không khảo sát độ nhạy được (mục 6.4.5).
+
+%================= 6 =================
+\section{Thực nghiệm}
+\noindent\textit{Mục này là khung đầy đủ theo yêu cầu của đề. Mọi ô \DIEN{} phải lấy từ số liệu thật do các lần chạy của nhóm sinh ra (tệp \path|results/raw/*.csv|).}
+
+\subsection{Môi trường}
+\begin{center}
+\begin{tabularx}{\textwidth}{lY}
+\toprule
+Hạng mục & Giá trị\\
+\midrule
+Hệ điều hành & Ubuntu 24.04.5 LTS (máy chạy mọi số liệu trong báo cáo này). README của nhóm ghi Windows 11 Pro: \dien{nếu nhóm chạy lại trên Windows thì cập nhật cả mục này lẫn số liệu, vì thời gian và kết quả theo ngân sách thời gian sẽ khác}\\
+Ngôn ngữ, trình thông dịch & Python 3.12.3, CPython\\
+Thư viện & Các chương trình thuật toán (\texttt{src/}) chỉ dùng thư viện chuẩn (\texttt{argparse}, \texttt{csv}, \texttt{math}, \texttt{random}, \texttt{sys}, \texttt{time}, \texttt{pathlib}, \texttt{subprocess}, \texttt{re}, \texttt{dataclasses}). Script tổng hợp và vẽ hình (\texttt{experiments/shared/}) dùng thêm numpy 2.5.4, scipy 1.18.1, matplotlib 3.11.2\\
+CPU, RAM & Intel Xeon 2,30 GHz, 1 lõi ảo, 3,9 GiB RAM; các lần chạy thực hiện tuần tự, mỗi lần một tiến trình riêng\\
+Cách đo thời gian & Đồng hồ thực: \texttt{time.perf\_counter} trong \texttt{main\_A.py} và \texttt{main\_C.py}, \texttt{time.time} trong các module của B (\texttt{greedy.py}, \texttt{local\_search.py}, \texttt{tabu.py}); cùng một máy và cùng ngôn ngữ cho mọi thuật toán\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection{Dữ liệu}
+Dữ liệu gồm ít nhất 10 thể hiện thuộc ít nhất 3 mức kích thước, theo định dạng OR-Library:
+\begin{table}[htbp]
+\centering
+\caption{Các thể hiện dùng trong thực nghiệm. $^\dagger$: không có tối ưu chứng minh được, $f^*$ là giá trị tốt nhất trong thực nghiệm này.}
+\footnotesize
+\begin{tabularx}{\textwidth}{llccYY}
+\toprule
+Nhóm & Thể hiện & $m\times n$ & Mật độ & Tối ưu/BKS & Nguồn\\
+\midrule
+Ví dụ của đề & \texttt{vidu} & $7\times6$ & $0{,}45$ & 16 (tối ưu) & Đề bài\\
+Tự sinh, nhỏ & \texttt{nho\_10x20\_s101} & $10\times20$ & $0{,}31$ & 65 (tối ưu) & Bộ sinh của B, seed 101\\
+ & \texttt{nho\_15x25\_s102} & $15\times25$ & $0{,}27$ & 136 (tối ưu) & seed 102\\
+ & \texttt{nho\_20x28\_s103} & $20\times28$ & $0{,}19$ & 212 (tối ưu) & seed 103\\
+ & \texttt{nho\_25x30\_s104} & $25\times30$ & $0{,}21$ & 133 (tối ưu) & seed 104\\
+Tự sinh, vừa & \texttt{vua\_100x400\_s201} & $100\times400$ & $0{,}05$ & 204$^\dagger$ & Bộ sinh của B, seed 201\\
+ & \texttt{vua\_150x600\_s202} & $150\times600$ & $0{,}04$ & 261$^\dagger$ & seed 202\\
+ & \texttt{vua\_200x1000\_s203} & $200\times1000$ & $0{,}03$ & 316$^\dagger$ & seed 203\\
+OR-Library scp4x & scp41,\dots & $200\times1000$ & \DIEN & scp41: 429 (tối ưu); các bài còn lại tra OR-Library & Beasley (1990)\\
+OR-Library scp5x, scp6x & \DIEN & \DIEN & \DIEN & \DIEN & Beasley (1990)\\
+Bộ lớn (tùy chọn) & scpa--scpd, scpnre--scpnrh & \DIEN & \DIEN & BKS & Beasley (1990)\\
+\bottomrule
+\end{tabularx}
+\end{table}
+Hiện có 8 thể hiện thuộc 2 mức kích thước (nhỏ, vừa) đã chạy. Để đủ yêu cầu ít nhất 10 thể hiện thuộc ít nhất 3 mức, cần thêm tối thiểu 2 thể hiện OR-Library làm mức lớn: \dien{tải scp41 và ít nhất một thể hiện khác vào \path|data/chuan/|, chạy lại \path|run_all.py| và điền các dòng trên}. Mật độ ở bảng là mật độ đo được trên tệp.
+
+Các thể hiện tự sinh do B tạo: chi phí nguyên trong $[1,100]$, seed sinh $101$--$104$ và $201$--$203$ (tách khỏi seed chạy 1--10); đã kiểm tra mọi hàng của cả 7 tệp đều có ít nhất một cột phủ. Tệp \texttt{DANH\_MUC.md} nhắc tới bộ sinh \texttt{src/gen\_scp.py} nhưng tệp này không có trong kho mã hiện tại: \dien{bổ sung bộ sinh và mô tả cách sinh quan hệ phủ cùng cách đảm bảo mọi hàng được phủ}. Riêng thể hiện $120\times500$ (mật độ $0{,}04$, seed sinh 301, thư mục \path|data/tuning/|) do \texttt{experiments/shared/gen\_tuning.py} sinh, chỉ dùng để khảo sát tham số ở mục 6.4.5 và không tham gia so sánh cuối, để tránh chọn tham số trên chính tập đánh giá.
+
+\subsubsection{Cách xác định $f^*$ để tính gap}
+\begin{itemize}
+\item Thể hiện nhỏ: $f^*$ là tối ưu do thuật toán chính xác tìm ra (không \texttt{TIMEOUT}).
+\item Thể hiện OR-Library: $f^*$ là tối ưu hoặc BKS công bố.
+\item Thể hiện tự sinh lớn không có tối ưu: $f^*$ là giá trị tốt nhất trong mọi lần chạy của mọi thuật toán, ghi rõ là ``tốt nhất trong thực nghiệm này'' trong chú thích bảng.
+\end{itemize}
+
+\subsection{Kế hoạch thí nghiệm}
+\begin{itemize}
+\item Số lần chạy: 10 lần độc lập cho mỗi (thuật toán, thể hiện) với seed $1,\dots,10$ ghi trong cột \texttt{seed} của tệp kết quả. GREEDY và EXACT xác định nên chỉ chạy một lần.
+\item Ngân sách: cùng thời gian cho mọi thuật toán trên một thể hiện; gợi ý của đề là 30 giây cho scp4x--scp6x và 120 giây cho bộ lớn; ngân sách thực dùng: $0{,}2$ s (\texttt{vidu}), $0{,}5$ s (thể hiện nhỏ) và $3$ s (thể hiện vừa) cho SA, TS, GA, GA\_LS (cùng ngân sách) và cho HC (HC dừng sớm khi tới cực tiểu cục bộ); EXACT có giới hạn 60 s (nhỏ) và 30 s (vừa). Ngân sách ngắn hơn nhiều so với gợi ý của đề (do cài đặt Python, máy 1 lõi và thời gian thực hiện), nên các kết luận ở thể hiện vừa là kết luận cho ngân sách ngắn.
+\item Tham số: dùng giá trị mặc định ở mục 5.6, trừ phần phân tích độ nhạy ở mục 6.4.5 (chạy riêng trên thể hiện chỉnh tham số, seed 1--5, mỗi lần 2 s).
+\item Chỉ số: best, avg, std, thời gian trung bình, thời gian đến khi đạt nghiệm tốt nhất (\texttt{time\_to\_best\_s}), số lần đạt tối ưu trên tổng số lần chạy, và độ lệch tương đối
+\[
+\mathrm{gap}=\frac{|f-f^*|}{|f^*|}\times100\%\qquad(\mathrm{Gap}_b\ \text{với}\ f=\text{best},\ \mathrm{Gap}_a\ \text{với}\ f=\text{avg}).
+\]
+\item Mọi nghiệm đưa vào bảng kết quả đều phải qua \texttt{kiemtra.py} và báo \texttt{HOP LE}; báo cáo thêm tỉ lệ lần chạy cho nghiệm hợp lệ (với thuật toán sửa chữa của nhóm, tỉ lệ này phải là 100\%). Trong thực nghiệm này 496/496 nghiệm (EXACT, GREEDY, HC\_FI, HC\_BI, SA, TS, GA, GA\_LS) đều báo \texttt{HOP LE}, ghi ở \path|results/raw/check.csv|.
+\end{itemize}
+
+\subsection{Kết quả}
+\noindent\textit{Mọi số liệu dưới đây do \path|experiments/shared/run_all.py| chạy và \path|experiments/shared/summarize.py| tổng hợp từ \path|results/raw/*.csv|; gap tính theo công thức ở mục 6.3 với $f^*$ như mục 6.2.}
+
+\subsubsection{Thuật toán chính xác}
+\begin{table}[htbp]
+\centering
+\caption{Thuật toán nhánh cận. Giới hạn thời gian 60 s (nhỏ) và 30 s (vừa). $^{*}$: nghiệm tốt nhất tìm được khi hết thời gian, chưa chứng minh tối ưu.}
+\small
+\begin{tabularx}{\textwidth}{lrrYrrl}
+\toprule
+Thể hiện & $m$ & $n$ & Cột còn lại sau giảm cỡ & Tối ưu & Thời gian (s) & Trạng thái\\
+\midrule
+\texttt{vidu} & 7 & 6 & 6 (bắt buộc 0) & 16 & 0{,}000 & tối ưu\\
+\texttt{nho\_10x20\_s101} & 10 & 20 & 11 (bắt buộc 0) & 65 & 0{,}000 & tối ưu\\
+\texttt{nho\_15x25\_s102} & 15 & 25 & 19 (bắt buộc 0) & 136 & 0{,}000 & tối ưu\\
+\texttt{nho\_20x28\_s103} & 20 & 28 & 24 (bắt buộc 1) & 212 & 0{,}000 & tối ưu\\
+\texttt{nho\_25x30\_s104} & 25 & 30 & 30 (bắt buộc 0) & 133 & 0{,}000 & tối ưu\\
+\texttt{vua\_100x400\_s201} & 100 & 400 & 371 (bắt buộc 0) & 214$^{*}$ & 30{,}0 & TIMEOUT\\
+\texttt{vua\_150x600\_s202} & 150 & 600 & 585 (bắt buộc 0) & 273$^{*}$ & 30{,}0 & TIMEOUT\\
+\texttt{vua\_200x1000\_s203} & 200 & 1000 & 963 (bắt buộc 0) & 381$^{*}$ & 30{,}0 & TIMEOUT\\
+\bottomrule
+\end{tabularx}
+\label{tbl:exact}
+\end{table}
+Thuật toán kết thúc với chứng nhận tối ưu ở mọi thể hiện nhỏ trong chưa đến 1 ms; các giá trị 65, 136, 212, 133 khớp với giá trị mà B đã tự kiểm tra bằng một nhánh cận riêng (ghi trong \texttt{DANH\_MUC.md}). Giảm cỡ dữ liệu hiệu quả khi ma trận dày và nhỏ (loại 9 trong 20 cột của \texttt{nho\_10x20\_s101}, tức $45\%$; có thêm một cột bắt buộc ở \texttt{nho\_20x28\_s103}) nhưng ít tác dụng ở thể hiện vừa thưa (chỉ loại $2{,}5$--$7{,}3\%$ cột). Cả ba thể hiện vừa đều hết 30 s; nghiệm tốt nhất mà thuật toán tìm được là 214, 273 và 381, kém $f^*$ tốt nhất biết lần lượt $4{,}9\%$, $4{,}6\%$ và $20{,}6\%$, và kém cả nghiệm tham lam (213, 272, 330). Đây là hệ quả của hạn chế (1) ở mục 3.5: cận trên ban đầu $+\infty$ nên nhánh cận bắt đầu bằng một lần lặn sâu theo thứ tự chi phí chứ không từ nghiệm tham lam.
+
+\subsubsection{Tham lam và tìm kiếm cục bộ}
+\begin{table}[htbp]
+\centering
+\caption{Tham lam và leo đồi (trung bình 10 seed; trong ngoặc là gap \%; số lượt đánh giá là số nước đi lân cận được đánh giá).}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\textwidth}{lrrrrYY}
+\toprule
+Thể hiện & $f^*$ & Greedy+tỉa & HC\_FI & HC\_BI & Số lượt đánh giá FI/BI & Thời gian FI/BI (s)\\
+\midrule
+\texttt{vidu} & 16 & 16 (0{,}00) & 16{,}00 (0{,}00) & 16{,}00 (0{,}00) & 6/6 & 0{,}000/0{,}000\\
+\texttt{nho\_10x20\_s101} & 65 & 65 (0{,}00) & 65{,}00 (0{,}00) & 65{,}00 (0{,}00) & 14/14 & 0{,}000/0{,}000\\
+\texttt{nho\_15x25\_s102} & 136 & 136 (0{,}00) & 136{,}00 (0{,}00) & 136{,}00 (0{,}00) & 29/29 & 0{,}000/0{,}000\\
+\texttt{nho\_20x28\_s103} & 212 & 216 (1{,}89) & 212{,}00 (0{,}00) & 212{,}00 (0{,}00) & 56/67 & 0{,}000/0{,}000\\
+\texttt{nho\_25x30\_s104} & 133 & 133 (0{,}00) & 133{,}00 (0{,}00) & 133{,}00 (0{,}00) & 45/45 & 0{,}000/0{,}000\\
+\texttt{vua\_100x400\_s201} & 204 & 213 (4{,}41) & 211{,}00 (3{,}43) & 211{,}00 (3{,}43) & 868/1258 & 0{,}008/0{,}009\\
+\texttt{vua\_150x600\_s202} & 261 & 272 (4{,}21) & 269{,}10 (3{,}10) & 268{,}20 (2{,}76) & 1452/2097 & 0{,}016/0{,}018\\
+\texttt{vua\_200x1000\_s203} & 316 & 330 (4{,}43) & 316{,}50 (0{,}16) & 316{,}00 (0{,}00) & 4077/9176 & 0{,}039/0{,}055\\
+\bottomrule
+\end{tabularx}
+\label{tbl:ls}
+\end{table}
+Tham lam kèm xóa cột thừa đã tối ưu ở 3/4 thể hiện nhỏ và lệch $1{,}89\%$ ở \texttt{nho\_20x28\_s103} (216 so với 212), chỗ mà cả hai chiến lược leo đồi đều sửa được. Ở thể hiện vừa tham lam lệch $4{,}2$--$4{,}4\%$; leo đồi giảm gap trung bình xuống $0$--$3{,}4\%$ chỉ trong $8$--$60$ ms nhưng dễ kẹt ở cực tiểu cục bộ: trên \texttt{vua\_100x400\_s201} cả hai chiến lược dừng ở 211 với mọi seed (gap $3{,}43\%$, không lần nào đạt 204). First improvement và best improvement cho chất lượng gần như nhau (BI nhỉnh hơn ở \texttt{vua\_150x600\_s202}: $268{,}2$ so với $269{,}1$, và ở \texttt{vua\_200x1000\_s203}: $316{,}00$ so với $316{,}50$, chưa kiểm định thống kê) nhưng BI phải đánh giá nhiều nước đi hơn ($1258$ so với $868$; $2097$ so với $1452$; $9176$ so với $4077$) và chạy lâu hơn một chút, đúng như dự đoán ở mục 4.4.
+
+\subsubsection{So sánh các metaheuristic}
+Mỗi thể hiện một nhóm dòng, mỗi thuật toán một dòng; in đậm giá trị tốt nhất của mỗi thể hiện (cột Best và Avg). Thuật toán của thành viên D chưa có nên chưa có dòng tương ứng: \dien{thêm dòng ACO/GRASP sau khi D chạy xong}.
+
+\begin{table}[htbp]
+\centering
+\caption{Thể hiện nhỏ ($0{,}5$ s mỗi lần chạy, 10 seed, $f^*$ là tối ưu).}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\textwidth}{lrlrrrrrrY}
+\toprule
+Thể hiện & $f^*$ & Thuật toán & Best & Avg & Std & Gap$_b$\,\% & Gap$_a$\,\% & T (s) & Đạt $f^*$\\
+\midrule
+\texttt{nho\_10x20\_s101} & 65 & SA & \textbf{65} & \textbf{65{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}50 & 10/10\\
+ &  & TS & \textbf{65} & \textbf{65{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}50 & 10/10\\
+ &  & GA & \textbf{65} & \textbf{65{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}50 & 10/10\\
+ &  & GA\_LS & \textbf{65} & \textbf{65{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}50 & 10/10\\
+\midrule
+\texttt{nho\_15x25\_s102} & 136 & SA & \textbf{136} & \textbf{136{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}50 & 10/10\\
+ &  & TS & \textbf{136} & \textbf{136{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}50 & 10/10\\
+ &  & GA & \textbf{136} & \textbf{136{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}50 & 10/10\\
+ &  & GA\_LS & \textbf{136} & \textbf{136{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}50 & 10/10\\
+\midrule
+\texttt{nho\_20x28\_s103} & 212 & SA & \textbf{212} & \textbf{212{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}50 & 10/10\\
+ &  & TS & \textbf{212} & \textbf{212{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}50 & 10/10\\
+ &  & GA & \textbf{212} & \textbf{212{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}50 & 10/10\\
+ &  & GA\_LS & \textbf{212} & \textbf{212{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}50 & 10/10\\
+\midrule
+\texttt{nho\_25x30\_s104} & 133 & SA & \textbf{133} & \textbf{133{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}50 & 10/10\\
+ &  & TS & \textbf{133} & \textbf{133{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}50 & 10/10\\
+ &  & GA & \textbf{133} & \textbf{133{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}50 & 10/10\\
+ &  & GA\_LS & \textbf{133} & \textbf{133{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}50 & 10/10\\
+\bottomrule
+\end{tabularx}
+\label{tbl:meta_small}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Thể hiện vừa (3 s mỗi lần chạy, 10 seed). $^\dagger$: $f^*$ là giá trị tốt nhất trong thực nghiệm này, không phải tối ưu chứng minh; ``Đạt $f^*$'' là số lần chạy đạt giá trị đó. Std là độ lệch chuẩn mẫu; T là thời gian chạy thực đo được.}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\textwidth}{lrlrrrrrrY}
+\toprule
+Thể hiện & $f^*$ & Thuật toán & Best & Avg & Std & Gap$_b$\,\% & Gap$_a$\,\% & T (s) & Đạt $f^*$\\
+\midrule
+\texttt{vua\_100x400\_s201} & 204$^{\dagger}$ & SA & \textbf{204} & 207{,}20 & 3{,}49 & 0{,}00 & 1{,}57 & 3{,}00 & 5/10\\
+ &  & TS & \textbf{204} & \textbf{204{,}60} & 1{,}35 & 0{,}00 & 0{,}29 & 3{,}00 & 8/10\\
+ &  & GA & 208 & 210{,}70 & 5{,}33 & 1{,}96 & 3{,}28 & 3{,}00 & 0/10\\
+ &  & GA\_LS & \textbf{204} & 207{,}40 & 1{,}35 & 0{,}00 & 1{,}67 & 3{,}00 & 1/10\\
+\midrule
+\texttt{vua\_150x600\_s202} & 261$^{\dagger}$ & SA & 263 & 268{,}70 & 2{,}11 & 0{,}77 & 2{,}95 & 3{,}00 & 0/10\\
+ &  & TS & \textbf{261} & \textbf{261{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 3{,}00 & 10/10\\
+ &  & GA & \textbf{261} & 275{,}10 & 6{,}57 & 0{,}00 & 5{,}40 & 3{,}00 & 1/10\\
+ &  & GA\_LS & \textbf{261} & 265{,}70 & 4{,}83 & 0{,}00 & 1{,}80 & 3{,}00 & 4/10\\
+\midrule
+\texttt{vua\_200x1000\_s203} & 316$^{\dagger}$ & SA & \textbf{316} & 317{,}10 & 1{,}45 & 0{,}00 & 0{,}35 & 3{,}00 & 3/10\\
+ &  & TS & \textbf{316} & \textbf{316{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 3{,}00 & 10/10\\
+ &  & GA & 318 & 320{,}10 & 1{,}45 & 0{,}63 & 1{,}30 & 3{,}00 & 0/10\\
+ &  & GA\_LS & 317 & 318{,}30 & 1{,}06 & 0{,}32 & 0{,}73 & 3{,}00 & 0/10\\
+\bottomrule
+\end{tabularx}
+\label{tbl:meta_mid}
+\end{table}
+Ở thể hiện nhỏ cả 16 dòng đều đạt tối ưu ở 10/10 lần chạy nên không phân biệt được thuật toán. Ở thể hiện vừa, TS có Avg tốt nhất và độ lệch chuẩn nhỏ nhất ở cả ba thể hiện (đạt $f^*$ ở 8/10, 10/10 và 10/10 lần chạy); GA luôn có Avg tệ nhất.
+
+\subsubsection{Đường hội tụ}
+Với mỗi thể hiện đại diện, Hình~\ref{fig:conv_vua1} và \ref{fig:conv_vua3} vẽ giá trị tốt nhất theo thời gian từ \path|results/conv/<thể hiện>_<thuật toán>_s<seed>_conv.csv|: đường là trung vị của 10 lần chạy, dải tô là khoảng tứ phân vị 25--75\%, phân biệt thuật toán bằng cả màu và kiểu nét; do tệp log chỉ ghi khi có cải thiện, giá trị cuối được kéo dài đến hết ngân sách. Hình~\ref{fig:conv_nho} (thể hiện nhỏ) và Hình~\ref{fig:box} (biểu đồ hộp giá trị cuối trên 3 thể hiện vừa) bổ sung cho các hình này. Đường chấm xám là $f^*$.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.78\textwidth]{figures/conv_nho.pdf}
+\caption{Hội tụ trên \texttt{nho\_25x30\_s104}: mọi thuật toán về tối ưu gần như tức thì.}
+\label{fig:conv_nho}
+\end{figure}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.78\textwidth]{figures/conv_vua1.pdf}
+\caption{Hội tụ trên \texttt{vua\_100x400\_s201}.}
+\label{fig:conv_vua1}
+\end{figure}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.78\textwidth]{figures/conv_vua3.pdf}
+\caption{Hội tụ trên \texttt{vua\_200x1000\_s203}.}
+\label{fig:conv_vua3}
+\end{figure}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/boxplot_mid.pdf}
+\caption{Phân bố chi phí cuối của 10 lần chạy trên ba thể hiện vừa (dấu tam giác là trung bình, đường chấm là $f^*$).}
+\label{fig:box}
+\end{figure}
+
+Nhận xét: GA và GA\_LS giảm rất nhanh lúc đầu rồi ngừng cải thiện sớm (thời điểm đạt nghiệm cuối trung bình chỉ $0{,}04$--$0{,}37$ s trên ngân sách 3 s; xem cột \texttt{time\_to\_best\_s} trong \path|results/raw/|), trong khi TS và SA còn cải thiện muộn hơn ở \texttt{vua\_100x400\_s201} (TS đạt nghiệm cuối trung bình sau $1{,}85$ s, SA sau $0{,}85$ s). Việc GA, GA\_LS dừng sớm gợi ý quần thể mất đa dạng, nhưng nhóm chưa đo độ đa dạng nên đây mới là giả thuyết. Ở \texttt{vua\_200x1000\_s203} TS và HC\_BI đều về 316 sau chưa đến $0{,}1$ s.
+
+\subsubsection{Phân tích độ nhạy tham số}
+Chạy trên thể hiện riêng $120\times500$ (\path|data/tuning/|), 5 seed (1--5), mỗi lần 2 s, thay một tham số một lần và giữ các tham số còn lại ở giá trị mặc định ($P=40$, $p_m=1/n$; TS: tenure theo công thức, sample $=40$).
+\begin{table}[htbp]
+\centering
+\caption{Độ nhạy tham số trên \texttt{tune\_120x500\_s301} (5 seed, 2 s). Std là độ lệch chuẩn mẫu.}
+\small
+\begin{tabularx}{\textwidth}{llrrrr}
+\toprule
+Thuật toán & Tham số & Giá trị & Avg & Best & Std\\
+\midrule
+GA & $P$ & 20 & 197{,}00 & 196 & 0{,}71\\
+GA & $P$ & 40 & 196{,}00 & 196 & 0{,}00\\
+GA & $P$ & 80 & 194{,}40 & 193 & 1{,}95\\
+GA & $p_m\cdot n$ & 0{,}5 & 195{,}40 & 193 & 1{,}34\\
+GA & $p_m\cdot n$ & 2{,}0 & 195{,}60 & 193 & 1{,}52\\
+GA\_LS & $P$ & 20 & 204{,}60 & 196 & 8{,}26\\
+GA\_LS & $P$ & 40 & 195{,}80 & 192 & 2{,}49\\
+GA\_LS & $P$ & 80 & 194{,}80 & 192 & 1{,}79\\
+GA\_LS & $p_m\cdot n$ & 0{,}5 & 196{,}00 & 196 & 0{,}00\\
+GA\_LS & $p_m\cdot n$ & 2{,}0 & 195{,}20 & 192 & 1{,}79\\
+TS & tenure & 3 & 192{,}00 & 192 & 0{,}00\\
+TS & tenure & 10 & 192{,}00 & 192 & 0{,}00\\
+TS & tenure & 25 & 192{,}00 & 192 & 0{,}00\\
+TS & sample & 10 & 192{,}00 & 192 & 0{,}00\\
+TS & sample & 100 & 192{,}00 & 192 & 0{,}00\\
+TS & mặc định & - & 192{,}00 & 192 & 0{,}00\\
+GA & mặc định & - & 196{,}00 & 196 & 0{,}00\\
+GA\_LS & mặc định & - & 195{,}80 & 192 & 2{,}49\\
+\bottomrule
+\end{tabularx}
+\label{tbl:sens}
+\end{table}
+Kết quả: với GA\_LS, giảm quần thể xuống $P=20$ làm Avg tệ đi rõ rệt ($204{,}6$ với std $8{,}26$, so với $195{,}8$ ở $P=40$); tăng lên $P=80$ cho Avg tốt nhất ở cả GA ($194{,}4$) và GA\_LS ($194{,}8$) trong ngân sách này. Xác suất đột biến trong khoảng $[0{,}5/n;\,2/n]$ gần như không đổi chất lượng (Avg $195{,}2$--$196{,}0$). Với 5 seed và độ lệch chuẩn $1$--$2{,}5$, chênh lệch dưới khoảng $1{,}5$ đơn vị không đủ để kết luận. TS đạt 192 ở mọi seed và mọi cấu hình (kể cả mặc định), nghĩa là thể hiện chỉnh tham số quá dễ với TS ở ngân sách 2 s nên không cho biết TS nhạy với tenure hay sample đến đâu. SA chưa khảo sát được vì các tham số ($T_0$, $\alpha$, số bước mỗi mức nhiệt) đang cố định trong \texttt{main\_A.py} và chưa có tùy chọn dòng lệnh: \dien{thêm tham số dòng lệnh cho SA rồi chạy khảo sát $T_0$, $\alpha$; ACO/GRASP của D}.
+
+\subsubsection{Kiểm định thống kê}
+Với $k$ thuật toán chạy trên $N$ thể hiện (dùng giá trị trung bình mỗi thể hiện), dùng kiểm định Friedman. Gọi $R_j$ là hạng trung bình của thuật toán $j$ (hạng 1 là tốt nhất, hòa thì lấy hạng trung bình):
+\[
+\chi^2_F=\frac{12N}{k(k+1)}\left(\sum_{j=1}^{k}R_j^2-\frac{k(k+1)^2}{4}\right)\qquad(\text{bậc tự do } k-1).
+\]
+Công thức này chưa hiệu chỉnh cho các hạng hòa; vì bốn thể hiện nhỏ hòa hoàn toàn, nhóm dùng bản có hiệu chỉnh hòa của \texttt{scipy.stats.friedmanchisquare} (nếu áp công thức không hiệu chỉnh cho cùng dữ liệu thì $\chi^2_F=3{,}51$, nhỏ hơn giá trị tới hạn $7{,}81$ nên kết luận sẽ khác; dữ liệu nhiều hòa như thế này nên dùng bản hiệu chỉnh).
+
+Với $k=\FriedK$ (SA, TS, GA, GA\_LS) và $N=\FriedN$ thể hiện tự sinh (4 nhỏ và 3 vừa): $\chi^2_F=\FriedChi$ (bậc tự do 3), $p=\FriedP$, nên bác bỏ $H_0$ ở mức $0{,}05$ nhưng chỉ sát ngưỡng. Hạng trung bình trên 3 thể hiện vừa (4 thể hiện nhỏ hòa hoàn toàn, không đóng góp): 
+\begin{center}
+\begin{tabular}{lcccc}
+\toprule
+ & SA & TS & GA & GA\_LS\\
+\midrule
+Hạng trung bình (thể hiện vừa) & \RankRowMid\\
+\bottomrule
+\end{tabular}
+\end{center}
+Vì $N$ nhỏ nên kết luận của Friedman chỉ mang tính tham khảo; so sánh cặp ở dưới dựa trên 10 lần chạy mỗi thuật toán trên từng thể hiện vừa.
+
+Cho so sánh cặp nhóm dùng kiểm định tổng hạng Wilcoxon (Mann--Whitney $U$, hai phía) trên 10 lần chạy của hai thuật toán, rồi hiệu chỉnh Holm cho 6 cặp trong mỗi thể hiện. Nhóm không dùng kiểm định hạng dấu Wilcoxon theo cặp trên từng seed vì các seed của hai thuật toán không tạo thành cặp có ý nghĩa (mỗi thuật toán dùng seed cho luồng ngẫu nhiên khác nhau); kiểm định hạng dấu chỉ hợp lý nếu ghép theo thể hiện, khi đó $N=\FriedN$ quá nhỏ. In đậm khi $p$ hiệu chỉnh $<0{,}05$.
+\begin{table}[htbp]
+\centering
+\caption{So sánh cặp (Mann--Whitney $U$ hai phía, hiệu chỉnh Holm trong từng thể hiện).}
+\small
+\begin{tabularx}{0.8\textwidth}{llrr}
+\toprule
+Thể hiện & Cặp & $p$ & $p$ (Holm)\\
+\midrule
+\texttt{vua\_100x400\_s201} & SA -- TS & 0{,}0901 & 0{,}2703\\
+ & SA -- GA & 0{,}2040 & 0{,}4081\\
+ & SA -- GA\_LS & 0{,}9356 & 0{,}9356\\
+ & TS -- GA & 0{,}0002 & \textbf{0{,}0012}\\
+ & TS -- GA\_LS & 0{,}0015 & \textbf{0{,}0075}\\
+ & GA -- GA\_LS & 0{,}0327 & 0{,}1307\\
+\midrule
+\texttt{vua\_150x600\_s202} & SA -- TS & 0{,}0001 & \textbf{0{,}0003}\\
+ & SA -- GA & 0{,}0103 & \textbf{0{,}0237}\\
+ & SA -- GA\_LS & 0{,}0954 & 0{,}0954\\
+ & TS -- GA & 0{,}0002 & \textbf{0{,}0011}\\
+ & TS -- GA\_LS & 0{,}0059 & \textbf{0{,}0237}\\
+ & GA -- GA\_LS & 0{,}0059 & \textbf{0{,}0237}\\
+\midrule
+\texttt{vua\_200x1000\_s203} & SA -- TS & 0{,}0018 & \textbf{0{,}0055}\\
+ & SA -- GA & 0{,}0012 & \textbf{0{,}0048}\\
+ & SA -- GA\_LS & 0{,}0150 & \textbf{0{,}0184}\\
+ & TS -- GA & 0{,}0001 & \textbf{0{,}0003}\\
+ & TS -- GA\_LS & 0{,}0001 & \textbf{0{,}0003}\\
+ & GA -- GA\_LS & 0{,}0092 & \textbf{0{,}0184}\\
+\bottomrule
+\end{tabularx}
+\label{tbl:pairs}
+\end{table}
+Kết quả: TS tốt hơn GA và GA\_LS có ý nghĩa ở cả 3 thể hiện vừa; GA\_LS tốt hơn GA có ý nghĩa ở \texttt{vua\_150x600\_s202} và \texttt{vua\_200x1000\_s203} nhưng chưa có ý nghĩa ở \texttt{vua\_100x400\_s201} ($p_{\text{Holm}}=0{,}131$); SA tốt hơn GA ở 2 thể hiện sau và khác GA\_LS có ý nghĩa chỉ ở \texttt{vua\_200x1000\_s203}. Lưu ý: $p$ chỉ hiệu chỉnh trong từng thể hiện, không hiệu chỉnh giữa 3 thể hiện; mỗi nhóm chỉ có 10 quan sát và nhiều giá trị hòa nên $p$ chỉ là xấp xỉ; ngân sách 3 s là ngắn. Ý nghĩa thống kê ở đây không phải là kết luận chung cho mọi ngân sách hay mọi thể hiện.
+
+\subsection{Thảo luận}
+\begin{enumerate}
+\item \textbf{Thuật toán tốt nhất theo mức kích thước.} Thể hiện nhỏ: không phân biệt được (mọi thuật toán và cả hai chiến lược leo đồi đều tối ưu ở 10/10 lần chạy; chỉ tham lam thuần lệch ở \texttt{nho\_20x28\_s103}). Thể hiện vừa: TS tốt nhất (Avg $204{,}60$; $261{,}00$; $316{,}00$), tiếp theo là SA và GA\_LS (hạng trung bình $2{,}33$ và $2{,}67$ trên 3 thể hiện), GA kém nhất. Về nguyên nhân, nhóm chỉ có giả thuyết chưa kiểm chứng bằng thực nghiệm đối chứng: TS xuất phát từ nghiệm tham lam và dùng lân cận bỏ-rồi-sửa với hoàn tác bằng nhật ký nên thử được nhiều nước đi trong ngân sách ngắn, còn GA, SA phải tự khám phá từ nghiệm kém hơn hoặc sao chép cả lời giải mỗi bước (mục 5.2). Hai lưu ý: ở \texttt{vua\_200x1000\_s203}, HC\_BI (trung bình $316{,}00$ sau $0{,}06$ s) tốt hơn SA, GA, GA\_LS, tức thể hiện này khá dễ và ba metaheuristic đó chưa chứng tỏ giá trị so với một leo đồi trong 3 s; và $f^*$ của thể hiện vừa là giá trị tốt nhất tìm được (TS đóng góp phần lớn), nên gap có thể đánh giá thấp khoảng cách thật tới tối ưu. Cần cận dưới (ví dụ nới lỏng Lagrange) hoặc thể hiện OR-Library có BKS để khẳng định.
+\item \textbf{Tìm kiếm cục bộ trong GA\_LS có bù được thời gian không?} Có, trong ngân sách này. GA\_LS có Avg tốt hơn GA ở cả 3 thể hiện vừa ($207{,}40$ so với $210{,}70$; $265{,}70$ so với $275{,}10$; $318{,}30$ so với $320{,}10$) với độ lệch chuẩn nhỏ hơn, và khác biệt có ý nghĩa (Holm) ở 2/3 thể hiện (Bảng~\ref{tbl:pairs}), dù số thế hệ ít hơn. Tuy nhiên GA\_LS vẫn kém TS và không vượt SA một cách nhất quán.
+\item \textbf{Tham số ảnh hưởng nhiều nhất tới khám phá so với khai thác.} Trong dữ liệu hiện có (Bảng~\ref{tbl:sens}), tham số rõ nhất là kích thước quần thể $P$ của GA\_LS ($P=20$ tệ rõ; $P=80$ tốt nhất); $p_m$ ít ảnh hưởng trong khoảng khảo sát. Chưa thể kết luận về TS (thể hiện chỉnh tham số quá dễ) và SA (chưa khảo sát). Chỉ 5 seed trên 1 thể hiện, nên đây là kết quả sơ bộ.
+\item \textbf{Thuật toán chính xác và tham lam cho thấy gì về độ khó.} Thể hiện nhỏ không khó (EXACT chưa đến 1 ms, tham lam đã gần tối ưu). Thể hiện vừa vượt khả năng của EXACT hiện tại trong 30 s, và nghiệm tạm thời của nó tệ hơn cả tham lam (hạn chế cận trên $+\infty$ và cận dưới lỏng). Tham lam cách $f^*$ khoảng $4{,}2$--$4{,}4\%$, leo đồi rút còn $0$--$3{,}4\%$, phần còn lại do metaheuristic khai thác.
+\item \textbf{Tỉ lệ đạt tối ưu trên thể hiện nhỏ.} $10/10$ lần chạy cho SA, TS, GA, GA\_LS, HC\_FI và HC\_BI trên cả 4 thể hiện nhỏ và \texttt{vidu}; tham lam thuần tối ưu ở 3/4 thể hiện nhỏ (và ở \texttt{vidu}).
+\item \textbf{Khác biệt có ý nghĩa thống kê không?} Có ở thể hiện vừa cho phần lớn cặp có TS hoặc GA (Bảng~\ref{tbl:pairs}); Friedman trên 7 thể hiện chỉ sát ngưỡng ($p=\FriedP$) vì 4 thể hiện nhỏ hòa hoàn toàn. Khẳng định rộng hơn cần thêm thể hiện (đặc biệt OR-Library), ngân sách dài hơn và thuật toán của D.
+\end{enumerate}
+
+%================= 7 =================
+\section{Kết luận}
+\textbf{Kết quả đạt được.} Nhóm đã cài đặt và kiểm tra bằng bộ kiểm tra độc lập: thuật toán chính xác (nhánh cận kèm giảm cỡ dữ liệu), tham lam Chvátal kèm xóa cột thừa, hai chiến lược leo đồi, SA, TS, GA và GA\_LS. Trên 8 thể hiện (ví dụ của đề, 4 nhỏ, 3 vừa), 10 seed mỗi cặp, 496/496 nghiệm hợp lệ. Gap trung bình theo $f^*$: thể hiện nhỏ $0\%$ cho cả bốn metaheuristic; thể hiện vừa TS $0$--$0{,}29\%$, SA $0{,}35$--$2{,}95\%$, GA\_LS $0{,}73$--$1{,}80\%$, GA $1{,}30$--$5{,}40\%$ (với $f^*$ là giá trị tốt nhất trong thực nghiệm). TS là thuật toán hiệu quả nhất trong điều kiện thực nghiệm này (ngân sách 3 s, Python); tìm kiếm cục bộ làm GA\_LS tốt hơn GA có ý nghĩa thống kê ở 2/3 thể hiện vừa.
+
+\textbf{Hạn chế.}
+\begin{itemize}
+\item Thuật toán chính xác khởi tạo cận trên là $+\infty$ (chưa dùng nghiệm tham lam), cận dưới chưa dùng nới lỏng Lagrange, ranh giới giải được còn nhỏ ($n=30$ trong thực nghiệm này) so với các thể hiện OR-Library.
+\item SA tính lại toàn bộ nghiệm sau mỗi bước (chưa có delta evaluation) và lịch nguội theo số bước chứ chưa theo thời gian.
+\item TS dùng cấm mềm; N2 trong tìm kiếm cục bộ mới là đánh giá gia tăng một phần.
+\item Cài đặt bằng Python nên tốc độ thấp hơn đáng kể so với ngôn ngữ biên dịch; kết quả thời gian chỉ so sánh được trong cùng một ngôn ngữ.
+\item Thực nghiệm còn thiếu: chưa có thể hiện OR-Library (mới 2 mức kích thước, 8 thể hiện, chưa đủ 10 thể hiện và 3 mức); chưa có thuật toán của thành viên D; ngân sách chỉ $0{,}5$--$3$ s (đề gợi ý 30--120 s) nên thứ hạng giữa các metaheuristic có thể đổi khi chạy lâu hơn; $f^*$ của thể hiện vừa chỉ là giá trị tốt nhất tìm được và chưa có cận dưới để đo khoảng cách thật tới tối ưu; số liệu chạy trên Linux, 1 lõi, chưa chạy lại trên máy Windows của nhóm.
+\item Khảo sát độ nhạy mới có 5 seed trên một thể hiện, chưa khảo sát SA, và thể hiện chỉnh tham số quá dễ với TS.
+\item Phần giải thích nguyên nhân (TS tốt hơn nhờ xuất phát từ nghiệm tham lam và lân cận hiệu quả; GA, GA\_LS mất đa dạng sớm; SA nguội chậm theo số bước) mới là giả thuyết, chưa có thực nghiệm đối chứng (ablation).
+\end{itemize}
+
+\textbf{Hướng phát triển.} Cận dưới bằng nới lỏng Lagrange (dùng cho nhánh cận và để tính khoảng cách tới tối ưu cho bộ dữ liệu lớn); delta evaluation đầy đủ cho SA; lịch nguội theo thời gian; thử thuật toán lớp LNS hoặc ILS; sinh dữ liệu từ bản đồ nút giao thực tế (ví dụ trích từ OpenStreetMap, camera phủ các nút trong bán kính cho trước).
+
+%================= TÀI LIỆU THAM KHẢO =================
+\begin{thebibliography}{99}
+\addcontentsline{toc}{section}{Tài liệu tham khảo}
+\bibitem{karp} R. M. Karp, ``Reducibility among combinatorial problems'', trong \textit{Complexity of Computer Computations}, Plenum Press, 1972, tr. 85--103.
+\bibitem{chvatal} V. Chvátal, ``A greedy heuristic for the set-covering problem'', \textit{Mathematics of Operations Research}, 4(3), 1979, tr. 233--235.
+\bibitem{dinur} I. Dinur, D. Steurer, ``Analytical approach to parallel repetition'', \textit{Proc. 46th ACM STOC}, 2014.
+\bibitem{garey} M. R. Garey, D. S. Johnson, \textit{Computers and Intractability: A Guide to the Theory of NP-Completeness}, W. H. Freeman, 1979.
+\bibitem{beasley90} J. E. Beasley, ``OR-Library: distributing test problems by electronic mail'', \textit{Journal of the Operational Research Society}, 41(11), 1990, tr. 1069--1072.
+\bibitem{beasleychu} J. E. Beasley, P. C. Chu, ``A genetic algorithm for the set covering problem'', \textit{European Journal of Operational Research}, 94(2), 1996, tr. 392--404.
+\bibitem{kirk} S. Kirkpatrick, C. D. Gelatt, M. P. Vecchi, ``Optimization by simulated annealing'', \textit{Science}, 220(4598), 1983, tr. 671--680.
+\bibitem{glover} F. Glover, ``Future paths for integer programming and links to artificial intelligence'', \textit{Computers \& Operations Research}, 13(5), 1986, tr. 533--549.
+\bibitem{holland} J. H. Holland, \textit{Adaptation in Natural and Artificial Systems}, University of Michigan Press, 1975.
+\bibitem{moscato} P. Moscato, ``On evolution, search, optimization, genetic algorithms and martial arts: towards memetic algorithms'', Caltech Concurrent Computation Program, Report 826, 1989.
+\bibitem{talbi} E.-G. Talbi, \textit{Metaheuristics: From Design to Implementation}, Wiley, 2009.
+\bibitem{d} \dien{tài liệu gốc của thuật toán thành viên D, ví dụ M. Dorigo, T. Stützle, \textit{Ant Colony Optimization}, MIT Press, 2004; hoặc T. A. Feo, M. G. C. Resende, ``Greedy randomized adaptive search procedures'', \textit{Journal of Global Optimization}, 6, 1995}
+\bibitem{ai} Công cụ AI đã dùng khi soạn tài liệu (nếu có): \dien{ghi rõ công cụ và phần việc theo mục liêm chính học thuật của đề}.
+\end{thebibliography}
+
+%================= PHỤ LỤC =================
+\appendix
+\section{Bảng phân công công việc}
+\begin{center}
+\small
+\begin{tabularx}{\textwidth}{llYYr}
+\toprule
+TV & Họ tên & Phần mã & Phần báo cáo & Đóng góp\\
+\midrule
+A & Phan Việt Anh & Bộ đọc, bộ kiểm tra, thuật toán chính xác, SA & Phát biểu bài toán, NP-khó, thuật toán chính xác, SA, ghép báo cáo & \DIEN\%\\
+B & Hoàng Duy Khánh & Tham lam Chvátal, xóa cột thừa, tìm kiếm cục bộ, TS, bộ sinh dữ liệu & Heuristic, tìm kiếm cục bộ, Tabu Search & \DIEN\%\\
+C & Huỳnh Xuân Huy & GA, GA\_LS & GA và thuật toán lai & \DIEN\%\\
+D & Phạm Nhật Mai Thành & \dien{ACO/GRASP}, script thực nghiệm, biểu đồ, kiểm định & Thực nghiệm, phân tích thống kê, kết luận & \DIEN\%\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\section{Lệnh chạy và tái lập kết quả}
+\begin{Verbatim}
+# Vi du chay duoc ngay (ket qua dung 16)
+python src\main_A.py data\vidu\vidu.txt EXACT results\solutions\vidu_EXACT.sol 42 10 results\conv\vidu_EXACT_conv.csv
+python src\kiemtra.py data\vidu\vidu.txt results\solutions\vidu_EXACT.sol     # HOP LE | Tong chi phi: 16
+
+# Cu phap chung
+python src\main_A.py <tep_vao> <EXACT|SA> <tep_ra> [seed] [budget_sec] [conv_csv]
+python src\main_C.py <tep_vao> <GA|GA_LS> <tep_ra> [seed] [budget_sec] [conv_csv] [population] [mutation_rate]
+python src\greedy.py <tep_vao> GREEDY <tep_ra> [seed] [budget_sec] [conv_csv] [raw=<tep_csv>] [run=<k>]
+python src\local_search.py <tep_vao> <HC_FI|HC_BI> <tep_ra> [seed] [budget_sec] [conv_csv]
+python src\tabu.py <tep_vao> TS <tep_ra> [seed] [budget_sec] [conv_csv] [tenure=<k>] [sample=<k>]
+
+# Chay GA va GA_LS tren du lieu tu sinh (seed 1..10)
+python experiments\member_c\run_tusinh.py [--budget 1.0] [--seeds 1 2 3 4 5 6 7 8 9 10] [--population 40] [--mutation-rate 0.025] [--output results] [instance...]
+\end{Verbatim}
+Các lệnh chạy lại toàn bộ thực nghiệm chính, khảo sát tham số và tổng hợp (bảng ở \path|report/gen/|, hình ở \path|results/figures/|):
+\begin{Verbatim}
+python experiments\shared\run_all.py        # EXACT, GREEDY, HC_FI, HC_BI, TS, SA, GA, GA_LS: 8 the hien x 10 seed
+python experiments\shared\gen_tuning.py     # sinh the hien chinh tham so (data\tuning\)
+python experiments\shared\sens.py           # do nhay tham so GA, GA_LS, TS (seed 1..5, 2 s)
+python experiments\shared\summarize.py      # bang, hinh, Friedman, Mann-Whitney + Holm
+\end{Verbatim}
+Seed chạy: 1--10 (độ nhạy: 1--5); seed sinh dữ liệu: 101--104, 201--203 và 301. Thời gian chạy trên máy ở mục 6.1: khoảng 9,5 phút cho \path|run_all.py| (558 s) và khoảng 3 phút cho \path|sens.py|. Các bảng trong báo cáo được dán từ \path|report/gen/*.tex|; nếu chạy lại phải dán lại hoặc biên dịch lại cùng các tệp đó.
+
+\end{document}
