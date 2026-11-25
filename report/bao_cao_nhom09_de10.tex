@@ -163,19 +163,19 @@ Tại mỗi nút, chọn hàng chưa phủ có ít cột hợp lệ nhất (MRV:
 
 \begin{Verbatim}
 EXACT(I, T_max):
-    giam co du lieu (loai cot troi, chon cot bat buoc)  ->  base_cost, cnt[.]
+    reduce_instance(remove dominated cols, pick forced cols) -> base_cost, cnt[.]
     best <- +inf
     DFS(cost = base_cost, covered, cnt, cur):
-        neu het thoi gian T_max: dat co timeout; return
-        neu cost >= best: return                       # cat theo can tren
-        neu covered = m: best <- cost; luu cur; return
-        neu cost + LB(cnt) >= best: return             # cat theo can duoi
-        i* <- hang chua phu co it cot hop le nhat
-        neu i* khong con cot hop le: return
-        voi moi cot c trong R_{i*} (tang dan theo c_c):
-            neu cost + c_c >= best: continue
-            them c (cap nhat cnt); DFS(cost + c_c, ...); bo c
-    tra ve best, loi giai tuong ung, co timeout
+        if elapsed_time > T_max: set timeout = True; return
+        if cost >= best: return                        # upper-bound pruning
+        if covered == m: best <- cost; best_sol <- cur; return
+        if cost + LB(cnt) >= best: return              # lower-bound pruning
+        i* <- uncovered row with minimum valid columns (MRV)
+        if i* has no valid column: return
+        for each column c in R_{i*} (sorted by c_c ascending):
+            if cost + c_c >= best: continue
+            add c (update cnt); DFS(cost + c_c, ...); remove c
+    return best, best_sol, timeout
 \end{Verbatim}
 
 \subsection{Độ phức tạp và giới hạn}
@@ -193,15 +193,17 @@ Một lời giải được biểu diễn bằng mảng nhị phân \texttt{sel[
 \subsection{Tham lam Chvátal và xóa cột thừa}
 \begin{Verbatim}
 GREEDY_CHVATAL(I):
-    U <- tap hang chua phu;  X <- {}
-    trong khi U khac rong:
-        chon j khong thuoc X minimizing  c_j / |S_j giao U|   (chi xet |S_j giao U| > 0; hoa thi lay chi so nho nhat)
-        X <- X + {j};  U <- U \ S_j
+    U <- set of all uncovered rows;  X <- empty set
+    while U is not empty:
+        select j not in X minimizing c_j / |S_j intersect U|  (|S_j intersect U| > 0; tie-break by smallest index)
+        X <- X U {j};  U <- U \ S_j
     REMOVE_REDUNDANT(X)
+    return X
 
 REMOVE_REDUNDANT(X):
-    duyet j thuoc X theo chi phi giam dan (hoa thi theo chi so):
-        neu moi i thuoc S_j co cnt[i] >= 2: loai j khoi X, cap nhat cnt
+    for each j in X sorted by cost c_j descending (tie-break by index):
+        if cnt[i] >= 2 for all i in S_j:
+            remove j from X and update cnt[.]
 \end{Verbatim}
 Duyệt theo chi phí giảm dần để ưu tiên loại các cột đắt trước. Mỗi bước chọn xét các cột ứng viên (những cột phủ ít nhất một hàng chưa phủ) và đếm số hàng mới phủ, nên toàn bộ phần xây dựng tốn $O(K\cdot nnz)$ với $K$ là số cột được chọn; \texttt{REMOVE\_REDUNDANT} tốn $O\bigl(\sum_{j\in X}|S_j|\bigr)$. Trên ví dụ nhỏ, hai bước này cho chi phí 19 rồi 16 (mục 1.4). Hàm \texttt{repair(st, rng, forbid)} chính là phần lặp của Chvátal áp dụng cho các hàng chưa phủ hiện tại và có thể cấm một số cột (dùng bởi tìm kiếm cục bộ và TS); khi có \texttt{rng} thì các cột hòa nhau được chọn ngẫu nhiên.
 
@@ -212,14 +214,15 @@ Duyệt theo chi phí giảm dần để ưu tiên loại các cột đắt trư
 
 \subsection{Leo đồi: first improvement và best improvement}
 \begin{Verbatim}
-HILL_CLIMB(X, chien_luoc):
-    lap cho den khi khong cai thien duoc hoac het thoi gian:
+HILL_CLIMB(X, strategy):
+    repeat until no improvement or time budget exceeded:
         REMOVE_REDUNDANT(X)
-        xao tron ngau nhien thu tu cac cot j thuoc X
-        voi moi j:
-            thu N1 (hoan doi) voi j  -> neu Delta < 0 va chien_luoc = FI: ap dung ngay, bat dau vong moi
-            thu N2 (bo j + sua chua) -> neu Delta < 0 va chien_luoc = FI: ap dung ngay, bat dau vong moi
-            (chien_luoc = BI: ghi nho nuoc di co Delta nho nhat, ap dung sau khi duyet xong moi j)
+        randomly shuffle selected columns j in X
+        for each j in X:
+            try N1 (1-to-1 swap) on j    -> if Delta < 0 and strategy == FI: apply and break
+            try N2 (drop j + repair)     -> if Delta < 0 and strategy == FI: apply and break
+            (if strategy == BI: record move with minimum Delta; apply best after scanning all j)
+    return X
 \end{Verbatim}
 First improvement (\texttt{HC\_FI}) dừng duyệt ở nước đi cải thiện đầu tiên nên mỗi bước rẻ nhưng cần nhiều bước; best improvement (\texttt{HC\_BI}) duyệt hết lân cận để chọn nước tốt nhất nên mỗi bước đắt hơn nhưng thường ít bước hơn. Cả hai đều xuất phát từ nghiệm Chvátal, dừng ở cực tiểu cục bộ đối với N1 và N2 nên thường kết thúc trước khi hết ngân sách thời gian. Số liệu thực nghiệm của hai chiến lược (gap, số lượt đánh giá, thời gian) nằm ở mục 6.4.2, Bảng~\ref{tbl:ls}.
 
@@ -248,16 +251,16 @@ GRASP & Đơn lời giải & D & Feo, Resende (1995)\\
 
 \begin{Verbatim}
 SA(I, seed, budget):
-    X <- GREEDY_CHVATAL(I);  X* <- X;  T <- max(1; 0,05 * f(X))
-    trong khi chua het budget:
-        lap steps_per_temp lan:
-            X' <- ban sao X;  lat 1 cot (p=0,7) hoac 2 cot (p=0,3) ngau nhien
+    X <- GREEDY_CHVATAL(I);  X* <- X;  T <- max(1, 0.05 * f(X))
+    while elapsed_time < budget:
+        for step = 1 to steps_per_temp:
+            X' <- copy(X);  flip 1 col (p = 0.7) or 2 cols (p = 0.3) at random
             REPAIR(X');  REMOVE_REDUNDANT(X')
             Delta <- f(X') - f(X)
-            neu Delta <= 0 hoac rand() < exp(-Delta / T): X <- X'
-            neu f(X) < f(X*): X* <- X
-        T <- max(0,01; alpha * T)
-    tra ve X*
+            if Delta <= 0 or rand() < exp(-Delta / T): X <- X'
+            if f(X) < f(X*): X* <- X
+        T <- max(0.01, alpha * T)
+    return X*
 \end{Verbatim}
 
 \textbf{Tham số.} $T_0=\max(1;\,0{,}05\times\text{chi phí nghiệm tham lam})$: đủ lớn để chấp nhận bước xấu vài đơn vị lúc đầu; hệ số nguội $\alpha=0{,}995$; số bước mỗi mức nhiệt $\max(20,\lfloor n/5\rfloor)$ tăng theo kích thước bài toán; nhiệt độ sàn $0{,}01$ (khi đó SA gần như leo đồi). Tăng $T_0$ hoặc $\alpha$ làm thuật toán khám phá nhiều hơn nhưng hội tụ chậm hơn.
@@ -273,17 +276,17 @@ SA(I, seed, budget):
 
 \begin{Verbatim}
 TS(I, tenure, sample):
-    X <- GREEDY_CHVATAL(I);  X* <- X;  tabu_until <- {}
-    voi moi vong it = 1, 2, ...:
-        cand <- toi da `sample` cot lay ngau nhien tu X
-        voi moi j thuoc cand:
-            X' <- X \ {j};  REPAIR(X', cam j);  REMOVE_REDUNDANT(X')
-            neu X' dung cot dang tabu va f(X') >= f(X*):      # khong thoa aspiration
-                lam lai REPAIR voi tap cam = tabu + {j}
-        chon X' tot nhat trong cac ung vien (ke ca xau hon X)
-        X <- X';  tabu_until[j*] <- it + tenure + randint(0,2)
-        neu f(X) < f(X*): X* <- X
-    tra ve X*
+    X <- GREEDY_CHVATAL(I);  X* <- X;  tabu_until <- empty map
+    for iter = 1, 2, ... while elapsed_time < budget:
+        cand <- random sample of at most `sample` columns from X
+        for each j in cand:
+            X' <- X \ {j};  REPAIR(X', forbid = {j});  REMOVE_REDUNDANT(X')
+            if X' uses a tabu column and f(X') >= f(X*):   # aspiration failed
+                re-run REPAIR(X', forbid = tabu_set U {j});  REMOVE_REDUNDANT(X')
+        select best X' among candidates (even if f(X') >= f(X))
+        X <- X';  tabu_until[j*] <- iter + tenure + randint(0, 2)
+        if f(X) < f(X*): X* <- X
+    return X*
 \end{Verbatim}
 
 \textbf{Tham số.} \texttt{tenure} mặc định $\max(5,\lfloor0{,}1\cdot|X_0|\rfloor+3)$ với $|X_0|$ là số cột của nghiệm tham lam ban đầu; tenure ngắn khai thác mạnh nhưng dễ lặp vòng, tenure dài khám phá nhiều nhưng có thể bỏ lỡ nghiệm tốt. \texttt{sample} mặc định 40 cân bằng chất lượng lân cận với thời gian một vòng.
@@ -297,18 +300,18 @@ TS(I, tenure, sample):
 
 \begin{Verbatim}
 GA(I, seed, budget, P, p_m):
-    quan the: ca the 0 tu vector rong (sau REPAIR gan nhu la tham lam);
-              P-1 ca the con lai: moi bit = 1 voi xac suat 0,25, roi REPAIR + prune
-    best <- ca the tot nhat
-    trong khi chua het budget:
-        moi <- [best]                                       # elitism
-        trong khi |moi| < P:
-            A, B <- chon giai dau (co 3) hai lan
-            voi moi bit j: lay bit tu A hoac B (xac suat 1/2); lat bit voi xac suat p_m
-            C <- REPAIR(C) roi tia cot thua (prune)
-            cap nhat best;  moi <- moi + [C]
-        quan the <- moi
-    tra ve best
+    pop[0] <- REPAIR(empty_vector) + prune                  # greedy-like individual
+    pop[1..P-1] <- random binary vectors (p=0.25) -> REPAIR + prune
+    best <- best individual in pop
+    while elapsed_time < budget:
+        next_pop <- [best]                                  # elitism
+        while |next_pop| < P:
+            A, B <- tournament_select(pop, size = 3) twice
+            for each bit j: child[j] <- A[j] or B[j] with prob 1/2; flip with prob p_m
+            C <- REPAIR(child) + prune
+            update best;  next_pop.append(C)
+        pop <- next_pop
+    return best
 \end{Verbatim}
 
 \textbf{Xử lý ràng buộc.} \texttt{REPAIR} quét các hàng chưa phủ theo chỉ số, mỗi hàng chọn cột có $c/\text{số hàng mới phủ}$ nhỏ nhất (hòa thì chọn ngẫu nhiên); \texttt{prune} bỏ cột thừa theo chi phí giảm dần (hòa thì ngẫu nhiên). Nhờ đó cá thể luôn hợp lệ và không cần hàm phạt.
@@ -336,6 +339,19 @@ Cách làm này thuộc loại Lamarck: kết quả của tìm kiếm cục bộ
 Chọn ngẫu nhiên một cột trong $\mathrm{RCL}$, cập nhật tập phủ $U$ và $g_j$ gia tăng cho tới khi mọi hàng đều được phủ, sau đó xóa các cột dư thừa theo chi phí giảm dần. Ở vòng lặp 1 đặt $\alpha = 0$ để thu ngay nghiệm tham lam chuẩn; các vòng tiếp theo chọn $\alpha \sim \mathcal{U}(0{,}02;\, 0{,}12)$.
 
 \textbf{Pha tìm kiếm cục bộ và tiêu chí dừng.} Sau pha xây dựng, nghiệm được cải thiện bằng hai lân cận nối tiếp: (i) \emph{hoán đổi 1--1} thay cột $j$ đang chọn bằng cột $k$ chưa chọn rẻ hơn phủ toàn bộ các hàng chỉ do $j$ phủ; (ii) \emph{phá hủy 1 -- sửa chữa tham lam} trên tối đa 30 cột có chi phí cao nhất, kèm xóa cột thừa. Lặp cho tới khi hết ngân sách thời gian.
+
+\begin{Verbatim}
+GRASP(I, seed, budget):
+    X* <- empty;  f(X*) <- +inf;  iter <- 0
+    while iter == 0 or elapsed_time < budget:
+        iter <- iter + 1
+        alpha <- 0.0 if iter == 1 else uniform(0.02, 0.12)
+        X <- CONSTRUCT_RCL(I, alpha);  REMOVE_REDUNDANT(X)
+        if elapsed_time < budget:
+            X <- LOCAL_SEARCH(X)    # Phase 1: 1-to-1 swap; Phase 2: destroy-1 + greedy repair (<= 30 cols)
+        if f(X) < f(X*): X* <- X
+    return X*
+\end{Verbatim}
 
 \subsection{Bảng tham số mặc định}
 \begin{center}
