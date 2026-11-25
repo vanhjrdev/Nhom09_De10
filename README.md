@@ -11,7 +11,6 @@ Bài toán phủ tập có trọng số (Weighted Set Cover).
 | C | Huỳnh Xuân Huy | `GA` và `GA_LS` (GA + tìm kiếm cục bộ) | Genetic Algorithm và thuật toán lai |
 | D | Phạm Nhật Mai Thành | `GRASP`, script thực nghiệm, tổng hợp, biểu đồ, kiểm định | Thực nghiệm, phân tích thống kê, kết luận |
 
-Đề: Đề 10 — Đặt camera giám sát giao thông: bài toán phủ tập (Set Cover), mức độ Khá.
 
 ## 2. Môi trường
 
