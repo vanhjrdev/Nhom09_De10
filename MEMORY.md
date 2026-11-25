@@ -1,0 +1,6 @@
+- EXACT 600s trên 3 thể hiện trung gian: vua_100x400_s201 (212, TIMEOUT), vua_150x600_s202 (273, TIMEOUT), vua_200x1000_s203 (373, TIMEOUT); máy Intel Core i5-10210U 4c8t ~8GB RAM. → Cập nhật bảng tbl:exact trong report/bao_cao_nhom09_de10.tex
+- Sửa lỗi định dạng bảng EXACT: {lrrrl} → {lrrrrl} (6 cột)
+- Biên dịch PDF xong: report/bao_cao_nhom09_de10.pdf (27 trang)
+- Commit f476bca đã push lên main
+- **Cần chạy lại EXACT 600s trên các thể hiện trung gian và ghi nmax, m, mật độ, máy** (máy hiện tại không phải là tester, chỉ mang tính tham khảo)
+- **Còn thiếu:** MSSV 4 thành viên (dòng 68–71, hiện \DIEN) và tên giảng viên (dòng 74, hiện \dien{tên giảng viên}) trong bao_cao_nhom09_de10.tex
