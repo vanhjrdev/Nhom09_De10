@@ -10,7 +10,7 @@
 \usepackage{booktabs}
 \usepackage{hyperref}
 
-\title{\textbf{BÁO CÁO ĐỀ TÀI 10: BÀI TOÁN PHỦ TẬP HỢP (SET COVER PROBLEM)}\\
+\title{\textbf{BÁO CÁO ĐỀ TÀI 10: ĐẶT CAMERA GIÁM SÁT GIAO THÔNG (BÀI TOÁN PHỦ TẬP HỢP -- SET COVER)}\\
 \large Phần A: Cơ sở lý thuyết, Thuật toán Chính xác và Simulated Annealing}
 \author{Nhóm 09}
 \date{}
@@ -21,116 +21,109 @@
 
 \section{Phát biểu bài toán}
 
-\subsection{Mô tả hình thức}
-Bài toán Phủ tập hợp có trọng số (Weighted Set Cover Problem -- SCP) là một bài toán tối ưu tổ hợp kinh điển. Đầu vào của bài toán gồm:
+\subsection{Bối cảnh và mô tả hình thức}
+Cơ quan quản lý giao thông đô thị cần lắp đặt hệ thống camera để giám sát toàn bộ các nút giao trọng điểm của một quận. Các vị trí lắp đặt ứng viên (cột đèn, giá long môn, nóc tòa nhà) có chi phí đầu tư khác nhau và mỗi vị trí quan sát được một tập hợp các nút giao lân cận. Mục tiêu là lựa chọn một tập con các vị trí đặt camera có tổng chi phí nhỏ nhất sao cho mọi nút giao đều được ít nhất một camera quan sát.
+
+Trong quy ước của thư viện chuẩn OR-Library, các nút giao tương ứng với các hàng và các vị trí đặt camera tương ứng với các cột của ma trận liên thuộc. Đầu vào bài toán gồm:
 \begin{itemize}
-    \item Một tập vũ trụ $U = \{1, 2, \dots, m\}$ gồm $m$ phần tử cần được bao phủ.
-    \item Một họ gồm $n$ tập con $\mathcal{S} = \{S_1, S_2, \dots, S_n\}$, trong đó $S_j \subseteq U$ với mọi $j \in \{1, \dots, n\}$ và thỏa mãn điều kiện hợp của tất cả các tập con bằng tập vũ trụ: $\bigcup_{j=1}^{n} S_j = U$.
-    \item Mỗi tập con $S_j$ đi kèm với một chi phí (trọng số) dương $c_j > 0$.
+    \item Tập vũ trụ $U = \{1, 2, \dots, m\}$ gồm $m$ nút giao (hàng) cần được giám sát.
+    \item Họ gồm $n$ tập con $\mathcal{S} = \{S_1, S_2, \dots, S_n\}$ tương ứng với $n$ vị trí ứng viên (cột), trong đó $S_j \subseteq U$ là tập các nút giao được quan sát bởi vị trí $j$, thỏa mãn điều kiện khả thi $\bigcup_{j=1}^{n} S_j = U$.
+    \item Mỗi vị trí $j \in \{1, \dots, n\}$ có chi phí lắp đặt dương $c_j > 0$.
 \end{itemize}
 
-\textbf{Mục tiêu:} Tìm một tập con các chỉ số $J \subseteq \{1, 2, \dots, n\}$ sao cho hợp của các tập con tương ứng bao phủ toàn bộ tập vũ trụ $U$, đồng thời tổng chi phí là nhỏ nhất.
-
-\subsection{Mô hình Quy hoạch nguyên tuyến tính (ILP)}
-Đặt biến quyết định nhị phân $x_j \in \{0, 1\}$ cho mỗi tập con $S_j$ ($j = 1, \dots, n$), trong đó:
-\[
-x_j = \begin{cases} 
-1 & \text{nếu tập con } S_j \text{ được chọn vào lời giải,} \\
-0 & \text{ngược lại.}
-\end{cases}
-\]
-
-Ký hiệu ma trận liên thuộc $A = (a_{ij})_{m \times n}$, với $a_{ij} = 1$ nếu phần tử $i \in S_j$ và $a_{ij} = 0$ nếu $i \notin S_j$. Bài toán Phủ tập hợp được mô hình hóa dưới dạng Quy hoạch nguyên tuyến tính (ILP) như sau:
+\subsection{Mô hình Quy hoạch nguyên tuyến tính (ILP) và không gian tìm kiếm}
+Đặt biến quyết định nhị phân $x_j \in \{0, 1\}$ cho mỗi vị trí $j \in \{1, \dots, n\}$, trong đó $x_j = 1$ nếu chọn đặt camera tại vị trí $j$ và $x_j = 0$ nếu ngược lại. Ký hiệu phần tử của ma trận phủ $A = (a_{ij})_{m \times n}$ với $a_{ij} = 1$ nếu $i \in S_j$ và $a_{ij} = 0$ nếu $i \notin S_j$. Mô hình ILP của bài toán được viết như sau:
 \begin{align}
 \text{Tối thiểu hóa:} \quad & Z = \sum_{j=1}^{n} c_j x_j \\
-\text{Ràng buộc:} \quad & \sum_{j=1}^{n} a_{ij} x_j \ge 1, \quad \forall i \in \{1, 2, \dots, m\} \\
+\text{Ràng buộc:} \quad & \sum_{j : i \in S_j} x_j \ge 1, \quad \forall i \in \{1, 2, \dots, m\} \\
 & x_j \in \{0, 1\}, \quad \forall j \in \{1, 2, \dots, n\}
 \end{align}
 
-Trong đó, hàm mục tiêu (1) tối thiểu hóa tổng chi phí của các tập con được chọn; hệ ràng buộc (2) đảm bảo mỗi phần tử $i \in U$ phải được bao phủ bởi ít nhất một tập con được chọn.
+\textbf{Kích thước không gian tìm kiếm:} Do mỗi vị trí $j$ có hai trạng thái chọn hoặc không chọn, không gian tìm kiếm toàn cục gồm $2^n$ cấu hình nhị phân khác nhau.
 
-\section{Tính chất NP-khó của bài toán}
+\subsection{Ví dụ minh họa nhỏ}
+Xét thực thể ví dụ của Đề 10 gồm $m = 7$ nút giao và $n = 6$ vị trí đặt camera:
+\begin{itemize}
+    \item Chi phí các vị trí: $c = (7, 5, 9, 4, 3, 7)$.
+    \item Tập nút giao phủ được theo từng cột: $S_1 = \{1, 4, 7\}$, $S_2 = \{5, 6\}$, $S_3 = \{2, 3, 5, 7\}$, $S_4 = \{2, 3, 6, 7\}$, $S_5 = \{4, 6\}$, $S_6 = \{1, 3, 6, 7\}$.
+\end{itemize}
+Duyệt toàn bộ $2^6 = 64$ cấu hình cho thấy nghiệm tối ưu duy nhất là $J^* = \{1, 2, 4\}$ với $S_1 \cup S_2 \cup S_4 = \{1, 2, 3, 4, 5, 6, 7\} = U$ và tổng chi phí tối thiểu $Z^* = c_1 + c_2 + c_4 = 7 + 5 + 4 = 16$. Trong khi đó, giải thuật tham lam Chvátal lần lượt chọn cột $4$ (tỷ số $4/4$), cột $5$ ($3/1$), cột $2$ ($5/1$) và cột $1$ ($7/1$) cho tổng chi phí $19$; sau bước tỉa cột dư thừa (loại bỏ cột $5$ do nút $4$ đã được cột $1$ phủ), nghiệm thu về $J = \{1, 2, 4\}$ đạt chi phí $16$.
 
-Bài toán Phủ tập hợp thuộc lớp \textbf{NP-khó} (NP-hard), và phiên bản quyết định tương ứng của nó (``Tồn tại hay không một phép phủ có tổng chi phí không vượt quá $K$?'') là một trong 21 bài toán \textbf{NP-đầy đủ} (NP-complete) kinh điển được Richard Karp chứng minh vào năm 1972.
+\section{Tính chất NP-khó và hệ quả thuật toán}
 
 \subsection{Chứng minh tính NP-đầy đủ}
-Để chứng minh phiên bản quyết định của SCP thuộc lớp NP-đầy đủ, ta thực hiện hai bước:
+Phiên bản quyết định của bài toán Phủ tập hợp (``Tồn tại hay không một tập chỉ số $J \subseteq \{1, \dots, n\}$ sao cho $\bigcup_{j \in J} S_j = U$ và $\sum_{j \in J} c_j \le K$?'') là một trong 21 bài toán \textbf{NP-đầy đủ} kinh điển của Richard Karp (1972):
 \begin{enumerate}
-    \item \textbf{Thuộc lớp NP:} Cho trước một tập chỉ số ứng viên $J \subseteq \{1, \dots, n\}$ và ngưỡng chi phí $K$, ta có thể kiểm tra trong thời gian đa thức $\mathcal{O}(m \cdot n)$ xem $\bigcup_{j \in J} S_j = U$ có thỏa mãn hay không và tính tổng $\sum_{j \in J} c_j \le K$. Do đó, bài toán nằm trong lớp NP.
-    \item \textbf{Quy dẫn đa thức từ bài toán Phủ đỉnh (Vertex Cover):} Bài toán Phủ đỉnh trên đồ thị vô hướng $G = (V, E)$ đã được biết là NP-đầy đủ. Với một thực thể bất kỳ của bài toán Phủ đỉnh $(G, k)$, ta xây dựng thực thể của bài toán Phủ tập hợp trong thời gian đa thức như sau:
-    \begin{itemize}
-        \item Đặt tập vũ trụ $U = E$ (mỗi cạnh của đồ thị tương ứng với một phần tử cần phủ).
-        \item Với mỗi đỉnh $v \in V$, tạo một tập con $S_v = \{e \in E \mid e \text{ liên thuộc với } v\}$ với chi phí đồng nhất $c_v = 1$.
-    \end{itemize}
-    Khi đó, đồ thị $G$ có một tập phủ đỉnh kích thước không quá $k$ khi và chỉ khi tồn tại một họ không quá $k$ tập con $S_v$ phủ toàn bộ tập $U$. Vì bài toán Phủ đỉnh quy dẫn được về SCP trong thời gian đa thức, phiên bản quyết định của SCP là NP-đầy đủ, suy ra bài toán tối ưu SCP là \textbf{NP-khó}.
+    \item \textbf{Thuộc lớp NP:} Với một tập ứng viên $J$ và ngưỡng $K$ cho trước, ta kiểm tra điều kiện $\bigcup_{j \in J} S_j = U$ và tính tổng $\sum_{j \in J} c_j \le K$ trong thời gian đa thức $\mathcal{O}(m \cdot n)$.
+    \item \textbf{Quy dẫn đa thức từ bài toán Phủ đỉnh (Vertex Cover):} Cho đồ thị vô hướng $G = (V, E)$ và số nguyên $k$ là một thực thể của bài toán Phủ đỉnh (đã biết là NP-đầy đủ). Ta biến đổi sang thực thể SCP trong thời gian đa thức bằng cách đặt tập vũ trụ $U = E$, và ứng với mỗi đỉnh $v \in V$ tạo một tập con $S_v = \{e \in E \mid e \text{ liên thuộc với } v\}$ với chi phí $c_v = 1$. Khi đó, $G$ có tập phủ đỉnh kích thước không quá $k$ khi và chỉ khi tồn tại tối đa $k$ tập con $S_v$ phủ toàn bộ $U$.
 \end{enumerate}
 
-\subsection{Ý nghĩa thực tiễn}
-Do tính chất NP-khó (giả sử $\text{P} \neq \text{NP}$), không tồn tại thuật toán thời gian đa thức nào giải chính xác bài toán cho mọi trường hợp đầu vào. Vì vậy:
+\subsection{Khả năng xấp xỉ và định hướng thiết kế giải thuật}
+Theo kết quả của Chvátal (1979), giải thuật tham lam đạt tỷ số xấp xỉ $H(d) \le 1 + \ln d$ với $d = \max_j |S_j|$, và theo Dinur cùng Steurer (2014), không tồn tại thuật toán thời gian đa thức nào đạt tỷ số xấp xỉ $(1 - \epsilon)\ln m$ với mọi $\epsilon > 0$ trừ khi $\text{P} = \text{NP}$. Vì vậy:
 \begin{itemize}
-    \item Với các bộ dữ liệu kích thước nhỏ, ta có thể áp dụng thuật toán chính xác (như Nhánh cận) để tìm nghiệm tối ưu toàn cục làm chuẩn đánh giá (Ground Truth).
-    \item Với các bộ dữ liệu kích thước lớn (như các bộ chuẩn OR-Library), cần sử dụng các thuật toán metaheuristic (như Simulated Annealing) để tìm nghiệm gần tối ưu trong thời gian cho phép.
+    \item Trên các bộ dữ liệu kích thước nhỏ ($n \le 30$), nhóm cài đặt thuật toán chính xác Nhánh cận (\texttt{ExactSolver}) để tìm nghiệm tối ưu toàn cục làm mốc đối chiếu.
+    \item Trên các bộ chuẩn lớn của OR-Library (như \texttt{scp4x}--\texttt{scp6x}, \texttt{scpa}--\texttt{scpd}, \texttt{scpnre}--\texttt{scpnrh}), nhóm sử dụng metaheuristic Simulated Annealing (\texttt{SASolver}) để tìm lời giải chất lượng cao trong ngân sách thời gian cho trước.
 \end{itemize}
 
 \section{Thuật toán chính xác: Nhánh cận (Branch and Bound)}
 
-Trong mô-đun \texttt{ExactSolver}, thuật toán Nhánh cận được thiết kế để duyệt cây không gian trạng thái một cách thông minh và loại bỏ sớm các nhánh không có khả năng cải thiện kỷ lục hiện tại.
+Lớp \texttt{ExactSolver} tìm nghiệm tối ưu toàn cục thông qua tìm kiếm theo chiều sâu (DFS) kết hợp giảm kích thước bài toán trước khi duyệt và cắt tỉa nhánh dựa trên cận dưới.
 
-\subsection{Chiến lược phân nhánh và tiền xử lý}
+\subsection{Tiền xử lý giảm cỡ dữ liệu (Reduction)}
+Trước khi bước vào cây tìm kiếm DFS, hàm \texttt{preprocess} thực hiện liên tiếp hai phép rút gọn bảo toàn tính tối ưu:
+\begin{enumerate}
+    \item \textbf{Loại bỏ cột rỗng và cột bị trội (Column Dominance):} Các cột không phủ hàng nào ($S_{j_1} = \emptyset$) bị loại bỏ. Ngoài ra, nếu tồn tại cặp cột $(j_1, j_2)$ thỏa mãn $c_{j_2} \le c_{j_1}$, $|S_{j_2}| \ge |S_{j_1}|$ và $S_{j_1} \subseteq S_{j_2}$, thì cột $j_1$ bị trội hoàn toàn bởi $j_2$ nên được đánh dấu loại bỏ khỏi không gian xét.
+    \item \textbf{Cố định cột bắt buộc (Essential Columns):} Lặp lại quá trình quét các hàng chưa được phủ; nếu một hàng $i$ chỉ còn duy nhất một cột khả dụng $c$ bao phủ nó, thì cột $c$ bắt buộc phải thuộc mọi phép phủ hợp lệ. Thuật toán đưa $c$ vào danh sách \texttt{forced\_cols}, cộng $c_c$ vào chi phí nền \texttt{base\_cost}, cập nhật số lần phủ \texttt{cov\_cnt} của các hàng thuộc $S_c$ và đánh dấu không xét lại $c$ trong quá trình phân nhánh.
+\end{enumerate}
+
+\subsection{Chiến lược phân nhánh và cập nhật cận trên}
 \begin{itemize}
-    \item \textbf{Tiền xử lý (Reduction):} Nếu tồn tại phần tử $i \in U$ chỉ thuộc duy nhất một tập con $S_j$, thì $S_j$ bắt buộc phải được chọn vào mọi nghiệm hợp lệ. Các tập con này được cố định ngay từ đầu để giảm kích thước cây tìm kiếm.
-    \item \textbf{Chọn biến phân nhánh:} Tại mỗi nút trên cây tìm kiếm, thuật toán chọn phần tử chưa được phủ $i^*$ có số lượng tập con khả dụng bao phủ nó ít nhất (nguyên tắc \textit{Minimum Remaining Values} -- MRV) nhằm kích hoạt cắt tỉa sớm nhất có thể. Từ đó, thuật toán lần lượt rẽ nhánh bằng cách thử chọn từng tập con $S_j$ chứa $i^*$.
-    \item \textbf{Cập nhật cận trên ($UB$):} Giá trị $UB$ lưu tổng chi phí nhỏ nhất của một phép phủ hợp lệ đã tìm thấy (khởi tạo bằng một nghiệm tham lam ban đầu). Mỗi khi đạt tới trạng thái phủ toàn bộ $U$ với chi phí $C < UB$, thuật toán cập nhật $UB \leftarrow C$ và lưu lại nghiệm tốt nhất.
+    \item \textbf{Khởi tạo và cập nhật cận trên ($UB$):} Kỷ lục chi phí tốt nhất \texttt{best\_cost} được khởi tạo bằng $+\infty$. Mỗi khi nhánh duyệt phủ đủ toàn bộ $m$ hàng với tổng chi phí tích lũy $C_{\text{curr}} < \text{best\_cost}$, thuật toán cập nhật $\text{best\_cost} \leftarrow C_{\text{curr}}$ và ghi nhận danh sách cột tốt nhất \texttt{best\_cols}.
+    \item \textbf{Chọn biến phân nhánh theo MRV:} Tại mỗi nút chưa phủ hết $m$ hàng, thuật toán tìm hàng chưa được phủ $i^*$ có số lượng cột khả dụng bao phủ nó ít nhất (\textit{Minimum Remaining Values} -- MRV) để thu hẹp hệ số phân nhánh. Các cột ứng viên chứa $i^*$ được sắp xếp theo chi phí $c_j$ tăng dần nhằm sớm tìm ra nghiệm hợp lệ có chi phí thấp, giúp siết chặt cận trên ngay từ những nhánh đầu tiên.
 \end{itemize}
 
-\subsection{Hàm ước lượng cận dưới ($LB$) và điều kiện cắt tỉa}
-Tại một nút trung gian có chi phí tích lũy hiện tại là $C_{\text{curr}}$ và tập các phần tử chưa được phủ là $U_{\text{rem}} \subseteq U$, thuật toán tính cận dưới $LB$ cho phần chi phí tối thiểu cần thêm vào để phủ nốt $U_{\text{rem}}$:
+\subsection{Hàm ước lượng cận dưới ($LB$) và quy tắc cắt tỉa}
+Tại nút hiện tại có chi phí tích lũy $C_{\text{curr}}$ và tập các hàng chưa được phủ là $U_{\text{rem}} = \{i \in U \mid \text{cov\_cnt}[i] = 0\}$, hàm \texttt{lower\_bound} tính chi phí tối thiểu ước lượng để phủ nốt $U_{\text{rem}}$ bằng cách phân bổ đều chi phí mỗi cột khả dụng cho toàn bộ kích thước $|S_j|$ của cột đó, sau đó làm tròn lên số nguyên gần nhất:
 \[
-LB = C_{\text{curr}} + \max_{i \in U_{\text{rem}}} \left( \min_{j : i \in S_j} c_j \right)
+LB = C_{\text{curr}} + \left\lceil \sum_{i \in U_{\text{rem}}} \min_{j : i \in S_j,\; j \text{ khả dụng}} \left( \frac{c_j}{|S_j|} \right) \right\rceil
 \]
-Ngoài ra, có thể kết hợp ước lượng theo mật độ chi phí trên mỗi phần tử chưa phủ:
-\[
-LB_{\text{density}} = C_{\text{curr}} + \sum_{i \in U_{\text{rem}}} \min_{j : i \in S_j} \left( \frac{c_j}{|S_j \cap U_{\text{rem}}|} \right)
-\]
-\textbf{Quy tắc cắt tỉa:} Nếu $LB \ge UB$ (hoặc $LB_{\text{density}} \ge UB$), nhánh hiện tại chắc chắn không thể sinh ra nghiệm tốt hơn kỷ lục $UB$ đang có nên bị cắt bỏ ngay lập tức.
+Nếu tồn tại một hàng $i \in U_{\text{rem}}$ không còn cột khả dụng nào phủ được, nhánh hiện tại vô nghiệm và bị loại ngay. Ngược lại, nếu $LB \ge \text{best\_cost}$ (hoặc vượt quá giới hạn thời gian \texttt{time\_limit\_sec}), thuật toán thực hiện cắt tỉa nhánh ngay lập tức.
 
 \section{Thuật toán gần đúng: Simulated Annealing (SA)}
 
-Để giải quyết các bộ dữ liệu lớn vượt quá khả năng xử lý của Nhánh cận trong thời gian ngắn, mô-đun \texttt{SASolver} cài đặt thuật toán Luyện kim mô phỏng (Simulated Annealing -- SA).
+Lớp \texttt{SASolver} cài đặt thuật toán Luyện kim mô phỏng theo nguyên lý của Kirkpatrick và cộng sự (1983), duy trì tính hợp lệ của lời giải sau mỗi bước di chuyển thông qua cơ chế sửa chữa và loại bỏ dư thừa.
 
-\subsection{Biểu diễn nghiệm và Khởi tạo}
+\subsection{Biểu diễn nghiệm và Khởi tạo tham lam Chvátal}
 \begin{itemize}
-    \item \textbf{Biểu diễn nghiệm:} Mỗi trạng thái nghiệm được biểu diễn bằng tập hợp các chỉ số $J \subseteq \{1, \dots, n\}$ cùng mảng đếm $\text{cover\_count}[i]$ lưu số lượng tập con trong $J$ đang bao phủ phần tử $i \in U$ (giúp kiểm tra tính hợp lệ và cập nhật trạng thái trong thời gian $\mathcal{O}(|S_j|)$).
-    \item \textbf{Khởi tạo tham lam (Greedy Initialization):} Bắt đầu với $J = \emptyset$, tại mỗi bước thuật toán chọn tập con $S_j$ tối thiểu hóa tỷ lệ chi phí trên số phần tử mới được phủ thêm:
+    \item \textbf{Biểu diễn dữ liệu:} Lời giải hiện tại được lưu bằng mảng Boolean \texttt{in\_sol} kích thước $n + 1$ kết hợp mảng đếm \texttt{cov\_cnt} kích thước $m + 1$ ghi nhận số lượng cột đang được chọn bao phủ từng hàng $i \in U$. Cách tổ chức này cho phép kiểm tra tính dư thừa và cập nhật trạng thái trong thời gian $\mathcal{O}(|S_j|)$.
+    \item \textbf{Khởi tạo tham lam và tỉa cột thừa:} Hàm \texttt{build\_initial} bắt đầu từ tập rỗng và ở mỗi bước chọn cột $j^*$ tối thiểu hóa tỷ số chi phí trên số hàng chưa phủ mới được bao phủ thêm:
     \[
-    j^* = \arg\min_{j} \frac{c_j}{|S_j \cap U_{\text{rem}}|}
+    j^* = \arg\min_{j \notin J} \frac{c_j}{|S_j \cap U_{\text{rem}}|}
     \]
-    Quá trình lặp lại cho đến khi $U_{\text{rem}} = \emptyset$, sau đó thực hiện loại bỏ các tập con dư thừa (\textit{redundancy elimination}) để thu được nghiệm khởi tạo gọn nhẹ.
+    Sau khi phủ toàn bộ $m$ hàng, hàm \texttt{remove\_redundant} duyệt qua các cột đang chọn theo thứ tự chi phí $c_j$ giảm dần; nếu mọi hàng $r \in S_j$ đều thỏa mãn $\text{cov\_cnt}[r] \ge 2$, cột $j$ được loại bỏ để giảm chi phí mà vẫn bảo toàn tính hợp lệ.
 \end{itemize}
 
-\subsection{Cấu trúc láng giềng và Cơ chế phục hồi tính hợp lệ}
-Tại mỗi bước lặp, từ nghiệm hợp lệ hiện tại $J$, thuật toán sinh nghiệm láng giềng $J'$ bằng thao tác phá hủy và sửa chữa (\textit{Ruin-and-Recreate} / \textit{Flip}):
+\subsection{Toán tử sinh láng giềng và phục hồi tính hợp lệ}
+Tại mỗi bước lặp của chuỗi Markov, thuật toán tạo nghiệm ứng viên $J'$ từ nghiệm hiện tại $J$ qua ba giai đoạn:
 \begin{enumerate}
-    \item \textbf{Loại bỏ (Remove):} Chọn ngẫu nhiên một (hoặc một vài) tập con $S_k \in J$ và loại bỏ khỏi nghiệm, khiến một tập hợp nhỏ các phần tử $U_{\text{uncovered}}$ bị mất bao phủ.
-    \item \textbf{Sửa chữa tham lam ngẫu nhiên (Randomized Greedy Repair):} Lần lượt phủ lại các phần tử trong $U_{\text{uncovered}}$ bằng cách chọn các tập con $S_j$ có tỷ lệ $c_j / |S_j \cap U_{\text{uncovered}}|$ tốt nhất (có pha trộn yếu tố ngẫu nhiên để tăng tính đa dạng).
-    \item \textbf{Tỉa dư thừa (Prune):} Duyệt qua các tập con trong $J'$ theo thứ tự chi phí giảm dần; nếu việc bỏ đi $S_j$ vẫn giữ nguyên điều kiện $\text{cover\_count}[i] \ge 1$ với mọi $i \in S_j$, loại bỏ $S_j$ để giảm tổng chi phí.
+    \item \textbf{Đảo bit ngẫu nhiên (Random Flip):} Chọn ngẫu nhiên $k \in \{1, 2\}$ cột (với xác suất $0{,}7$ đảo $1$ cột và xác suất $0{,}3$ đảo $2$ cột). Với mỗi cột $c$ được chọn ngẫu nhiên đồng đều trong $\{1, \dots, n\}$, thuật toán đảo trạng thái chọn của $c$ (nếu đang chọn thì loại bỏ, nếu chưa chọn thì thêm vào) đồng thời cập nhật gia tăng \texttt{next\_cost} và \texttt{next\_cov}.
+    \item \textbf{Sửa chữa tham lam (Deterministic Greedy Repair):} Nếu việc loại bỏ cột khiến một số hàng bị mất bao phủ ($\text{next\_cov}[i] = 0$), hàm \texttt{repair} lần lượt duyệt các hàng chưa phủ theo chỉ số tăng dần và bổ sung cột $c$ phủ hàng $i$ có tỷ số chi phí trên số hàng mới phủ thêm $c_c / \max(1, \text{gain})$ nhỏ nhất.
+    \item \textbf{Loại bỏ cột dư thừa (Redundancy Elimination):} Gọi lại thủ tục \texttt{remove\_redundant} theo thứ tự chi phí giảm dần nhằm loại bỏ các cột trở nên dư thừa sau bước đảo bit và sửa chữa.
 \end{enumerate}
 
-\subsection{Lịch giảm nhiệt độ và Xác suất chấp nhận}
-Gọi $\Delta E = \text{Cost}(J') - \text{Cost}(J)$ là độ chênh lệch chi phí giữa nghiệm láng giềng $J'$ và nghiệm hiện tại $J$:
+\subsection{Quy tắc chấp nhận Metropolis và Lịch làm nguội}
+Gọi $\Delta = \text{Cost}(J') - \text{Cost}(J)$ là chênh lệch chi phí giữa nghiệm láng giềng khả thi $J'$ và nghiệm hiện tại $J$:
 \begin{itemize}
-    \item Nếu $\Delta E \le 0$: Nghiệm $J'$ tốt hơn hoặc bằng nghiệm hiện tại, luôn chấp nhận $J \leftarrow J'$ (và cập nhật nghiệm tốt nhất toàn cục $J_{\text{best}}$ nếu $\text{Cost}(J') < \text{Cost}(J_{\text{best}})$).
-    \item Nếu $\Delta E > 0$: Nghiệm $J'$ xấu hơn, nhưng vẫn được chấp nhận theo tiêu chuẩn Metropolis với xác suất:
-    \[
-    P(\Delta E, T) = \exp\left(-\frac{\Delta E}{T}\right)
-    \]
-    Cơ chế này giúp thuật toán thoát khỏi các cực trị địa phương (\textit{local optima}) ở giai đoạn đầu khi nhiệt độ $T$ còn cao.
+    \item Nếu $\Delta \le 0$: Chấp nhận $J \leftarrow J'$ và cập nhật nghiệm tốt nhất toàn cục $J_{\text{best}}$ cùng nhật ký hội tụ (\texttt{conv\_csv\_file}) nếu $\text{Cost}(J') < \text{Cost}(J_{\text{best}})$.
+    \item Nếu $\Delta > 0$: Chấp nhận nghiệm xấu hơn theo tiêu chuẩn Metropolis với xác suất $P(\Delta, T) = \exp(-\Delta / T)$ nhằm thoát khỏi cực trị địa phương.
 \end{itemize}
 
-\textbf{Lịch làm nguội (Cooling Schedule):} Nhiệt độ khởi tạo $T_0$ được thiết lập tỷ lệ với chi phí trung bình của các tập con để đảm bảo xác suất chấp nhận ban đầu đủ lớn. Sau mỗi chu kỳ gồm $L$ bước lặp (Markov chain length), nhiệt độ được giảm theo quy luật cấp số nhân:
-\[
-T_{k+1} = \alpha \cdot T_k, \quad \text{với } \alpha \in (0.90, 0.995)
-\]
-Thuật toán dừng khi nhiệt độ hạ xuống dưới ngưỡng $T_{\min}$ hoặc khi hết ngân sách thời gian chạy (\texttt{budget\_sec}) được cấp phát.
+\textbf{Tham số vận hành và tiêu chí dừng:}
+\begin{itemize}
+    \item \textbf{Nhiệt độ khởi tạo:} $T_0 = \max\big(1{,}0,\; 0{,}05 \times \text{Cost}(J_0)\big)$, tỷ lệ trực tiếp với chi phí nghiệm khởi tạo ban đầu.
+    \item \textbf{Độ dài chuỗi Markov mỗi mức nhiệt:} $L = \max\big(20,\; \lfloor n / 5 \rfloor\big)$ bước lặp, tự động co giãn theo số lượng cột $n$ của thực thể.
+    \item \textbf{Lịch giảm nhiệt độ:} Sau mỗi chuỗi $L$ bước lặp, nhiệt độ được cập nhật theo quy luật cấp số nhân có chặn dưới: $T \leftarrow \max(0{,}01,\; 0{,}995 \cdot T)$.
+    \item \textbf{Tiêu chí dừng:} Thuật toán chạy liên tục và dừng khi thời gian thực thi chạm ngưỡng ngân sách thời gian \texttt{budget\_sec} được cấp phát.
+\end{itemize}
 
 \end{document}
