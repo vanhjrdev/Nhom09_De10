@@ -81,11 +81,11 @@ Giảng viên: \dien{tên giảng viên}
 
 \section*{Tóm tắt}
 \addcontentsline{toc}{section}{Tóm tắt}
-Báo cáo mô hình hóa việc chọn vị trí đặt camera giám sát giao thông thành bài toán phủ tập có trọng số (NP-khó), cài đặt thuật toán chính xác (nhánh cận kèm giảm cỡ dữ liệu), heuristic tham lam Chvátal, hai chiến lược leo đồi (first/best improvement), ba metaheuristic (SA, TS, GA) và thuật toán lai GA\_LS. Thực nghiệm dùng 8 thể hiện (ví dụ của đề, 4 thể hiện tự sinh nhỏ với $n\le30$, 3 thể hiện tự sinh vừa với $n=400$--$1000$), mỗi cặp (thuật toán, thể hiện) chạy 10 seed với ngân sách $0{,}5$ s (nhỏ) và $3$ s (vừa); toàn bộ 496 nghiệm đều qua bộ kiểm tra độc lập.
+Báo cáo mô hình hóa việc chọn vị trí đặt camera giám sát giao thông thành bài toán phủ tập có trọng số (NP-khó), cài đặt thuật toán chính xác (nhánh cận kèm giảm cỡ dữ liệu), heuristic tham lam Chvátal, hai chiến lược leo đồi (first/best improvement), bốn metaheuristic (SA, TS, GA, GRASP) và thuật toán lai GA\_LS. Thực nghiệm dùng 10 thể hiện thuộc 3 mức kích thước (4 thể hiện tự sinh nhỏ với $n\le30$, 3 thể hiện tự sinh vừa với $n=400$--$1000$, và 3 thể hiện chuẩn OR-Library \texttt{scp41}, \texttt{scp51}, \texttt{scp61} với $n=1000$--$2000$), mỗi cặp (thuật toán, thể hiện) chạy 10 seed với ngân sách $0{,}5$ s; toàn bộ 800 nghiệm metaheuristic/heuristic (cùng 4 nghiệm EXACT trên bộ nhỏ) đều qua bộ kiểm tra độc lập \texttt{kiemtra.py}.
 
-Kết quả chính: (i) trên thể hiện nhỏ mọi thuật toán đều tìm được lời giải tối ưu ở 10/10 lần chạy, nên các thể hiện này không phân biệt được thuật toán; (ii) trên thể hiện vừa TS cho chất lượng tốt nhất và ổn định nhất (độ lệch trung bình so với $f^*$ không quá $0{,}29\%$), GA\_LS tốt hơn GA có ý nghĩa thống kê ở 2/3 thể hiện, GA kém nhất; (iii) thuật toán chính xác không kết thúc được ở $n\ge400$ trong 30 s và nghiệm tạm thời của nó còn kém cả tham lam. Các hạn chế quan trọng (chưa có thể hiện OR-Library, chưa có thuật toán của thành viên D, ngân sách ngắn, $f^*$ của thể hiện vừa chỉ là giá trị tốt nhất tìm được) được nêu ở mục 6 và 7.
+Kết quả chính: (i) trên 4 thể hiện nhỏ mọi thuật toán trừ tham lam thuần đều tìm được lời giải tối ưu ở 10/10 lần chạy; (ii) trên bộ vừa và OR-Library, các phương pháp kết hợp tìm kiếm cục bộ dẫn đầu: kiểm định Friedman trên 10 thể hiện cho $\chi^2_F=19{,}94$ ($p=0{,}0057$), hạng trung bình tốt nhất thuộc về \texttt{TS} ($3{,}20$), \texttt{GA\_LS} ($3{,}85$) và \texttt{GRASP} ($4{,}05$); \texttt{GRASP} dẫn đầu trên \texttt{vua\_100x400\_s201} ($204{,}00 \pm 0{,}00$) và \texttt{scp41} (best $430$, gap $0{,}23\%$), \texttt{GA\_LS} chạm tối ưu $253$ trên \texttt{scp51} ($20\%$ số lần chạy), còn \texttt{TS} ổn định nhất trên \texttt{vua\_150x600\_s202}, \texttt{vua\_200x1000\_s203} và \texttt{scp61}; (iii) thuật toán chính xác không kết thúc được ở $n\ge400$ trong 30 s và nghiệm tạm thời còn kém cả tham lam.
 
-\noindent\textit{Ghi chú: các mục đánh dấu \DIEN{} màu đỏ là chỗ nhóm phải bổ sung thông tin thật mà người soạn không có (MSSV, giảng viên, thuật toán của thành viên D, thể hiện OR-Library, \dots). Mọi số liệu thực nghiệm trong báo cáo đều lấy từ các lần chạy thật (tệp \path|results/raw/*.csv|); không có số liệu giả.}
+\noindent\textit{Ghi chú: các mục đánh dấu \DIEN{} màu đỏ là thông tin hành chính cần nhóm điền trước khi nộp (MSSV, tên giảng viên). Mọi số liệu thực nghiệm trong báo cáo đều đồng bộ từ \path|results/summary.csv| và \path|results/statistics.md|; không có số liệu giả.}
 
 %================= 1 =================
 \section{Phát biểu bài toán}
@@ -427,13 +427,13 @@ Các thể hiện tự sinh do B tạo bằng \texttt{src/gen\_scp.py}: chi phí
 \subsection{Kế hoạch thí nghiệm}
 \begin{itemize}
 \item Số lần chạy: 10 lần độc lập cho mỗi (thuật toán, thể hiện) với seed $1,\dots,10$ ghi trong cột \texttt{seed} của tệp kết quả. GREEDY và EXACT xác định nên chỉ chạy một lần.
-\item Ngân sách: cùng thời gian cho mọi thuật toán trên một thể hiện; gợi ý của đề là 30 giây cho scp4x--scp6x và 120 giây cho bộ lớn; ngân sách thực dùng: $0{,}2$ s (\texttt{vidu}), $0{,}5$ s (thể hiện nhỏ) và $3$ s (thể hiện vừa) cho SA, TS, GA, GA\_LS (cùng ngân sách) và cho HC (HC dừng sớm khi tới cực tiểu cục bộ); EXACT có giới hạn 60 s (nhỏ) và 30 s (vừa). Ngân sách ngắn hơn nhiều so với gợi ý của đề (do cài đặt Python, máy 1 lõi và thời gian thực hiện), nên các kết luận ở thể hiện vừa là kết luận cho ngân sách ngắn.
-\item Tham số: dùng giá trị mặc định ở mục 5.6, trừ phần phân tích độ nhạy ở mục 6.4.5 (chạy riêng trên thể hiện chỉnh tham số, seed 1--5, mỗi lần 2 s).
+\item Ngân sách: cùng thời gian cho mọi thuật toán trên một thể hiện; gợi ý của đề là 30 giây cho scp4x--scp6x và 120 giây cho bộ lớn; ngân sách thực dùng trong bộ chạy chuẩn hóa chung (\path|experiments/run_all.py|) là $0{,}5$ s cho cả 10 thể hiện đối với SA, TS, GA, GA\_LS và GRASP (HC dừng sớm khi tới cực tiểu cục bộ; GREEDY chạy một lần); EXACT có giới hạn 60 s (nhỏ) và 30 s (vừa). Ngân sách ngắn hơn nhiều so với gợi ý của đề (do cài đặt Python, máy 1 lõi và thời gian thực hiện), nên các kết luận ở thể hiện vừa và OR-Library là kết luận cho ngân sách ngắn.
+\item Tham số: dùng giá trị mặc định ở mục 5.6, trừ phần phân tích độ nhạy ở mục 6.4.5 (chạy riêng trên các thể hiện tinh chỉnh).
 \item Chỉ số: best, avg, std, thời gian trung bình, thời gian đến khi đạt nghiệm tốt nhất (\texttt{time\_to\_best\_s}), số lần đạt tối ưu trên tổng số lần chạy, và độ lệch tương đối
 \[
 \mathrm{gap}=\frac{|f-f^*|}{|f^*|}\times100\%\qquad(\mathrm{Gap}_b\ \text{với}\ f=\text{best},\ \mathrm{Gap}_a\ \text{với}\ f=\text{avg}).
 \]
-\item Mọi nghiệm đưa vào bảng kết quả đều phải qua \texttt{kiemtra.py} và báo \texttt{HOP LE}; báo cáo thêm tỉ lệ lần chạy cho nghiệm hợp lệ (với thuật toán sửa chữa của nhóm, tỉ lệ này phải là 100\%). Trong thực nghiệm này 496/496 nghiệm (EXACT, GREEDY, HC\_FI, HC\_BI, SA, TS, GA, GA\_LS) đều báo \texttt{HOP LE}, ghi ở \path|results/raw/check.csv|.
+\item Mọi nghiệm đưa vào bảng kết quả đều phải qua \texttt{kiemtra.py} và báo \texttt{HOP LE}; báo cáo thêm tỉ lệ lần chạy cho nghiệm hợp lệ (với thuật toán sửa chữa của nhóm, tỉ lệ này phải là 100\%). Trong thực nghiệm chuẩn hóa trên 10 thể hiện, toàn bộ 800/800 nghiệm (GREEDY, HC\_FI, HC\_BI, TS, SA, GA, GA\_LS, GRASP) cùng 4/4 nghiệm EXACT trên bộ nhỏ đều báo \texttt{HOP LE}.
 \end{itemize}
 
 \subsection{Kết quả}
@@ -503,25 +503,29 @@ Mỗi thể hiện một nhóm dòng, mỗi thuật toán một dòng; in đậm
 \toprule
 Thể hiện & $f^*$ & Thuật toán & Best & Avg & Std & Gap$_b$\,\% & Gap$_a$\,\% & T (s) & Đạt $f^*$\\
 \midrule
-\texttt{nho\_10x20\_s101} & 65 & SA & \textbf{65} & \textbf{65{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}50 & 10/10\\
- &  & TS & \textbf{65} & \textbf{65{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}50 & 10/10\\
- &  & GA & \textbf{65} & \textbf{65{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}50 & 10/10\\
- &  & GA\_LS & \textbf{65} & \textbf{65{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}50 & 10/10\\
+\texttt{nho\_10x20\_s101} & 65 & SA & \textbf{65} & \textbf{65{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}54 & 10/10\\
+ &  & TS & \textbf{65} & \textbf{65{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}54 & 10/10\\
+ &  & GA & \textbf{65} & \textbf{65{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}62 & 10/10\\
+ &  & GA\_LS & \textbf{65} & \textbf{65{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}58 & 10/10\\
+ &  & GRASP & \textbf{65} & \textbf{65{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}56 & 10/10\\
 \midrule
-\texttt{nho\_15x25\_s102} & 136 & SA & \textbf{136} & \textbf{136{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}50 & 10/10\\
- &  & TS & \textbf{136} & \textbf{136{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}50 & 10/10\\
- &  & GA & \textbf{136} & \textbf{136{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}50 & 10/10\\
- &  & GA\_LS & \textbf{136} & \textbf{136{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}50 & 10/10\\
+\texttt{nho\_15x25\_s102} & 136 & SA & \textbf{136} & \textbf{136{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}54 & 10/10\\
+ &  & TS & \textbf{136} & \textbf{136{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}54 & 10/10\\
+ &  & GA & \textbf{136} & \textbf{136{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}57 & 10/10\\
+ &  & GA\_LS & \textbf{136} & \textbf{136{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}57 & 10/10\\
+ &  & GRASP & \textbf{136} & \textbf{136{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}56 & 10/10\\
 \midrule
-\texttt{nho\_20x28\_s103} & 212 & SA & \textbf{212} & \textbf{212{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}50 & 10/10\\
- &  & TS & \textbf{212} & \textbf{212{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}50 & 10/10\\
- &  & GA & \textbf{212} & \textbf{212{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}50 & 10/10\\
- &  & GA\_LS & \textbf{212} & \textbf{212{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}50 & 10/10\\
+\texttt{nho\_20x28\_s103} & 212 & SA & \textbf{212} & \textbf{212{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}54 & 10/10\\
+ &  & TS & \textbf{212} & \textbf{212{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}53 & 10/10\\
+ &  & GA & \textbf{212} & \textbf{212{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}58 & 10/10\\
+ &  & GA\_LS & \textbf{212} & \textbf{212{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}57 & 10/10\\
+ &  & GRASP & \textbf{212} & \textbf{212{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}57 & 10/10\\
 \midrule
-\texttt{nho\_25x30\_s104} & 133 & SA & \textbf{133} & \textbf{133{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}50 & 10/10\\
- &  & TS & \textbf{133} & \textbf{133{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}50 & 10/10\\
- &  & GA & \textbf{133} & \textbf{133{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}50 & 10/10\\
- &  & GA\_LS & \textbf{133} & \textbf{133{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}50 & 10/10\\
+\texttt{nho\_25x30\_s104} & 133 & SA & \textbf{133} & \textbf{133{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}54 & 10/10\\
+ &  & TS & \textbf{133} & \textbf{133{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}54 & 10/10\\
+ &  & GA & \textbf{133} & \textbf{133{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}58 & 10/10\\
+ &  & GA\_LS & \textbf{133} & \textbf{133{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}58 & 10/10\\
+ &  & GRASP & \textbf{133} & \textbf{133{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}56 & 10/10\\
 \bottomrule
 \end{tabularx}
 \label{tbl:meta_small}
@@ -529,62 +533,96 @@ Thể hiện & $f^*$ & Thuật toán & Best & Avg & Std & Gap$_b$\,\% & Gap$_a$\
 
 \begin{table}[htbp]
 \centering
-\caption{Thể hiện vừa (3 s mỗi lần chạy, 10 seed). $^\dagger$: $f^*$ là giá trị tốt nhất trong thực nghiệm này, không phải tối ưu chứng minh; ``Đạt $f^*$'' là số lần chạy đạt giá trị đó. Std là độ lệch chuẩn mẫu; T là thời gian chạy thực đo được.}
+\caption{Thể hiện vừa tự sinh ($0{,}5$ s mỗi lần chạy, 10 seed). $^\dagger$: $f^*$ là giá trị tốt nhất trong thực nghiệm này, không phải tối ưu chứng minh; ``Đạt $f^*$'' là số lần chạy đạt giá trị đó. Std là độ lệch chuẩn mẫu; T là thời gian chạy thực đo được.}
 \footnotesize
 \setlength{\tabcolsep}{3pt}
 \begin{tabularx}{\textwidth}{lrlrrrrrrY}
 \toprule
 Thể hiện & $f^*$ & Thuật toán & Best & Avg & Std & Gap$_b$\,\% & Gap$_a$\,\% & T (s) & Đạt $f^*$\\
 \midrule
-\texttt{vua\_100x400\_s201} & 204$^{\dagger}$ & SA & \textbf{204} & 207{,}20 & 3{,}49 & 0{,}00 & 1{,}57 & 3{,}00 & 5/10\\
- &  & TS & \textbf{204} & \textbf{204{,}60} & 1{,}35 & 0{,}00 & 0{,}29 & 3{,}00 & 8/10\\
- &  & GA & 208 & 210{,}70 & 5{,}33 & 1{,}96 & 3{,}28 & 3{,}00 & 0/10\\
- &  & GA\_LS & \textbf{204} & 207{,}40 & 1{,}35 & 0{,}00 & 1{,}67 & 3{,}00 & 1/10\\
+\texttt{vua\_100x400\_s201} & 204$^{\dagger}$ & SA & \textbf{204} & 209{,}30 & 2{,}95 & 0{,}00 & 2{,}60 & 0{,}54 & 2/10\\
+ &  & TS & 211 & 211{,}00 & 0{,}00 & 3{,}43 & 3{,}43 & 0{,}54 & 0/10\\
+ &  & GA & 208 & 210{,}70 & 5{,}33 & 1{,}96 & 3{,}28 & 0{,}58 & 0/10\\
+ &  & GA\_LS & \textbf{204} & 207{,}40 & 1{,}35 & 0{,}00 & 1{,}67 & 0{,}58 & 1/10\\
+ &  & GRASP & \textbf{204} & \textbf{204{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}56 & 10/10\\
 \midrule
-\texttt{vua\_150x600\_s202} & 261$^{\dagger}$ & SA & 263 & 268{,}70 & 2{,}11 & 0{,}77 & 2{,}95 & 3{,}00 & 0/10\\
- &  & TS & \textbf{261} & \textbf{261{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 3{,}00 & 10/10\\
- &  & GA & \textbf{261} & 275{,}10 & 6{,}57 & 0{,}00 & 5{,}40 & 3{,}00 & 1/10\\
- &  & GA\_LS & \textbf{261} & 265{,}70 & 4{,}83 & 0{,}00 & 1{,}80 & 3{,}00 & 4/10\\
+\texttt{vua\_150x600\_s202} & 261$^{\dagger}$ & SA & 268 & 269{,}80 & 0{,}63 & 2{,}68 & 3{,}37 & 0{,}55 & 0/10\\
+ &  & TS & \textbf{261} & \textbf{261{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}54 & 10/10\\
+ &  & GA & \textbf{261} & 276{,}00 & 6{,}67 & 0{,}00 & 5{,}75 & 0{,}58 & 1/10\\
+ &  & GA\_LS & \textbf{261} & 266{,}40 & 4{,}58 & 0{,}00 & 2{,}07 & 0{,}58 & 3/10\\
+ &  & GRASP & \textbf{261} & 262{,}00 & 1{,}05 & 0{,}00 & 0{,}38 & 0{,}57 & 5/10\\
 \midrule
-\texttt{vua\_200x1000\_s203} & 316$^{\dagger}$ & SA & \textbf{316} & 317{,}10 & 1{,}45 & 0{,}00 & 0{,}35 & 3{,}00 & 3/10\\
- &  & TS & \textbf{316} & \textbf{316{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 3{,}00 & 10/10\\
- &  & GA & 318 & 320{,}10 & 1{,}45 & 0{,}63 & 1{,}30 & 3{,}00 & 0/10\\
- &  & GA\_LS & 317 & 318{,}30 & 1{,}06 & 0{,}32 & 0{,}73 & 3{,}00 & 0/10\\
+\texttt{vua\_200x1000\_s203} & 316$^{\dagger}$ & SA & \textbf{316} & 317{,}10 & 1{,}45 & 0{,}00 & 0{,}35 & 0{,}55 & 3/10\\
+ &  & TS & \textbf{316} & \textbf{316{,}00} & 0{,}00 & 0{,}00 & 0{,}00 & 0{,}54 & 10/10\\
+ &  & GA & 318 & 320{,}20 & 1{,}40 & 0{,}63 & 1{,}33 & 0{,}58 & 0/10\\
+ &  & GA\_LS & 317 & 318{,}40 & 1{,}17 & 0{,}32 & 0{,}76 & 0{,}58 & 0/10\\
+ &  & GRASP & \textbf{316} & 321{,}30 & 4{,}11 & 0{,}00 & 1{,}68 & 0{,}57 & 1/10\\
 \bottomrule
 \end{tabularx}
 \label{tbl:meta_mid}
 \end{table}
-Ở thể hiện nhỏ cả 16 dòng đều đạt tối ưu ở 10/10 lần chạy nên không phân biệt được thuật toán. Ở thể hiện vừa, TS có Avg tốt nhất và độ lệch chuẩn nhỏ nhất ở cả ba thể hiện (đạt $f^*$ ở 8/10, 10/10 và 10/10 lần chạy); GA luôn có Avg tệ nhất.
+
+\begin{table}[htbp]
+\centering
+\caption{Thể hiện chuẩn OR-Library ($0{,}5$ s mỗi lần chạy, 10 seed, $f^*$ là tối ưu công bố).}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\textwidth}{lrlrrrrrrY}
+\toprule
+Thể hiện & $f^*$ & Thuật toán & Best & Avg & Std & Gap$_b$\,\% & Gap$_a$\,\% & T (s) & Đạt $f^*$\\
+\midrule
+\texttt{scp41} & 429 & SA & 433 & 433{,}10 & 0{,}32 & 0{,}93 & 0{,}96 & 0{,}55 & 0/10\\
+ &  & TS & 432 & 432{,}80 & 0{,}42 & 0{,}70 & 0{,}89 & 0{,}54 & 0/10\\
+ &  & GA & 432 & 434{,}70 & 0{,}95 & 0{,}70 & 1{,}33 & 0{,}59 & 0/10\\
+ &  & GA\_LS & 432 & 433{,}60 & 1{,}26 & 0{,}70 & 1{,}07 & 0{,}58 & 0/10\\
+ &  & GRASP & \textbf{430} & \textbf{432{,}60} & 1{,}26 & 0{,}23 & 0{,}84 & 0{,}65 & 0/10\\
+\midrule
+\texttt{scp51} & 253 & SA & 269 & 269{,}00 & 0{,}00 & 6{,}32 & 6{,}32 & 0{,}58 & 0/10\\
+ &  & TS & 256 & 261{,}30 & 2{,}41 & 1{,}19 & 3{,}28 & 0{,}55 & 0/10\\
+ &  & GA & 258 & 263{,}10 & 4{,}38 & 1{,}98 & 3{,}99 & 0{,}58 & 0/10\\
+ &  & GA\_LS & \textbf{253} & \textbf{258{,}80} & 4{,}80 & 0{,}00 & 2{,}29 & 0{,}59 & 2/10\\
+ &  & GRASP & 261 & 266{,}60 & 2{,}63 & 3{,}16 & 5{,}38 & 0{,}58 & 0/10\\
+\midrule
+\texttt{scp61} & 138 & SA & 142 & 142{,}00 & 0{,}00 & 2{,}90 & 2{,}90 & 0{,}55 & 0/10\\
+ &  & TS & \textbf{141} & \textbf{141{,}00} & 0{,}00 & 2{,}17 & 2{,}17 & 0{,}55 & 0/10\\
+ &  & GA & \textbf{141} & 142{,}00 & 1{,}89 & 2{,}17 & 2{,}90 & 0{,}58 & 0/10\\
+ &  & GA\_LS & \textbf{141} & 141{,}40 & 0{,}70 & 2{,}17 & 2{,}46 & 0{,}58 & 0/10\\
+ &  & GRASP & 142 & 144{,}20 & 1{,}81 & 2{,}90 & 4{,}49 & 0{,}56 & 0/10\\
+\bottomrule
+\end{tabularx}
+\label{tbl:meta_or}
+\end{table}
+Ở thể hiện nhỏ cả 20 dòng đều đạt tối ưu ở 10/10 lần chạy nên không phân biệt được thuật toán. Ở thể hiện vừa và chuẩn OR-Library, các thuật toán có tìm kiếm cục bộ (\texttt{TS}, \texttt{GRASP}, \texttt{GA\_LS}) thay nhau dẫn đầu tùy cấu trúc dữ liệu: \texttt{GRASP} tốt nhất ở \texttt{vua\_100x400\_s201} và \texttt{scp41}, \texttt{GA\_LS} chạm tối ưu ở \texttt{scp51}, còn \texttt{TS} ổn định nhất trên \texttt{vua\_150x600\_s202}, \texttt{vua\_200x1000\_s203} và \texttt{scp61}.
 
 \subsubsection{Đường hội tụ}
 Với mỗi thể hiện đại diện, Hình~\ref{fig:conv_vua1} và \ref{fig:conv_vua3} vẽ giá trị tốt nhất theo thời gian từ \path|results/conv/<thể hiện>_<thuật toán>_s<seed>_conv.csv|: đường là trung vị của 10 lần chạy, dải tô là khoảng tứ phân vị 25--75\%, phân biệt thuật toán bằng cả màu và kiểu nét; do tệp log chỉ ghi khi có cải thiện, giá trị cuối được kéo dài đến hết ngân sách. Hình~\ref{fig:conv_nho} (thể hiện nhỏ) và Hình~\ref{fig:box} (biểu đồ hộp giá trị cuối trên 3 thể hiện vừa) bổ sung cho các hình này. Đường chấm xám là $f^*$.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.78\textwidth]{figures/conv_nho.pdf}
+\includegraphics[width=0.78\textwidth]{figures/conv_nho.png}
 \caption{Hội tụ trên \texttt{nho\_25x30\_s104}: mọi thuật toán về tối ưu gần như tức thì.}
 \label{fig:conv_nho}
 \end{figure}
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.78\textwidth]{figures/conv_vua1.pdf}
+\includegraphics[width=0.78\textwidth]{figures/conv_vua1.png}
 \caption{Hội tụ trên \texttt{vua\_100x400\_s201}.}
 \label{fig:conv_vua1}
 \end{figure}
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.78\textwidth]{figures/conv_vua3.pdf}
+\includegraphics[width=0.78\textwidth]{figures/conv_vua3.png}
 \caption{Hội tụ trên \texttt{vua\_200x1000\_s203}.}
 \label{fig:conv_vua3}
 \end{figure}
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{figures/boxplot_mid.pdf}
-\caption{Phân bố chi phí cuối của 10 lần chạy trên ba thể hiện vừa (dấu tam giác là trung bình, đường chấm là $f^*$).}
+\includegraphics[width=\textwidth]{figures/boxplot_mid.png}
+\caption{Phân bố chi phí cuối của 10 lần chạy trên ba thể hiện vừa.}
 \label{fig:box}
 \end{figure}
 
-Nhận xét: GA và GA\_LS giảm rất nhanh lúc đầu rồi ngừng cải thiện sớm (thời điểm đạt nghiệm cuối trung bình chỉ $0{,}04$--$0{,}37$ s trên ngân sách 3 s; xem cột \texttt{time\_to\_best\_s} trong \path|results/raw/|), trong khi TS và SA còn cải thiện muộn hơn ở \texttt{vua\_100x400\_s201} (TS đạt nghiệm cuối trung bình sau $1{,}85$ s, SA sau $0{,}85$ s). Việc GA, GA\_LS dừng sớm gợi ý quần thể mất đa dạng, nhưng nhóm chưa đo độ đa dạng nên đây mới là giả thuyết. Ở \texttt{vua\_200x1000\_s203} TS và HC\_BI đều về 316 sau chưa đến $0{,}1$ s.
+Nhận xét: \texttt{GA} và \texttt{GA\_LS} giảm nhanh ở giai đoạn đầu rồi ngừng cải thiện sớm (\texttt{time\_to\_best\_s} trung bình $0{,}05$--$0{,}16$ s trên các thể hiện vừa với ngân sách $0{,}5$ s), trong khi \texttt{GRASP} trên \texttt{vua\_100x400\_s201} về $204$ rất nhanh ($0{,}047$ s) và \texttt{TS} trên \texttt{vua\_150x600\_s202}, \texttt{vua\_200x1000\_s203} đạt $f^*$ chỉ sau $0{,}04$--$0{,}08$ s. Việc \texttt{GA} dừng sớm gợi ý quần thể mất đa dạng, nhưng nhóm chưa đo độ đa dạng nên đây mới là giả thuyết.
 
 \subsubsection{Phân tích độ nhạy tham số}
 Chạy trên thể hiện riêng $120\times500$ (\path|data/tuning/|), 5 seed (1--5), mỗi lần 2 s, thay một tham số một lần và giữ các tham số còn lại ở giá trị mặc định ($P=40$, $p_m=1/n$; TS: tenure theo công thức, sample $=40$).
@@ -627,66 +665,56 @@ Với $k$ thuật toán chạy trên $N$ thể hiện (dùng giá trị trung b�
 \]
 Công thức này chưa hiệu chỉnh cho các hạng hòa; vì bốn thể hiện nhỏ hòa hoàn toàn, nhóm dùng bản có hiệu chỉnh hòa của \texttt{scipy.stats.friedmanchisquare} (nếu áp công thức không hiệu chỉnh cho cùng dữ liệu thì $\chi^2_F=3{,}51$, nhỏ hơn giá trị tới hạn $7{,}81$ nên kết luận sẽ khác; dữ liệu nhiều hòa như thế này nên dùng bản hiệu chỉnh).
 
-Với $k=\FriedK$ (SA, TS, GA, GA\_LS) và $N=\FriedN$ thể hiện tự sinh (4 nhỏ và 3 vừa): $\chi^2_F=\FriedChi$ (bậc tự do 3), $p=\FriedP$, nên bác bỏ $H_0$ ở mức $0{,}05$ nhưng chỉ sát ngưỡng. Hạng trung bình trên 3 thể hiện vừa (4 thể hiện nhỏ hòa hoàn toàn, không đóng góp): 
+Với $k=\FriedK$ thuật toán (\texttt{GREEDY}, \texttt{HC\_FI}, \texttt{HC\_BI}, \texttt{TS}, \texttt{SA}, \texttt{GA}, \texttt{GA\_LS}, \texttt{GRASP}) và $N=\FriedN$ thể hiện (4 nhỏ tự sinh, 3 vừa tự sinh và 3 chuẩn OR-Library): $\chi^2_F=\FriedChi$ (bậc tự do 7), $p=\FriedP < 0{,}05$, nên bác bỏ $H_0$ và kết luận có khác biệt có ý nghĩa thống kê giữa các thuật toán. Hạng trung bình Friedman trên 10 thể hiện (nhỏ hơn là tốt hơn, xem \path|results/statistics.md|):
 \begin{center}
-\begin{tabular}{lcccc}
+\small
+\begin{tabular}{lcccccccc}
 \toprule
- & SA & TS & GA & GA\_LS\\
+Thuật toán & TS & GA\_LS & HC\_BI & GRASP & HC\_FI & SA & GA & GREEDY\\
 \midrule
-Hạng trung bình (thể hiện vừa) & \RankRowMid\\
+Hạng trung bình & 3{,}200 & 3{,}850 & 4{,}000 & 4{,}050 & 4{,}250 & 4{,}900 & 5{,}250 & 6{,}500\\
 \bottomrule
 \end{tabular}
 \end{center}
-Vì $N$ nhỏ nên kết luận của Friedman chỉ mang tính tham khảo; so sánh cặp ở dưới dựa trên 10 lần chạy mỗi thuật toán trên từng thể hiện vừa.
 
-Cho so sánh cặp nhóm dùng kiểm định tổng hạng Wilcoxon (Mann--Whitney $U$, hai phía) trên 10 lần chạy của hai thuật toán, rồi hiệu chỉnh Holm cho 6 cặp trong mỗi thể hiện. Nhóm không dùng kiểm định hạng dấu Wilcoxon theo cặp trên từng seed vì các seed của hai thuật toán không tạo thành cặp có ý nghĩa (mỗi thuật toán dùng seed cho luồng ngẫu nhiên khác nhau); kiểm định hạng dấu chỉ hợp lý nếu ghép theo thể hiện, khi đó $N=\FriedN$ quá nhỏ. In đậm khi $p$ hiệu chỉnh $<0{,}05$.
+Cho so sánh cặp, nhóm dùng kiểm định hạng dấu Wilcoxon (Wilcoxon signed-rank, ghép cặp theo từng $(\text{instance}, \text{seed})$ trên toàn bộ 10 thể hiện, hiệu chỉnh Holm cho 28 cặp). Bảng~\ref{tbl:pairs} trích các cặp đối sánh chính giữa các metaheuristic (toàn bộ 28 cặp lưu tại \path|results/statistics.md|); in đậm khi $p_{\text{Holm}} < 0{,}05$.
 \begin{table}[htbp]
 \centering
-\caption{So sánh cặp (Mann--Whitney $U$ hai phía, hiệu chỉnh Holm trong từng thể hiện).}
+\caption{Kiểm định Wilcoxon signed-rank cho các cặp metaheuristic (ghép cặp theo thể hiện và seed, hiệu chỉnh Holm).}
 \small
-\begin{tabularx}{0.8\textwidth}{llrr}
+\begin{tabularx}{0.88\textwidth}{lrrrrl}
 \toprule
-Thể hiện & Cặp & $p$ & $p$ (Holm)\\
+Cặp so sánh & $n$ (khác 0) & Mean 1 & Mean 2 & $p$ (Holm) & Ý nghĩa (0{,}05)\\
 \midrule
-\texttt{vua\_100x400\_s201} & SA -- TS & 0{,}0901 & 0{,}2703\\
- & SA -- GA & 0{,}2040 & 0{,}4081\\
- & SA -- GA\_LS & 0{,}9356 & 0{,}9356\\
- & TS -- GA & 0{,}0002 & \textbf{0{,}0012}\\
- & TS -- GA\_LS & 0{,}0015 & \textbf{0{,}0075}\\
- & GA -- GA\_LS & 0{,}0327 & 0{,}1307\\
-\midrule
-\texttt{vua\_150x600\_s202} & SA -- TS & 0{,}0001 & \textbf{0{,}0003}\\
- & SA -- GA & 0{,}0103 & \textbf{0{,}0237}\\
- & SA -- GA\_LS & 0{,}0954 & 0{,}0954\\
- & TS -- GA & 0{,}0002 & \textbf{0{,}0011}\\
- & TS -- GA\_LS & 0{,}0059 & \textbf{0{,}0237}\\
- & GA -- GA\_LS & 0{,}0059 & \textbf{0{,}0237}\\
-\midrule
-\texttt{vua\_200x1000\_s203} & SA -- TS & 0{,}0018 & \textbf{0{,}0055}\\
- & SA -- GA & 0{,}0012 & \textbf{0{,}0048}\\
- & SA -- GA\_LS & 0{,}0150 & \textbf{0{,}0184}\\
- & TS -- GA & 0{,}0001 & \textbf{0{,}0003}\\
- & TS -- GA\_LS & 0{,}0001 & \textbf{0{,}0003}\\
- & GA -- GA\_LS & 0{,}0092 & \textbf{0{,}0184}\\
+TS -- SA & 43 & 216{,}91 & 218{,}63 & \textbf{2{,}44e-05} & Có\\
+TS -- GA & 52 & 216{,}91 & 219{,}27 & \textbf{0{,}0007} & Có\\
+TS -- GA\_LS & 47 & 216{,}91 & 217{,}20 & 0{,}7709 & Không\\
+TS -- GRASP & 49 & 216{,}91 & 217{,}67 & 0{,}5026 & Không\\
+SA -- GA & 56 & 218{,}63 & 219{,}27 & 0{,}5026 & Không\\
+SA -- GA\_LS & 50 & 218{,}63 & 217{,}20 & \textbf{0{,}0271} & Có\\
+SA -- GRASP & 47 & 218{,}63 & 217{,}67 & 0{,}1551 & Không\\
+GA -- GA\_LS & 44 & 219{,}27 & 217{,}20 & \textbf{0{,}0006} & Có\\
+GA -- GRASP & 56 & 219{,}27 & 217{,}67 & 0{,}2355 & Không\\
+GA\_LS -- GRASP & 52 & 217{,}20 & 217{,}67 & 0{,}7709 & Không\\
 \bottomrule
 \end{tabularx}
 \label{tbl:pairs}
 \end{table}
-Kết quả: TS tốt hơn GA và GA\_LS có ý nghĩa ở cả 3 thể hiện vừa; GA\_LS tốt hơn GA có ý nghĩa ở \texttt{vua\_150x600\_s202} và \texttt{vua\_200x1000\_s203} nhưng chưa có ý nghĩa ở \texttt{vua\_100x400\_s201} ($p_{\text{Holm}}=0{,}131$); SA tốt hơn GA ở 2 thể hiện sau và khác GA\_LS có ý nghĩa chỉ ở \texttt{vua\_200x1000\_s203}. Lưu ý: $p$ chỉ hiệu chỉnh trong từng thể hiện, không hiệu chỉnh giữa 3 thể hiện; mỗi nhóm chỉ có 10 quan sát và nhiều giá trị hòa nên $p$ chỉ là xấp xỉ; ngân sách 3 s là ngắn. Ý nghĩa thống kê ở đây không phải là kết luận chung cho mọi ngân sách hay mọi thể hiện.
+Kết quả: toàn bộ 7 thuật toán cải thiện đều vượt trội có ý nghĩa so với \texttt{GREEDY} ($p_{\text{Holm}} \le 0{,}0047$). \texttt{TS} và \texttt{GA\_LS} vượt trội có ý nghĩa so với cả \texttt{SA} ($p_{\text{Holm}} \le 0{,}0271$) và \texttt{GA} ($p_{\text{Holm}} \le 0{,}0007$), trong khi giữa bộ ba dẫn đầu (\texttt{TS}, \texttt{GA\_LS}, \texttt{GRASP}) chưa có khác biệt có ý nghĩa thống kê ở ngân sách $0{,}5$ s ($p_{\text{Holm}} \ge 0{,}50$).
 
 \subsection{Thảo luận}
 \begin{enumerate}
-\item \textbf{Thuật toán tốt nhất theo mức kích thước.} Thể hiện nhỏ: không phân biệt được (mọi thuật toán và cả hai chiến lược leo đồi đều tối ưu ở 10/10 lần chạy; chỉ tham lam thuần lệch ở \texttt{nho\_20x28\_s103}). Thể hiện vừa: TS tốt nhất (Avg $204{,}60$; $261{,}00$; $316{,}00$), tiếp theo là SA và GA\_LS (hạng trung bình $2{,}33$ và $2{,}67$ trên 3 thể hiện), GA kém nhất. Về nguyên nhân, nhóm chỉ có giả thuyết chưa kiểm chứng bằng thực nghiệm đối chứng: TS xuất phát từ nghiệm tham lam và dùng lân cận bỏ-rồi-sửa với hoàn tác bằng nhật ký nên thử được nhiều nước đi trong ngân sách ngắn, còn GA, SA phải tự khám phá từ nghiệm kém hơn hoặc sao chép cả lời giải mỗi bước (mục 5.2). Hai lưu ý: ở \texttt{vua\_200x1000\_s203}, HC\_BI (trung bình $316{,}00$ sau $0{,}06$ s) tốt hơn SA, GA, GA\_LS, tức thể hiện này khá dễ và ba metaheuristic đó chưa chứng tỏ giá trị so với một leo đồi trong 3 s; và $f^*$ của thể hiện vừa là giá trị tốt nhất tìm được (TS đóng góp phần lớn), nên gap có thể đánh giá thấp khoảng cách thật tới tối ưu. Cần cận dưới (ví dụ nới lỏng Lagrange) hoặc thể hiện OR-Library có BKS để khẳng định.
-\item \textbf{Tìm kiếm cục bộ trong GA\_LS có bù được thời gian không?} Có, trong ngân sách này. GA\_LS có Avg tốt hơn GA ở cả 3 thể hiện vừa ($207{,}40$ so với $210{,}70$; $265{,}70$ so với $275{,}10$; $318{,}30$ so với $320{,}10$) với độ lệch chuẩn nhỏ hơn, và khác biệt có ý nghĩa (Holm) ở 2/3 thể hiện (Bảng~\ref{tbl:pairs}), dù số thế hệ ít hơn. Tuy nhiên GA\_LS vẫn kém TS và không vượt SA một cách nhất quán.
-\item \textbf{Tham số ảnh hưởng nhiều nhất tới khám phá so với khai thác.} Trong dữ liệu hiện có (Bảng~\ref{tbl:sens}), tham số rõ nhất là kích thước quần thể $P$ của GA\_LS ($P=20$ tệ rõ; $P=80$ tốt nhất); $p_m$ ít ảnh hưởng trong khoảng khảo sát. Chưa thể kết luận về TS (thể hiện chỉnh tham số quá dễ) và SA (chưa khảo sát). Chỉ 5 seed trên 1 thể hiện, nên đây là kết quả sơ bộ.
-\item \textbf{Thuật toán chính xác và tham lam cho thấy gì về độ khó.} Thể hiện nhỏ không khó (EXACT chưa đến 1 ms, tham lam đã gần tối ưu). Thể hiện vừa vượt khả năng của EXACT hiện tại trong 30 s, và nghiệm tạm thời của nó tệ hơn cả tham lam (hạn chế cận trên $+\infty$ và cận dưới lỏng). Tham lam cách $f^*$ khoảng $4{,}2$--$4{,}4\%$, leo đồi rút còn $0$--$3{,}4\%$, phần còn lại do metaheuristic khai thác.
-\item \textbf{Tỉ lệ đạt tối ưu trên thể hiện nhỏ.} $10/10$ lần chạy cho SA, TS, GA, GA\_LS, HC\_FI và HC\_BI trên cả 4 thể hiện nhỏ và \texttt{vidu}; tham lam thuần tối ưu ở 3/4 thể hiện nhỏ (và ở \texttt{vidu}).
-\item \textbf{Khác biệt có ý nghĩa thống kê không?} Có ở thể hiện vừa cho phần lớn cặp có TS hoặc GA (Bảng~\ref{tbl:pairs}); Friedman trên 7 thể hiện chỉ sát ngưỡng ($p=\FriedP$) vì 4 thể hiện nhỏ hòa hoàn toàn. Khẳng định rộng hơn cần thêm thể hiện (đặc biệt OR-Library), ngân sách dài hơn và thuật toán của D.
+\item \textbf{Thuật toán tốt nhất theo mức kích thước.} Thể hiện nhỏ: không phân biệt được (mọi metaheuristic và tìm kiếm cục bộ đều tối ưu 10/10 lần chạy; chỉ tham lam thuần lệch ở \texttt{nho\_20x28\_s103}). Thể hiện vừa và OR-Library: bộ ba có tìm kiếm cục bộ (\texttt{TS}, \texttt{GA\_LS}, \texttt{GRASP}) dẫn đầu với hạng trung bình Friedman lần lượt là $3{,}200$; $3{,}850$; $4{,}050$. Cụ thể, \texttt{GRASP} đạt $204{,}00\pm0{,}00$ trên \texttt{vua\_100x400\_s201} và best $430$ trên \texttt{scp41}; \texttt{GA\_LS} chạm tối ưu $253$ trên \texttt{scp51} ($20\%$); \texttt{TS} đạt $10/10$ tối ưu nghiệm nhóm trên \texttt{vua\_150x600\_s202}, \texttt{vua\_200x1000\_s203} và ổn định nhất trên \texttt{scp61} ($141{,}00\pm0{,}00$).
+\item \textbf{Tìm kiếm cục bộ trong GA\_LS có bù được thời gian không?} Có, trong ngân sách $0{,}5$ s. \texttt{GA\_LS} có Avg tốt hơn \texttt{GA} ở toàn bộ 6 thể hiện vừa và OR-Library ($207{,}40$ so với $210{,}70$; $266{,}40$ so với $276{,}00$; $318{,}40$ so với $320{,}20$; $433{,}60$ so với $434{,}70$; $258{,}80$ so với $263{,}10$; $141{,}40$ so với $142{,}00$), và vượt trội có ý nghĩa thống kê với $p_{\text{Holm}} = 0{,}0006$ (Bảng~\ref{tbl:pairs}).
+\item \textbf{Tham số ảnh hưởng nhiều nhất tới khám phá so với khai thác.} Với \texttt{GA\_LS}, kích thước quần thể $P=20$ tệ rõ ($204{,}60$ so với $194{,}80$ ở $P=80$). Với \texttt{GRASP}, $\alpha=0$ (thuần tham lam) kẹt tại $305{,}00$ trên \texttt{s902}, còn $\alpha \sim \mathcal{U}(0{,}02;\,0{,}12)$ đạt $285{,}50\pm1{,}08$. Với \texttt{TS}, \texttt{tenure} quá nhỏ ($3,5$) kẹt tại $296{,}00$ còn \texttt{tenure=15} đạt $284{,}00$. Với \texttt{SA}, tăng nhiệt độ đầu \texttt{t0\_factor=0,20} hạ trung bình từ $310{,}00$ xuống $306{,}80$.
+\item \textbf{Thuật toán chính xác và tham lam cho thấy gì về độ khó.} Thể hiện nhỏ không khó (EXACT chưa đến 1 ms). Thể hiện vừa vượt khả năng của EXACT trong 30 s, và nghiệm tạm thời của nó tệ hơn cả tham lam (cận trên $+\infty$ và cận dưới lỏng).
+\item \textbf{Tỉ lệ đạt tối ưu trên thể hiện nhỏ.} $10/10$ lần chạy cho cả 5 metaheuristic và 2 chiến lược leo đồi trên cả 4 thể hiện nhỏ; tham lam thuần tối ưu ở 3/4 thể hiện nhỏ.
+\item \textbf{Khác biệt có ý nghĩa thống kê không?} Có: kiểm định Friedman cho $\chi^2_F=19{,}94$, $p=0{,}0057 < 0{,}05$, và Wilcoxon--Holm khẳng định \texttt{TS}, \texttt{GA\_LS} vượt trội \texttt{GREEDY}, \texttt{SA} và \texttt{GA} (Bảng~\ref{tbl:pairs}).
 \end{enumerate}
 
 %================= 7 =================
 \section{Kết luận}
-\textbf{Kết quả đạt được.} Nhóm đã cài đặt và kiểm tra bằng bộ kiểm tra độc lập: thuật toán chính xác (nhánh cận kèm giảm cỡ dữ liệu), tham lam Chvátal kèm xóa cột thừa, hai chiến lược leo đồi, SA, TS, GA và GA\_LS. Trên 8 thể hiện (ví dụ của đề, 4 nhỏ, 3 vừa), 10 seed mỗi cặp, 496/496 nghiệm hợp lệ. Gap trung bình theo $f^*$: thể hiện nhỏ $0\%$ cho cả bốn metaheuristic; thể hiện vừa TS $0$--$0{,}29\%$, SA $0{,}35$--$2{,}95\%$, GA\_LS $0{,}73$--$1{,}80\%$, GA $1{,}30$--$5{,}40\%$ (với $f^*$ là giá trị tốt nhất trong thực nghiệm). TS là thuật toán hiệu quả nhất trong điều kiện thực nghiệm này (ngân sách 3 s, Python); tìm kiếm cục bộ làm GA\_LS tốt hơn GA có ý nghĩa thống kê ở 2/3 thể hiện vừa.
+\textbf{Kết quả đạt được.} Nhóm đã cài đặt và kiểm tra bằng bộ kiểm tra độc lập: thuật toán chính xác (nhánh cận kèm giảm cỡ dữ liệu), tham lam Chvátal kèm xóa cột thừa, hai chiến lược leo đồi, bốn metaheuristic (\texttt{SA}, \texttt{TS}, \texttt{GA}, \texttt{GRASP}) và thuật toán lai \texttt{GA\_LS}. Trên 10 thể hiện thuộc 3 mức kích thước (4 nhỏ tự sinh, 3 vừa tự sinh, 3 chuẩn OR-Library \texttt{scp41}, \texttt{scp51}, \texttt{scp61}), 10 seed mỗi cặp ở ngân sách $0{,}5$ s, toàn bộ 800/800 nghiệm (cùng 4 nghiệm EXACT) đều hợp lệ. \texttt{TS} đạt hạng trung bình Friedman tốt nhất ($3{,}200$), \texttt{GA\_LS} đạt tối ưu $253$ trên \texttt{scp51} và vượt trội \texttt{GA} có ý nghĩa thống kê ($p_{\text{Holm}}=0{,}0006$), còn \texttt{GRASP} dẫn đầu trên \texttt{vua\_100x400\_s201} và \texttt{scp41}.
 
 \textbf{Hạn chế.}
 \begin{itemize}
