@@ -1,0 +1,1326 @@
+% Nguồn chỉnh sửa được chuyển đổi từ PDF bai_tap_lon.pdf (38 trang).
+% Biên dịch bằng XeLaTeX: xelatex bai_tap_lon.tex (2 lần để tạo mục lục).
+\documentclass[a4paper,11pt]{article}
+\usepackage{fontspec}
+\setmainfont{Liberation Serif}
+\setmonofont[Scale=0.90]{Noto Sans Mono}
+\usepackage[margin=20mm,top=21mm,bottom=20mm]{geometry}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{enumitem,tabularx,longtable,booktabs}
+\usepackage{fvextra,ragged2e}
+\usepackage{fancyhdr,titlesec,newunicodechar}
+\usepackage[hidelinks,unicode]{hyperref}
+\newunicodechar{≤}{\ensuremath{\le}}
+\newunicodechar{≥}{\ensuremath{\ge}}
+\newunicodechar{≠}{\ensuremath{\ne}}
+\newunicodechar{∈}{\ensuremath{\in}}
+\newunicodechar{∀}{\ensuremath{\forall}}
+\newunicodechar{⊂}{\ensuremath{\subset}}
+\newunicodechar{⊆}{\ensuremath{\subseteq}}
+\newunicodechar{×}{\ensuremath{\times}}
+\newunicodechar{π}{\ensuremath{\pi}}
+\newunicodechar{χ}{\ensuremath{\chi}}
+\newunicodechar{ω}{\ensuremath{\omega}}
+\newunicodechar{α}{\ensuremath{\alpha}}
+\newunicodechar{β}{\ensuremath{\beta}}
+\newunicodechar{ρ}{\ensuremath{\rho}}
+\newunicodechar{τ}{\ensuremath{\tau}}
+\newunicodechar{ε}{\ensuremath{\varepsilon}}
+\newunicodechar{∆}{\ensuremath{\Delta}}
+\newunicodechar{µ}{\ensuremath{\mu}}
+\newunicodechar{−}{\ensuremath{-}}
+\newunicodechar{∗}{\ensuremath{\ast}}
+\newunicodechar{∨}{\ensuremath{\lor}}
+\newunicodechar{¬}{\ensuremath{\neg}}
+\newunicodechar{∑}{\ensuremath{\sum}}
+\newunicodechar{√}{\ensuremath{\sqrt{\,}}}
+\newunicodechar{→}{\ensuremath{\to}}
+\newunicodechar{⇔}{\ensuremath{\Leftrightarrow}}
+\newunicodechar{⌈}{\ensuremath{\lceil}}
+\newunicodechar{⌉}{\ensuremath{\rceil}}
+\newunicodechar{′}{\ensuremath{\prime}}
+\newunicodechar{◦}{\ensuremath{\circ}}
+\newunicodechar{·}{\ensuremath{\cdot}}
+\titleformat{\section}{\large\bfseries}{\thesection.}{0.5em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection.}{0.5em}{}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\setlist{nosep,leftmargin=2em}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small Phân tích thiết kế giải thuật}
+\fancyhead[R]{\small Đề bài tập lớn: bài toán NP-khó và metaheuristic}
+\fancyfoot[C]{\thepage}
+\setlength{\headheight}{15pt}
+\newcommand{\topic}[1]{\par\medskip{\large\bfseries #1}\par\smallskip}
+\newcommand{\topichead}[1]{\par\medskip{\bfseries #1}\par\smallskip}
+\begin{document}
+\emergencystretch=3em
+\begin{titlepage}
+\centering
+{\Large\bfseries TRƯỜNG ĐẠI HỌC GIAO THÔNG VẬN TẢI THÀNH PHỐ HỒ CHÍ MINH\par}
+\vspace{0.5cm}{\large Ngành Công nghệ thông tin\par}
+\vspace{4cm}{\LARGE\bfseries ĐỀ BÀI TẬP LỚN\par}
+\vspace{0.5cm}{\Large\bfseries HỌC PHẦN: PHÂN TÍCH THIẾT KẾ GIẢI THUẬT\par}
+\vspace{3cm}{\Large Chủ đề: Các bài toán NP-khó\\ và giải thuật metaheuristic\par}
+\vfill Thành phố Hồ Chí Minh -- Năm học 2026--2027
+\end{titlepage}
+\renewcommand{\contentsname}{Mục lục}
+\tableofcontents
+\clearpage
+
+\section{Mục tiêu}
+Các chương 1–6 của học phần trình bày các chiến lược thiết kế thuật toán: vét cạn, quay lui, nhánh cận, chia để trị, quy hoạch động và tham lam. Với các bài toán NP-khó, chưa có thuật toán thời gian đa thức nào được biết (và sẽ không có nếu P ≠ NP); thuật toán cho lời giải tối ưu chỉ khả thi với dữ liệu nhỏ, còn tham lam thường chỉ cho lời giải gần đúng. Bài tập lớn yêu cầu sinh viên:
+
+\begin{itemize}
+\item Mô hình hóa một bài toán tối ưu tổ hợp thực tế và lập luận về tính NP-khó của nó.
+\item Cài đặt thuật toán chính xác cho dữ liệu nhỏ để làm mốc đối chiếu, và các heuristic xây dựng, tìm kiếm cục bộ.
+\item Tìm hiểu và cài đặt các giải thuật metaheuristic, thực nghiệm có kiểm soát trên bộ dữ liệu chuẩn và đánh giá chất lượng lời giải so với lời giải tối ưu hoặc lời giải tốt nhất đã biết.
+\end{itemize}
+\subsection{Kết quả cần đạt}
+Sau khi hoàn thành bài tập lớn, mỗi sinh viên phải có khả năng:
+
+\begin{enumerate}
+\item Viết được mô hình toán học (biến quyết định, hàm mục tiêu, ràng buộc) của bài toán nhóm chọn và tính được kích thước không gian tìm kiếm.
+\item Giải thích được vì sao bài toán là NP-khó (phép quy dẫn hoặc trích dẫn nguồn) và hệ quả của điều đó đối với việc chọn thuật toán.
+\item Cài đặt đúng và đo được giới hạn của thuật toán chính xác; cài đặt tham lam và tìm kiếm cục bộ có đánh giá gia tăng.
+\item Trình bày được nguyên lý, mã giả, tham số của metaheuristic mình phụ trách và lý giải được hành vi của nó qua số liệu thực nghiệm.
+\item Thiết kế và báo cáo một thí nghiệm có thể tái lập: dữ liệu, seed, ngân sách, chỉ số đánh giá, biểu đồ và nhận xét có căn cứ.
+\end{enumerate}
+\subsection{Quy trình thực hiện tổng quát}
+Mọi đề đều đi theo cùng một quy trình; mỗi bước tạo ra một sản phẩm dùng cho bước sau:
+
+\begin{enumerate}
+\item Hiểu bài toán: đọc đề, giải tay ví dụ nhỏ trong đề, viết mô hình toán học.
+\item Hạ tầng: bộ đọc dữ liệu (định dạng tự định nghĩa và định dạng bộ dữ liệu chuẩn), hàm tính hàm mục tiêu, hàm kiểm tra tính hợp lệ; kiểm thử bằng ví dụ nhỏ (phải ra đúng giá trị tối ưu đã cho).
+\item Mốc đối chiếu: thuật toán chính xác cho dữ liệu nhỏ; heuristic xây dựng cho mọi kích thước.
+\item Cải thiện: tìm kiếm cục bộ với ít nhất hai cấu trúc lân cận.
+\item Metaheuristic: cài đặt theo số lượng quy định ở mục 2.2, dùng lại bộ đọc dữ liệu, hàm mục tiêu và lân cận đã có.
+\item Thực nghiệm và báo cáo: chạy theo kế hoạch thí nghiệm, tổng hợp bảng/biểu đồ theo mẫu ở mục 6, viết báo cáo và chuẩn bị bảo vệ.
+\end{enumerate}
+Tài liệu này gồm: quy định chung (mục 2), yêu cầu kỹ thuật (mục 3), danh sách và nội dung chi tiết 15 đề (mục 4, 5), kế hoạch thực hiện và hồ sơ nộp bài (mục 6), tiêu chí đánh giá và hình thức bảo vệ (mục 7), câu hỏi thường gặp (mục 8).
+
+\section{Quy định chung}
+\subsection{Hình thức thực hiện}
+\begin{itemize}
+\item Sinh viên làm việc theo nhóm 1–4 người; mỗi nhóm chọn một đề trong danh sách (hạn chế trùng đề trong cùng lớp). Nhóm có thể đề xuất bài toán NP-khó khác nếu được giảng viên đồng ý.
+\item Ngôn ngữ lập trình tùy chọn (C/C++, Java, C\#, Python, Go, Rust, …). Phải tự cài đặt các thuật toán chính; được dùng thư viện cho cấu trúc dữ liệu, đọc dữ liệu, vẽ biểu đồ. Bộ giải có sẵn (bộ giải quy hoạch nguyên, thư viện metaheuristic) chỉ được dùng để đối chiếu kết quả, không thay cho phần tự cài đặt.
+\item Thời gian thực hiện: 8–10 tuần, nộp bài và bảo vệ vào tuần cuối học kỳ (theo lịch của giảng viên). Lịch trình gợi ý theo tuần ở mục 6.1.
+\end{itemize}
+\subsection{Khối lượng theo số thành viên}
+Mọi nhóm phải hoàn thành các thành phần bắt buộc ở mục 3.1; số metaheuristic và yêu cầu bổ sung tăng theo số thành viên:
+
+\begin{Verbatim}[fontsize=\tiny,breaklines=true,breakanywhere=true]
+Số thành viên       Số metaheuristic tối thiểu   Yêu cầu bổ sung
+
+        1                       1                Không
+        2                       2                Có ít nhất một thuật toán đơn lời giải và một thuật
+                                                 toán quần thể
+        3                       3                Như nhóm 2 người; thêm phân tích độ nhạy tham
+                                                 số cho từng metaheuristic
+        4                       4                Như nhóm 3 người; thêm một thuật toán lai (ví
+                                                 dụ GA + tìm kiếm cục bộ) và kiểm định thống kê
+                                                 (Wilcoxon hoặc Friedman)
+
+\end{Verbatim}
+Mỗi metaheuristic do một thành viên chịu trách nhiệm chính (ghi rõ trong bảng phân công) và người đó phải trình bày được thuật toán khi vấn đáp.
+
+\subsection{Sản phẩm phải nộp}
+\begin{enumerate}
+\item Mã nguồn đầy đủ, có chú thích, kèm tệp README hướng dẫn cài đặt, chạy và tái lập kết quả (lệnh chạy, tham số, seed) – nội dung tối thiểu của README ở mục 6.3.
+\item Dữ liệu: các bộ dữ liệu chuẩn đã dùng (hoặc đường dẫn tải) và bộ dữ liệu tự sinh; tệp kết quả thô (CSV) của mọi lần chạy.
+\item Báo cáo (PDF, 20–40 trang) gồm các phần: phát biểu bài toán; độ phức tạp; thuật toán chính xác; heuristic xây dựng và tìm kiếm cục bộ; các metaheuristic; thực nghiệm; kết luận, tài liệu tham khảo, bảng phân công. Nội dung chi tiết và số trang gợi ý của từng phần ở mục 6.4.
+\item Slide thuyết trình (15–20 phút) và demo chương trình (mục 7.2).
+\end{enumerate}
+Toàn bộ sản phẩm được nộp theo cấu trúc thư mục và quy ước tên tệp ở mục 6.2.
+
+\section{Yêu cầu kỹ thuật chung cho mọi đề}
+\subsection{Các thành phần thuật toán bắt buộc}
+\begin{enumerate}
+\item Thuật toán chính xác cho dữ liệu nhỏ (quay lui/nhánh cận/quy hoạch động): dùng để tìm lời giải tối ưu làm mốc so sánh và kiểm tra tính đúng của các thuật toán khác. Xác định thực nghiệm kích thước lớn nhất giải được trong 10 phút.
+\item Heuristic xây dựng: ít nhất một thuật toán tham lam tạo lời giải ban đầu hợp lệ.
+\item Tìm kiếm cục bộ: định nghĩa ít nhất hai cấu trúc lân cận, cài đặt leo đồi (chiến lược first improvement và best improvement); tính chi phí thay đổi theo kiểu gia tăng (delta evaluation) thay vì tính lại toàn bộ khi có thể.
+\item Metaheuristic: số lượng theo bảng ở mục 2.2, chọn trong mục 3.2 hoặc thuật toán khác có tài liệu gốc.
+\item Hàm kiểm tra tính hợp lệ độc lập của lời giải (mọi lời giải báo cáo phải qua hàm này).
+\end{enumerate}
+\subsection{Tìm hiểu giải thuật metaheuristic}
+Metaheuristic là chiến lược tổng quát điều khiển các heuristic cấp thấp để khám phá không gian lời giải, cân bằng giữa khai thác (intensification) vùng tốt và khám phá (diversification) vùng mới. Chúng không bảo đảm tối ưu nhưng thường cho lời giải tốt trong thời gian chấp nhận được. Danh sách gợi ý:
+
+\begin{Verbatim}[fontsize=\tiny,breaklines=true,breakanywhere=true]
+Thuật toán                          Nhóm         Ý tưởng chính và tham số
+
+Tôi luyện mô phỏng (Simulated     Đơn lời giải   Chấp nhận lời giải xấu hơn (mức tăng chi phí ∆ > 0) với xác
+Annealing, SA) – Kirkpatrick và                  suất e−∆/T ; nhiệt độ T giảm dần. Tham số: T0 , hệ số làm
+cộng sự (1983)                                   nguội, số bước mỗi mức nhiệt.
+Tìm kiếm Tabu (Tabu Search,       Đơn lời giải   Luôn đi tới lân cận tốt nhất không bị cấm; danh sách tabu
+TS) – Glover (1986)                              chặn quay lại; tiêu chí mong đợi (aspiration). Tham số: độ
+                                                 dài tabu.
+Tìm kiếm cục bộ lặp (Iterated     Đơn lời giải   Lặp: nhiễu (perturbation) lời giải tối ưu cục bộ rồi tìm kiếm
+Local Search, ILS) – Lourenço,                   cục bộ lại; tiêu chí chấp nhận.
+Martin, Stützle (2003)
+Tìm kiếm lân cận biến đổi         Đơn lời giải   Thay đổi có hệ thống giữa các cấu trúc lân cận N1 , N2 , . . .
+(Variable Neighborhood Search,                   khi bị kẹt.
+VNS) – Mladenović, Hansen
+(1997)
+GRASP – Feo, Resende (1995)       Đơn lời giải   Lặp: xây dựng tham lam ngẫu nhiên hóa (danh sách ứng viên
+                                                 hạn chế RCL, tham số α) + tìm kiếm cục bộ.
+Tìm kiếm lân cận lớn (LNS /       Đơn lời giải   Phá hủy một phần lời giải rồi sửa lại; ALNS chọn toán tử
+ALNS) – Shaw (1998); Ropke,                      thích nghi theo hiệu quả.
+Pisinger (2006)
+Giải thuật di truyền (Genetic      Quần thể      Mã hóa cá thể, chọn lọc, lai ghép, đột biến, thay thế. Tham
+Algorithm, GA) – Holland                         số: kích thước quần thể, xác suất lai/đột biến.
+(1975)
+Tối ưu đàn kiến (Ant Colony        Quần thể      Kiến xây dựng lời giải theo vết mùi τ và thông tin heuristic
+Optimization, ACO) – Dorigo                      η; bay hơi và cập nhật mùi. Tham số: α, β, ρ, số kiến.
+(1992); Dorigo, Stützle (2004)
+
+
+
+
+
+
+
+
+Thuật toán                        Nhóm      Ý tưởng chính và tham số
+
+Tối ưu bầy đàn (Particle Swarm   Quần thể   Hạt di chuyển theo vận tốc hướng về vị trí tốt nhất của bản
+Optimization, PSO) – Kennedy,               thân và của bầy; cần cách mã hóa rời rạc (ví dụ random key).
+Eberhart (1995)
+Thuật toán memetic – Moscato       Lai      GA kết hợp tìm kiếm cục bộ trên từng cá thể con.
+(1989)
+
+
+
+\end{Verbatim}
+Với mỗi metaheuristic, báo cáo phải trình bày: nguồn gốc và tài liệu gốc; mã giả tổng quát và mã giả cụ thể cho bài toán của nhóm; cách biểu diễn lời giải và xử lý ràng buộc (sửa chữa lời giải hay hàm phạt); tiêu chí dừng; ý nghĩa và cách chọn từng tham số.
+
+\subsection{Yêu cầu thực nghiệm}
+\begin{itemize}
+\item Dùng bộ dữ liệu chuẩn được nêu trong đề (có lời giải tối ưu hoặc tốt nhất đã biết – BKS) và bộ dữ liệu tự sinh nhiều kích thước; ít nhất 10 thể hiện (instance) thuộc ít nhất 3 mức kích thước.
+\item Mỗi metaheuristic chạy ít nhất 10 lần độc lập (khuyến khích 30) trên mỗi thể hiện với các seed khác nhau, được ghi lại.
+\item So sánh công bằng: cùng ngôn ngữ, cùng máy, cùng ngân sách (thời gian chạy hoặc số lần đánh giá hàm mục tiêu).
+\item Báo cáo cho mỗi thể hiện: giá trị tốt nhất, trung bình, độ lệch chuẩn, thời gian trung bình, độ lệch tương đối $\mathrm{gap}=\frac{|f-f^*|}{|f^*|}\times100\%$ so với tối ưu/BKS $f^*$ (dùng trị tuyệt đối để áp dụng cho cả bài toán cực tiểu và cực đại).
+\item Vẽ đường hội tụ (giá trị tốt nhất theo thời gian/số vòng lặp) của các thuật toán trên cùng biểu đồ.
+\item Trên dữ liệu nhỏ: đối chiếu với lời giải tối ưu của thuật toán chính xác; nêu tỉ lệ số lần metaheuristic tìm được tối ưu.
+\item Ghi rõ cấu hình máy, hệ điều hành, ngôn ngữ và phiên bản trình biên dịch/thông dịch, tham số của từng thuật toán.
+\end{itemize}
+Mẫu bảng kết quả và mô tả biểu đồ hội tụ ở mục 6.5.
+
+\topichead{Lưu ý}
+Kết quả thời gian phụ thuộc ngôn ngữ: không so sánh thời gian giữa các nhóm dùng ngôn ngữ khác nhau. Trong một nhóm, mọi thuật toán phải cài cùng một ngôn ngữ khi so sánh thời gian.
+
+\subsection{Liêm chính học thuật}
+Được tham khảo tài liệu và mã nguồn mở, nhưng mọi đoạn mã hoặc ý tưởng lấy từ nguồn khác (kể cả công cụ AI) phải ghi rõ nguồn trong báo cáo. Mỗi thành viên phải giải thích được phần mình phụ trách và nguyên lý của các thuật toán trong bài; bài sao chép nhận điểm 0. Kết quả thực nghiệm phải tái lập được từ mã nguồn và seed đã nộp.
+
+\section{Danh sách đề tài}
+\begin{Verbatim}[fontsize=\tiny,breaklines=true,breakanywhere=true]
+Đề     Tên đề tài                                                  Mức độ      Ví dụ nhỏ: tối ưu
+
+ 1     Lộ trình xe giao hàng: bài toán người du lịch (TSP)          Cơ bản     7 điểm: 31
+ 2     Định tuyến đội xe có giới hạn tải trọng (CVRP)             Nâng cao     6 khách: 44 (3 xe)
+ 3     Định tuyến đội xe có khung thời gian (VRPTW)               Nâng cao     5 khách: 3 xe, 37
+ 4     Chọn hàng vận chuyển: cái túi nhiều ràng buộc (MKP)           Khá       7 đơn, 2 ràng buộc:
+ 5     Xếp ô tô lên phà: bài toán đóng thùng (Bin Packing)           Khá       8 xe: 3 thùng
+ 6     Xếp lịch thi: bài toán tô màu đồ thị                          Khá       7 đỉnh: χ(G) = 3
+ 7     Lập lịch xưởng sửa chữa đầu máy: Job Shop (JSSP)           Nâng cao     3 × 3: Cmax = 11
+ 8     Lập lịch dây chuyền bảo dưỡng: Flow Shop hoán vị              Khá       5 × 3: Cmax = 27
+       (PFSP)
+ 9     Bố trí khu chức năng trong nhà ga: phân công bậc hai       Nâng cao     n = 5: 74
+       (QAP)
+10     Đặt camera giám sát giao thông: bài toán phủ tập (Set         Khá       7 nút, 6 vị trí: 16
+       Cover)
+11     Chọn vị trí kho trung chuyển: bài toán p-median               Khá       7 đỉnh, p = 2: 29
+12     Chọn tuyến không xung đột: tập độc lập lớn nhất / clique      Khá       8 đỉnh: α(G) = 4
+       lớn nhất
+13     Xếp kiện hàng lên sàn container: đóng thùng hai chiều      Nâng cao     7 kiện: 3 thùng
+14     Cấu hình hệ thống: bài toán thỏa mãn cực đại (MAX-            Khá       4 biến: 21 (trên 23)
+       SAT)
+15     Xếp thời khóa biểu học phần                                Nâng cao     7 buổi: phạt mềm 6
+
+
+\end{Verbatim}
+Cột cuối là kích thước và giá trị tối ưu của ví dụ nhỏ trong từng đề. Các giá trị này đã được kiểm chứng bằng chương trình vét cạn hoặc quy hoạch động (thư mục kiem\_chung, tệp de01.py– de15.py, mỗi tệp in ra lời giải tối ưu); chương trình của nhóm phải tái tạo đúng các giá trị này trước khi chạy dữ liệu lớn.
+
+\subsection{Hướng dẫn chọn đề}
+\begin{itemize}
+\item Mức độ phản ánh độ phức tạp của mô hình và của việc cài đặt: Cơ bản – một ràng buộc cấu trúc, biểu diễn lời giải tự nhiên (hoán vị); Khá – có thêm ràng buộc hoặc cần thủ tục sửa chữa lời giải; Nâng cao – nhiều loại ràng buộc, cần bộ giải mã hoặc kiểm tra khả thi phức tạp. Mọi mức độ đều được đánh giá theo cùng tiêu chí (mục 7); đề khó hơn được xem xét khi đánh giá mức độ hoàn thành.
+\item Trước khi chọn, nhóm nên đọc phần Dữ liệu vào/ra và Ví dụ nhỏ của đề, tự giải tay ví dụ nhỏ để chắc chắn đã hiểu bài toán.
+\item Khi đăng ký, nhóm nộp: tên đề, danh sách thành viên, dự kiến các metaheuristic và người phụ trách từng thuật toán.
+\end{itemize}
+\section{Nội dung chi tiết các đề tài}
+Mỗi đề dưới đây chỉ nêu phần riêng; các yêu cầu ở mục 2 và mục 3 áp dụng cho mọi đề. Gợi ý metaheuristic chỉ mang tính tham khảo.
+
+\subsection{Cách đọc một đề}
+Mỗi đề được trình bày trên một hoặc hai trang riêng, gồm các mục:
+
+\begin{itemize}
+\item Bối cảnh: tình huống thực tế mà bài toán mô hình hóa.
+\item Phát biểu và mô hình toán học: biến quyết định, hàm mục tiêu, ràng buộc. Đây là cơ sở để viết hàm mục tiêu và hàm kiểm tra tính hợp lệ.
+\item Tính NP-khó: kết quả đã biết và nguồn; báo cáo cần trình bày lại lập luận.
+\item Dữ liệu vào/ra: định dạng tệp tự định nghĩa (dùng cho ví dụ nhỏ và dữ liệu tự sinh), cách đọc bộ dữ liệu chuẩn, định dạng tệp lời giải.
+\item Ví dụ nhỏ: tệp vào, tệp lời giải tối ưu và giải thích; dùng làm bộ kiểm thử đầu tiên.
+\item Gợi ý thuật toán: thuật toán chính xác, heuristic xây dựng, lân cận và metaheuristic phù hợp.
+\item Yêu cầu tối thiểu (bắt buộc): những gì mọi nhóm làm đề này đều phải có (bổ sung cho mục 3.1).
+\item Yêu cầu nâng cao (khuyến khích): không bắt buộc; là căn cứ để xét mức Giỏi của các tiêu chí và điểm cộng (mục 7).
+\item Dữ liệu chuẩn và gợi ý thực nghiệm: thể hiện nên chạy (tên, kích thước, giá trị tối ưu hoặc BKS khi đã biết chắc), chỉ số cần báo cáo, ngân sách thời gian gợi ý.
+\end{itemize}
+\subsection{Quy ước chung về tệp dữ liệu và lời giải}
+\begin{itemize}
+\item Tệp văn bản thuần, các số cách nhau bởi khoảng trắng hoặc xuống dòng. Bộ đọc nên đọc theo dãy từ tố (token) thay vì giả định số lượng số trên mỗi dòng, vì nhiều bộ dữ liệu chuẩn xuống dòng tùy ý.
+\item Trong định dạng tự định nghĩa, các phần tử (điểm, khách hàng, vật, đỉnh, …) được đánh số từ 1, trừ khi đề ghi khác. Một số bộ chuẩn đánh số từ 0 (Job Shop, ITC-2007): đề sẽ nêu rõ.
+\item Không sửa tệp chuẩn gốc: viết bộ đọc cho đúng định dạng gốc; nếu cần chuyển đổi, giữ chương trình chuyển đổi trong mã nguồn.
+\item Tệp lời giải: dòng đầu là giá trị hàm mục tiêu, các dòng sau mô tả lời giải theo định dạng của đề. Chương trình kiểm tra độc lập được gọi dạng kiemtra <tệp\_vào> <tệp\_lời\_giải>: đọc cả hai tệp, kiểm tra mọi ràng buộc, tính lại hàm mục tiêu và báo HOP LE/KHONG HOP LE kèm lý do và giá trị tính được.
+\item BKS: lấy từ trang chính thức của bộ dữ liệu (ghi đường dẫn và ngày truy cập trong báo cáo). Chú ý quy ước tính khoảng cách và làm tròn: so sánh với BKS chỉ có nghĩa khi dùng cùng quy ước với nguồn công bố BKS.
+\item Ngân sách thời gian ghi trong đề chỉ là gợi ý cho máy tính cá nhân thông thường; nhóm được điều chỉnh (đặc biệt khi dùng ngôn ngữ thông dịch) nhưng phải dùng cùng ngân sách cho mọi thuật toán và ghi rõ trong báo cáo.
+\end{itemize}
+\topic{Đề 1. Lộ trình xe giao hàng: bài toán người du lịch (TSP)}
+\textit{Ứng dụng: giao hàng, thu gom, khoan mạch in         |       Mức độ: Cơ bản}
+\topichead{Bối cảnh}
+Một xe tải nhỏ của công ty chuyển phát xuất phát từ kho, giao hàng cho n − 1 điểm trong nội thành rồi quay về kho. Chi phí nhiên liệu và thời gian tỉ lệ với quãng đường, nên điều phối viên cần thứ tự giao hàng có tổng quãng đường ngắn nhất. Bài toán cùng dạng xuất hiện khi lập lộ trình thu gom rác, kiểm tra trạm, hay khoan lỗ trên mạch in.
+
+\topichead{Phát biểu và mô hình toán học}
+Cho $n$ điểm và ma trận khoảng cách $d_{ij}$. Tìm chu trình đi qua mỗi điểm đúng một lần, quay về điểm xuất phát, có tổng độ dài nhỏ nhất. Biểu diễn lời giải bằng hoán vị $\pi$ của $\{1,\ldots,n\}$ với $\pi(1)=1$:
+\[\min_{\pi}f(\pi)=\sum_{k=1}^{n-1}d_{\pi(k),\pi(k+1)}+d_{\pi(n),\pi(1)}.\]
+Dạng quy hoạch nguyên: $x_{ij}\in\{0,1\}$ (đi thẳng từ $i$ đến $j$); $\min\sum_{i\ne j}d_{ij}x_{ij}$ với $\sum_j x_{ij}=1$, $\sum_i x_{ij}=1$ và ràng buộc khử chu trình con $\sum_{i,j\in S}x_{ij}\le |S|-1$ với mọi $S\subset V$, $2\le|S|\le n-1$. Với $d$ đối xứng có $(n-1)!/2$ chu trình khác nhau.
+\topichead{Tính NP-khó}
+Phiên bản quyết định (có chu trình độ dài ≤ L?) là NP-đầy đủ, quy dẫn từ bài toán chu trình Hamilton (NP-đầy đủ theo Karp, 1972).
+
+\topichead{Dữ liệu vào/ra}
+Tự định nghĩa: dòng 1 là $n$; $n$ dòng tiếp theo dạng \texttt{i x\_i y\_i}. Khoảng cách theo quy ước EUC\_2D của TSPLIB:
+\[d_{ij}=\operatorname{nint}\!\left(\sqrt{(x_i-x_j)^2+(y_i-y_j)^2}\right),\]
+trong đó \texttt{nint} là làm tròn đến số nguyên gần nhất (cài đặt: \texttt{(int)(v + 0.5)}). TSPLIB: phần đầu gồm các dòng KHÓA : giá trị (NAME, TYPE, DIMENSION, EDGE\_\allowbreak WEIGHT\_\allowbreak TYPE, \ldots); sau dòng NODE\_\allowbreak COORD\_\allowbreak SECTION là DIMENSION dòng \texttt{i x y} (tọa độ có thể là số thực); tệp kết thúc bằng EOF. Chỉ chọn thể hiện có EDGE\_\allowbreak WEIGHT\_\allowbreak TYPE: EUC\_2D (các kiểu khác như GEO, ATT, EXPLICIT có công thức riêng). Một số thể hiện có tệp chu trình tối ưu \texttt{.opt.tour} (dãy đỉnh sau TOUR\_SECTION, kết thúc bằng $-1$) -- dùng để kiểm tra hàm tính khoảng cách. Lời giải: dòng 1 là độ dài chu trình; dòng 2 là hoán vị $n$ đỉnh bắt đầu từ đỉnh 1.
+
+\topichead{Ví dụ nhỏ (kiểm chứng: de01.py)}
+\begin{Verbatim}[fontsize=\scriptsize,breaklines=true,breakanywhere=true]
+Tệp vào vidu.txt                                           Tệp lời giải tối ưu
+7                                                          31
+1 0 0                                                      1 2 3 4 5 7 6
+2 2 6
+3 5 9
+4 9 7
+5 8 2
+6 4 3
+7 6 5
+\end{Verbatim}
+Đỉnh 1 là kho. Ví dụ $d_{12}=\operatorname{nint}(\sqrt{40})=\operatorname{nint}(6{,}32)=6$. Độ dài tối ưu là 31, có hai chu trình tối ưu: 1−2−3−4−5−7−6−1 và 1−2−3−4−7−5−6−1 (vét cạn 6! = 720 hoán vị và Held–Karp cho cùng kết quả). Láng giềng gần nhất xuất phát từ đỉnh 1 cho 1−6−7−2−3−4−5−1 dài 33 (gap 6,45\%).
+
+\topichead{Gợi ý thuật toán}
+\begin{itemize}
+\item Chính xác: quy hoạch động Held–Karp $O(n^2 2^n)$ hoặc nhánh cận (n ≤ 20).
+\item Xây dựng: láng giềng gần nhất, chèn rẻ nhất; lân cận: 2-opt, Or-opt, đổi chỗ hai điểm.
+\item Metaheuristic phù hợp: SA, TS, ACO (bài toán gốc của ACO), GA với lai ghép thứ tự (OX, PMX), ILS với nhiễu double-bridge.
+\end{itemize}
+\topichead{Yêu cầu tối thiểu (bắt buộc)}
+\begin{itemize}
+\item Bộ đọc TSPLIB (EUC\_2D); kiểm tra: độ dài của chu trình trong berlin52.opt.tour tính bằng chương trình phải đúng 7542.
+\item Held–Karp hoặc nhánh cận giải đúng ví dụ nhỏ và các thể hiện tự sinh đến ít nhất n = 15; báo cáo thời gian theo n.
+\item Láng giềng gần nhất và một heuristic chèn; 2-opt với đánh giá delta O(1) cho mỗi bước và ít nhất một lân cận khác.
+\item Các metaheuristic theo số thành viên; chạy trên ít nhất 10 thể hiện, báo cáo gap so với tối ưu.
+\end{itemize}
+\topichead{Yêu cầu nâng cao (khuyến khích)}
+\begin{itemize}
+\item Trực quan hóa lộ trình theo thời gian; thử với n ≥ 1 000 dùng danh sách láng giềng gần (candidate list) và kỹ thuật don’t look bits.
+\item Đối chiếu với một bộ giải chính xác có sẵn (ví dụ Concorde) – chỉ để đối chiếu.
+\end{itemize}
+\topichead{Dữ liệu chuẩn và gợi ý thực nghiệm}
+TSPLIB (Reinelt, 1991). Gợi ý (tên – giá trị tối ưu): eil51 – 426, berlin52 – 7542, st70 – 675, eil76 – 538, kroA100 – 21282, ch150 – 6528, pr152 – 73682, a280 – 2579, pcb442 – 50778; dữ liệu tự sinh n = 10, 12, . . . , 20 (tọa độ nguyên ngẫu nhiên trong [0, 1000]2 ) cho thuật toán chính xác. Ngân sách gợi ý: 0,1 · n giây mỗi lần chạy. Chỉ số: best, trung bình, độ lệch chuẩn, gap\%, thời gian đến khi đạt lời giải tốt nhất, số lần đạt tối ưu trên tổng số lần chạy.
+
+\topic{Đề 2. Định tuyến đội xe có giới hạn tải trọng (CVRP)}
+\textit{Ứng dụng: phân phối hàng từ kho, thu gom rác | Mức độ: Nâng cao}
+\topichead{Bối cảnh}
+Trung tâm phân phối của một chuỗi cửa hàng tiện lợi giao hàng hằng ngày cho n cửa hàng bằng đội xe tải cùng loại, tải trọng Q. Mỗi cửa hàng nhận hàng đúng một lần trong ngày. Điều phối viên phải chia các cửa hàng thành từng chuyến và sắp thứ tự ghé trong mỗi chuyến sao cho tổng quãng đường nhỏ nhất.
+
+\topichead{Phát biểu và mô hình toán học}
+Một kho (đỉnh $0$) và $n$ khách hàng, khách $i$ có nhu cầu $q_i$; đội xe giống nhau có tải trọng $Q$. Tìm tập lộ trình xuất phát và kết thúc tại kho, mỗi khách được phục vụ đúng một lần, tổng tải mỗi xe $\le Q$, tổng quãng đường nhỏ nhất. Lời giải là tập tuyến $R_1,\ldots,R_K$, tuyến $R_k=(0,v_1,\ldots,v_t,0)$:
+\[\min\sum_{k=1}^{K}c(R_k),\qquad c(R_k)=d_{0v_1}+\sum_{s=1}^{t-1}d_{v_s,v_{s+1}}+d_{v_t0}.\]
+Với ràng buộc: $\{R_k\}$ phân hoạch tập khách hàng $\{1,\ldots,n\}$ và $\sum_{i\in R_k}q_i\le Q$ với mọi $k$. Cận dưới số xe: $K\ge\left\lceil\frac{\sum_i q_i}{Q}\right\rceil$.
+\topichead{Tính NP-khó}
+Tổng quát hóa TSP (khi $Q\ge\sum_iq_i$ và chỉ có một xe); NP-khó (Lenstra, Rinnooy Kan, 1981).
+
+\topichead{Dữ liệu vào/ra}
+Tự định nghĩa: dòng 1: n Q; dòng 2: tọa độ kho x0 y0; n dòng: i x\_i y\_i q\_i; khoảng cách EUC\_2D làm tròn như đề 1. CVRPLIB (mở rộng định dạng TSPLIB): DIMENSION là số đỉnh kể cả kho, CAPACITY là Q; sau NODE\_\allowbreak COORD\_\allowbreak SECTION là tọa độ; sau DEMAND\_SECTION là các dòng i q\_i (kho có nhu cầu 0); DEPOT\_SECTION ghi số hiệu kho (thường là 1) và kết thúc bằng -1. Trong tên thể hiện (ví dụ A-n32-k5),
+
+n là số đỉnh, k là số xe tối thiểu. Lời giải theo dạng tệp .sol của CVRPLIB: mỗi tuyến một dòng Route \#k: ... liệt kê khách hàng (không ghi kho), dòng cuối Cost <tổng quãng đường>. Lưu ý: trong tệp .sol của CVRPLIB, khách hàng được đánh số lại từ 1 (số hiệu đỉnh trừ 1, vì kho là đỉnh 1).
+
+\topichead{Ví dụ nhỏ (kiểm chứng: de02.py)}
+\begin{Verbatim}[fontsize=\scriptsize,breaklines=true,breakanywhere=true]
+Tệp vào vidu.txt                                        Tệp lời giải tối ưu
+6 10                                                    Route #1: 1 2
+5 5                                                     Route #2: 3 4
+1 1 9 4                                                 Route #3: 5 6
+2 3 10 3                                                Cost 44
+3 9 9 5
+4 10 4 3
+5 8 1 4
+6 2 2 5
+
+\end{Verbatim}
+Tổng nhu cầu 24, Q = 10 nên cần ít nhất 3 xe. Lời giải tối ưu có tổng quãng đường 44 với 3 tuyến: 0−1−2−0 (tải 7, dài 13), 0−3−4−0 (tải 8, dài 16), 0−5−6−0 (tải 9, dài 15). Kiểm chứng bằng vét cạn mọi phân hoạch 6 khách hàng (203 phân hoạch) kết hợp vét cạn thứ tự trong từng tuyến.
+
+\topichead{Gợi ý thuật toán}
+\begin{itemize}
+\item Chính xác: nhánh cận hoặc vét cạn phân hoạch cho n ≤ 10–12.
+\item Xây dựng: thuật toán tiết kiệm Clarke–Wright, quét theo góc (sweep).
+\item Lân cận: 2-opt trong tuyến, relocate và swap giữa hai tuyến, 2-opt*.
+\item Metaheuristic phù hợp: TS, ALNS, GA với biểu diễn giant tour và thủ tục chia tuyến (split), ACO.
+\end{itemize}
+\topichead{Yêu cầu tối thiểu (bắt buộc)}
+\begin{itemize}
+\item Bộ đọc CVRPLIB và bộ ghi lời giải dạng .sol; hàm kiểm tra: mỗi khách đúng một lần, tải mỗi tuyến ≤ Q, tính lại tổng quãng đường.
+\item Thuật toán chính xác giải đúng ví dụ nhỏ và thể hiện tự sinh đến n = 10.
+\item Clarke–Wright (hoặc sweep); ít nhất một lân cận trong tuyến và một lân cận giữa hai tuyến, có đánh giá delta và kiểm tra tải trong O(1) (lưu tổng tải mỗi tuyến).
+\item Các metaheuristic theo số thành viên; thực nghiệm trên các tập A, B, P.
+\end{itemize}
+\topichead{Yêu cầu nâng cao (khuyến khích)}
+\begin{itemize}
+\item GA với giant tour và thủ tục Split của Prins (2004); hoặc ALNS với nhiều toán tử phá hủy/sửa chữa.
+\item Chạy một số thể hiện tập X có n từ 100 đến 200; vẽ bản đồ các tuyến.
+\end{itemize}
+\topichead{Dữ liệu chuẩn và gợi ý thực nghiệm}
+CVRPLIB: tập A, B, P (Augerat và cộng sự) và tập X (Uchoa và cộng sự, 2017). Gợi ý: P-n16-k8, B-n31-k5, A-n32-k5 (tối ưu 784), A-n45-k6, A-n80-k10, X-n101-k25 (tối ưu 27591); BKS của các thể hiện còn lại tra trên CVRPLIB. Ngân sách gợi ý: 30 giây (n ≤ 50), 60 giây (n ≤ 100), 120 giây (n > 100). Chỉ số: số xe, tổng quãng đường (best, trung bình, độ lệch chuẩn), gap\%, thời gian.
+
+\topic{Đề 3. Định tuyến đội xe có khung thời gian (VRPTW)}
+\textit{Ứng dụng: giao hàng theo giờ hẹn, xe đưa đón         |    Mức độ: Nâng cao}
+\topichead{Bối cảnh}
+Dịch vụ giao hàng của một siêu thị cho phép khách chọn khung giờ nhận hàng. Xe đến sớm phải chờ đến đầu khung giờ, không được đến muộn hơn cuối khung giờ; mỗi lần dừng mất một khoảng thời gian bốc dỡ. Vì chi phí cố định của mỗi xe lớn, công ty muốn dùng ít xe nhất, sau đó mới tối thiểu quãng đường.
+
+\topichead{Phát biểu và mô hình toán học}
+Như CVRP, thêm: khách $i$ có khung thời gian $[e_i,l_i]$ và thời gian phục vụ $s_i$; xe đến sớm phải chờ, không được đến muộn. Mục tiêu thứ bậc: tối thiểu số xe, sau đó tối thiểu tổng quãng đường. Với tuyến $(0,v_1,\ldots,v_t,0)$, thời gian di chuyển $t_{ij}$ (bằng khoảng cách), thời điểm bắt đầu phục vụ được tính truy hồi:
+\[b_{v_1}=\max(e_{v_1},e_0+t_{0v_1}),\quad b_{v_{k+1}}=\max\bigl(e_{v_{k+1}},b_{v_k}+s_{v_k}+t_{v_kv_{k+1}}\bigr).\]
+Ràng buộc: $b_{v_k}\le l_{v_k}$ với mọi $k$; xe về kho không muộn hơn $l_0$; tổng tải $\le Q$. Mục tiêu: $\operatorname{lexmin}\left(K,\sum_k c(R_k)\right)$.
+\topichead{Tính NP-khó}
+Chứa CVRP làm trường hợp riêng (khung thời gian rộng vô hạn). Hơn nữa, ngay cả việc kiểm tra có tồn tại lộ trình khả thi cho một xe (bài toán TSPTW) đã là NP-đầy đủ mạnh (Savelsbergh, 1985).
+
+\topichead{Dữ liệu vào/ra}
+Bộ Solomon: dòng đầu là tên thể hiện; mục VEHICLE có dòng tiêu đề NUMBER CAPACITY và dòng giá trị (số xe tối đa, tải trọng Q); mục CUSTOMER có dòng tiêu đề cột CUST NO. XCOORD. YCOORD. DEMAND READY TIME DUE DATE SERVICE TIME, sau đó mỗi dòng một đỉnh; đỉnh 0 là kho, khung thời gian của kho là thời gian làm việc. Thời gian di chuyển bằng khoảng cách Euclid. Các BKS được công bố với quy ước số thực (không làm tròn) hoặc cắt sau một chữ số thập phân – phải ghi rõ quy ước nhóm dùng. Tự định nghĩa (dạng rút gọn của Solomon): dòng 1: n Q; n + 1 dòng i x y q e l s (dòng i = 0 là kho). Lời giải: dòng 1: K tổng\_quãng\_đường; K dòng, mỗi dòng một tuyến bắt đầu và kết thúc bằng 0.
+
+\topichead{Ví dụ nhỏ (kiểm chứng: de03.py)}
+\begin{Verbatim}[fontsize=\scriptsize,breaklines=true,breakanywhere=true]
+Tệp vào vidu.txt                                         Tệp lời giải tối ưu
+5 10                                                     3 37
+0 5 5 0 0 60 0                                           0 1 2 0
+1 1 9 3 5 12 2                                           0 3 4 0
+2 3 10 2 20 30 2                                         0 5 0
+3 9 9 4 6 14 2
+4 10 4 3 15 25 2
+5 6 1 4 5 10 2
+
+\end{Verbatim}
+Để dễ tính tay, ví dụ dùng thời gian bằng khoảng cách Euclid làm tròn số nguyên. Tối ưu: 3 xe, tổng quãng đường 37. Tuyến 0−1−2−0: đến khách 1 lúc 6, phục vụ 6–8, đến khách 2 lúc 10, chờ đến 20; tuyến 0−3−4−0: đến khách 3 lúc 6, đến khách 4 lúc 13, chờ đến 15; tuyến 0−5−0: đến lúc 4, chờ đến
+
+\begin{enumerate}
+\item Nếu bỏ khung thời gian (chỉ còn CVRP), 2 xe là đủ (tuyến \{1, 2, 3\} và \{4, 5\}, tổng 34): khung thời
+\end{enumerate}
+gian buộc phải dùng thêm xe.
+
+\topichead{Gợi ý thuật toán}
+\begin{itemize}
+\item Xây dựng: chèn tuần tự Solomon I1.
+\item Kiểm tra khả thi khi chèn trong O(1) bằng thời gian chờ/độ trễ cho phép tính trước.
+\item Lân cận: relocate, exchange giữa hai tuyến, 2-opt*; Or-opt trong tuyến.
+\item Metaheuristic phù hợp: ALNS, TS, GA lai (memetic); xử lý vi phạm thời gian bằng hàm phạt.
+\end{itemize}
+\topichead{Yêu cầu tối thiểu (bắt buộc)}
+\begin{itemize}
+\item Bộ đọc định dạng Solomon; hàm kiểm tra tính lại lịch bi của mọi tuyến, báo khách hàng vi phạm khung thời gian hoặc tải.
+\item Thuật toán chính xác (vét cạn hoặc nhánh cận) giải đúng ví dụ nhỏ và thể hiện tự sinh đến n = 8.
+\item Một heuristic chèn (Solomon I1 hoặc chèn rẻ nhất có kiểm tra khả thi); ít nhất hai lân cận giữa các tuyến.
+\item Các metaheuristic theo số thành viên; báo cáo riêng số xe và quãng đường, so sánh theo thứ bậc.
+\end{itemize}
+\topichead{Yêu cầu nâng cao (khuyến khích)}
+\begin{itemize}
+\item Pha giảm số xe riêng (loại bỏ một tuyến rồi chèn lại khách hàng của nó); kiểm tra khả thi O(1) khi chèn.
+\item Chạy thử một số thể hiện của bộ Gehring–Homberger (200 khách hàng trở lên).
+\end{itemize}
+\topichead{Dữ liệu chuẩn và gợi ý thực nghiệm}
+Bộ Solomon (1987): các nhóm C1, C2, R1, R2, RC1, RC2 với 100 khách hàng. Gợi ý: phiên bản 25 và 50 khách hàng (lấy 25/50 khách đầu tiên của mỗi thể hiện) để đối chiếu với thuật toán chính xác; bản 100 khách: C101 (BKS: 10 xe, 828,94), C201, R101, R201, RC101, RC201 – tra BKS và quy ước tương ứng từ nguồn công bố. Ngân sách gợi ý: 60 giây với 100 khách hàng. Chỉ số: số xe (best, trung bình), quãng đường, gap\% quãng đường (chỉ khi cùng số xe với BKS), thời gian.
+
+\topic{Đề 4. Chọn hàng vận chuyển: cái túi nhiều ràng buộc (MKP)}
+\textit{Ứng dụng: chọn đơn hàng theo khối lượng, thể tích, số pallet             |   Mức độ: Khá}
+\topichead{Bối cảnh}
+Một xe tải liên tỉnh nhận chở các đơn hàng ký gửi. Mỗi đơn mang lại một khoản cước và chiếm một lượng khối lượng, thể tích, số vị trí pallet; xe có giới hạn riêng cho từng loại tài nguyên. Điều phối viên cần chọn tập đơn hàng nhận chở để tổng cước lớn nhất mà không vượt bất kỳ giới hạn nào.
+
+\topichead{Phát biểu và mô hình toán học}
+Có $n$ đơn hàng, đơn $j$ mang lợi nhuận $p_j$ và tiêu thụ $w_{ij}$ đơn vị tài nguyên $i$ ($i=1,\ldots,m$: khối lượng, thể tích, \ldots), mỗi tài nguyên có giới hạn $C_i$. Chọn tập đơn hàng tối đa lợi nhuận, không vượt giới hạn nào:
+\[\max\sum_{j=1}^{n}p_jx_j\quad\text{với}\quad\sum_{j=1}^{n}w_{ij}x_j\le C_i\ (i=1,\ldots,m),\quad x_j\in\{0,1\}.\]
+Không gian tìm kiếm có $2^n$ phần tử.
+\topichead{Tính NP-khó}
+Với m = 1 là bài toán cái túi 0/1 (NP-khó, Karp 1972); khác cái túi 0/1, MKP với m ≥ 2 không có lược đồ xấp xỉ thời gian đa thức đầy đủ (FPTAS) trừ khi P = NP.
+
+\topichead{Dữ liệu vào/ra}
+OR-Library (mknap1, mknapcb1–mknapcb9): số đầu tiên là số bài K trong tệp; mỗi bài gồm n m opt (opt = 0 nếu chưa biết), tiếp theo n hệ số pj , rồi m dãy, mỗi dãy n hệ số wij của một ràng buộc, cuối cùng m giá trị Ci . Các số xuống dòng tùy ý nên phải đọc theo từ tố. Mỗi tệp mknapcb có 30 bài (10 bài cho mỗi tỉ lệ chặt 0,25; 0,50; 0,75); giá trị tốt nhất đã biết và giá trị nới lỏng tuyến tính nằm trong tệp mkcbres. Tự định nghĩa: như một bài của OR-Library (không có dòng K và opt): dòng 1: n m; dòng
+
+2: p1 ..pn ; m dòng hệ số; dòng cuối C1 ..Cm . Lời giải: dòng 1 là tổng lợi nhuận; dòng 2 là danh sách chỉ số đơn được chọn (tăng dần).
+
+\topichead{Ví dụ nhỏ (kiểm chứng: de04.py)}
+\begin{Verbatim}[fontsize=\scriptsize,breaklines=true,breakanywhere=true]
+Tệp vào vidu.txt                                         Tệp lời giải tối ưu
+7 2                                                      32
+10 14 7 8 12 6 9                                         2 5 6
+5 7 3 4 6 2 5
+4 6 5 2 5 3 4
+15 14
+
+\end{Verbatim}
+Tài nguyên 1 là khối lượng (tấn, giới hạn 15), tài nguyên 2 là thể tích (m3 , giới hạn 14). Tối ưu duy nhất: chọn đơn \{2, 5, 6\}, lợi nhuận 32, dùng đúng 15 tấn và 14 m$^3$ (cả hai ràng buộc đều chặt). Tham lam theo tỉ số $p_j/\sum_i(w_{ij}/C_i)$ xét theo thứ tự 4, 6, 1, 5, 2, 7, 3 và chọn \{1, 3, 4, 6\}, lợi nhuận 31 (gap 3,13\%). Kiểm chứng bằng vét cạn 27 = 128 tập con.
+
+\topichead{Gợi ý thuật toán}
+\begin{itemize}
+\item Chính xác: quy hoạch động khi m = 1; nhánh cận với cận trên từ bài toán nới lỏng tuyến tính.
+\item Xây dựng: tham lam theo tỉ số lợi nhuận/tài nguyên có trọng số; thủ tục sửa chữa cá thể không khả thi (bỏ món có tỉ số thấp nhất).
+\item Metaheuristic phù hợp: GA mã hóa nhị phân + sửa chữa (Chu, Beasley 1998), TS với lân cận lật bit, SA, PSO nhị phân.
+\end{itemize}
+\topichead{Yêu cầu tối thiểu (bắt buộc)}
+\begin{itemize}
+\item Bộ đọc OR-Library (đọc được mọi bài trong một tệp); hàm kiểm tra tính lại lợi nhuận và mức dùng từng tài nguyên.
+\item Nhánh cận giải đúng ví dụ nhỏ và các bài trong mknap1; đo kích thước n lớn nhất giải được trong 10 phút với m = 5.
+\item Tham lam theo tỉ số + thủ tục sửa chữa (bỏ món) và cải thiện (thêm món còn vừa); lân cận lật một bit và hoán đổi một chọn – một không chọn, đánh giá delta bằng mảng mức dùng tài nguyên.
+\item Các metaheuristic theo số thành viên.
+\end{itemize}
+\topichead{Yêu cầu nâng cao (khuyến khích)}
+\begin{itemize}
+\item Thủ tục sửa chữa dùng trọng số từ nghiệm đối ngẫu của bài toán nới lỏng tuyến tính như Chu, Beasley (1998).
+\item Báo cáo thêm gap so với giá trị nới lỏng tuyến tính (cận trên) cho các bài chưa biết tối ưu.
+\end{itemize}
+\topichead{Dữ liệu chuẩn và gợi ý thực nghiệm}
+OR-Library (Beasley, 1990): bộ mknap và bộ mknapcb (Chu–Beasley; n ∈ \{100, 250, 500\}, m ∈ \{5, 10, 30\}). Gợi ý: toàn bộ mknap1 (bài nhỏ, đã biết tối ưu) cho thuật toán chính xác; ít nhất 10 bài mknapcb thuộc ít nhất hai kích thước và cả ba tỉ lệ chặt; dữ liệu tự sinh n = 10..30. Ngân sách gợi ý: 10 giây (n = 100) đến 60 giây (n = 500). Chỉ số: best, trung bình, độ lệch chuẩn, gap\% so với giá trị tốt nhất trong mkcbres, thời gian.
+
+\topic{Đề 5. Xếp ô tô lên phà: bài toán đóng thùng (Bin Packing)}
+\textit{Ứng dụng: xếp xe lên phà, xếp hàng vào container         |     Mức độ: Khá}
+\topichead{Bối cảnh}
+Một bến phà xếp ô tô đang chờ vào các làn trên boong; mỗi làn dài C mét, mỗi xe cần si mét (kể cả khoảng cách an toàn). Mỗi làn chỉ xếp một hàng xe nối đuôi nhau. Bến muốn dùng ít làn nhất (từ đó ít chuyến phà nhất) để chở hết đoàn xe.
+
+\topichead{Phát biểu và mô hình toán học}
+Có $n$ vật kích thước $s_i$ và các thùng sức chứa $C$. Xếp mọi vật vào ít thùng nhất sao cho tổng kích thước mỗi thùng $\le C$. Với $y_k=1$ nếu thùng $k$ được dùng, $x_{ik}=1$ nếu vật $i$ vào thùng $k$ ($k=1,\ldots,n$):
+\[\min\sum_k y_k\quad\text{với}\quad\sum_kx_{ik}=1\ (\forall i),\quad\sum_is_ix_{ik}\le Cy_k\ (\forall k),\quad x_{ik},y_k\in\{0,1\}.\]
+\topichead{Tính NP-khó}
+Phiên bản quyết định NP-đầy đủ (quy dẫn từ bài toán phân hoạch – Partition) và NP-khó mạnh (quy dẫn từ 3-Partition); không có thuật toán thời gian đa thức với tỉ số xấp xỉ (tuyệt đối) nhỏ hơn 3/2 trừ khi P = NP.
+
+\topichead{Dữ liệu vào/ra}
+OR-Library (binpack1–binpack8, Falkenauer): dòng đầu là số bài P ; mỗi bài gồm dòng mã bài, dòng C n số\_thùng\_BKS, rồi n dòng kích thước vật. binpack1–4 là lớp uniform (mã bài bắt đầu bằng u: u120, u250, u500, u1000; kích thước trong khoảng 20–100, C = 150); binpack5–8 là lớp triplet (mã bắt đầu bằng t: t60, t120, t249, t501; C = 100), lời giải tối ưu dùng đúng n/3 thùng, mỗi thùng 3 vật đầy. Kích thước có thể là số thực. Tự định nghĩa: dòng 1: n C; dòng 2: s1 ..sn . Lời giải: dòng 1 là số thùng K; K dòng, mỗi dòng là chỉ số các vật trong một thùng.
+
+\topichead{Ví dụ nhỏ (kiểm chứng: de05.py)}
+\begin{Verbatim}[fontsize=\scriptsize,breaklines=true,breakanywhere=true]
+Tệp vào vidu.txt                                        Tệp lời giải tối ưu
+8 10                                                    3
+5 5 5 4 4 3 2 2                                         1 2
+                                                        3 6 7
+                                                        4 5 8
+
+\end{Verbatim}
+Tổng kích thước 30 nên cận dưới ⌈30/10⌉ = 3. Lời giải tối ưu dùng 3 thùng đầy: \{5, 5\}, \{5, 3, 2\}, \{4, 4, 2\}. First Fit Decreasing cho 4 thùng: \{5, 5\}, \{5, 4\}, \{4, 3, 2\}, \{2\} – ví dụ cho thấy FFD không tối ưu. Kiểm chứng bằng vét cạn mọi cách gán vật vào k = 1, 2, 3 thùng.
+
+\topichead{Gợi ý thuật toán}
+
+\begin{itemize}
+\item Cận dưới $\left\lceil\frac{\sum_i s_i}{C}\right\rceil$; chính xác: nhánh cận cho $n\le25$.
+\item Xây dựng: Next Fit, First Fit, Best Fit, First Fit Decreasing (kèm trình bày tỉ số xấp xỉ đã biết).
+\item Hàm mục tiêu phụ nên thưởng thùng đầy, ví dụ cực đại hóa $\frac1N\sum_{k=1}^N(\text{tải}_k/C)^2$ với $N$ là số thùng (Falkenauer), để tìm kiếm có hướng thay vì chỉ đếm số thùng.
+\item Metaheuristic phù hợp: GA nhóm (Grouping GA, Falkenauer 1996), VNS, SA, TS.
+\end{itemize}
+\topichead{Yêu cầu tối thiểu (bắt buộc)}
+\begin{itemize}
+\item Bộ đọc OR-Library; hàm kiểm tra mọi vật được xếp đúng một lần và không thùng nào quá tải.
+\item Nhánh cận giải đúng ví dụ nhỏ và thể hiện tự sinh đến n = 20; bốn heuristic NF, FF, BF, FFD và so sánh với cận dưới.
+\item Ít nhất hai lân cận (chuyển một vật sang thùng khác; hoán đổi hai vật giữa hai thùng) với hàm mục tiêu phụ ở trên.
+\item Các metaheuristic theo số thành viên; báo cáo số thể hiện đạt BKS.
+\end{itemize}
+\topichead{Yêu cầu nâng cao (khuyến khích)}
+
+\begin{itemize}
+\item Cận dưới tốt hơn $\left\lceil\sum_i s_i/C\right\rceil$ (ví dụ cận L2 của Martello, Toth 1990) và dùng trong nhánh cận.
+\item Grouping GA đầy đủ theo Falkenauer (1996); thử trên bộ Scholl và cộng sự (1997).
+\end{itemize}
+\topichead{Dữ liệu chuẩn và gợi ý thực nghiệm}
+OR-Library binpack (Falkenauer); bộ Scholl và cộng sự (1997). Gợi ý: u120\_00–u120\_09, một số bài u250, u500; t60\_00–t60\_09, một số bài t120, t249 (triplet khó với heuristic vì mọi thùng phải đầy); dữ liệu tự sinh n = 10..25. Ngân sách gợi ý: 10 giây (n ≤ 250), 30 giây (n > 250). Chỉ số: số thùng (best, trung bình), chênh lệch so với BKS, số thể hiện đạt BKS, thời gian.
+
+\topic{Đề 6. Xếp lịch thi: bài toán tô màu đồ thị}
+\textit{Ứng dụng: xếp lịch thi, phân tần số, xếp sân ga       | Mức độ: Khá}
+\topichead{Bối cảnh}
+Phòng đào tạo xếp lịch thi cuối kỳ: mỗi môn thi diễn ra trong một ca; hai môn có sinh viên chung không được thi cùng ca. Nhà trường muốn dùng ít ca nhất để rút ngắn đợt thi. Cùng mô hình: phân tần số cho các trạm phát gần nhau, xếp đường đón tiễn trong ga cho các đoàn tàu trùng giờ.
+
+\topichead{Phát biểu và mô hình toán học}
+Mỗi môn thi là một đỉnh; hai môn có sinh viên chung được nối cạnh. Gán ca thi (màu) cho mỗi đỉnh sao cho hai đỉnh kề khác màu, dùng ít màu nhất (sắc số $\chi(G)$):
+\[\min k\quad\text{với}\quad c:V\to\{1,\ldots,k\},\quad c(u)\ne c(v)\ \forall(u,v)\in E.\]
+Với $k$ cố định, bài toán tối ưu tương ứng: $\min_c|\{(u,v)\in E:c(u)=c(v)\}|$ (số cạnh xung đột); tìm được giá trị $0$ nghĩa là tô được bằng $k$ màu. Cận dưới: kích thước clique lớn nhất $\omega(G)\le\chi(G)$.
+\topichead{Tính NP-khó}
+Quyết định G có tô được bằng k màu không là NP-đầy đủ với mọi k ≥ 3 (Karp, 1972; Garey, Johnson, Stockmeyer, 1976).
+
+\topichead{Dữ liệu vào/ra}
+Định dạng DIMACS (dùng cho cả dữ liệu chuẩn và tự sinh): dòng bắt đầu bằng c là chú thích; dòng p edge n m cho số đỉnh và số cạnh; m dòng e u v (đỉnh đánh số từ 1). Bộ đọc cần bỏ qua cạnh lặp nếu có. Bộ lịch thi Toronto: mỗi thể hiện gồm tệp .crs (mã môn, số sinh viên) và tệp .stu (mỗi dòng là danh sách môn của một sinh viên); hai môn cùng xuất hiện trên một dòng .stu được nối cạnh. Lời giải: dòng 1 là số màu k; dòng 2 là c(1), . . . , c(n).
+
+\topichead{Ví dụ nhỏ (kiểm chứng: de06.py)}
+\begin{Verbatim}[fontsize=\scriptsize,breaklines=true,breakanywhere=true]
+Tệp vào vidu.col                                      Tệp lời giải tối ưu
+p edge 7 11                                           3
+e 1 2                                                 1 2 3 2 1 2 3
+e 1 3
+e 1 4
+e 2 3
+e 2 5
+e 3 6
+e 4 5
+e 4 7
+e 5 6
+e 5 7
+e 6 7
+
+\end{Verbatim}
+Ba môn 1, 2, 3 đôi một có sinh viên chung (tam giác) nên cần ít nhất 3 ca; phép tô ở trên dùng 3 màu, vậy χ(G) = 3. Ca 1: môn \{1, 5\}; ca 2: \{2, 4, 6\}; ca 3: \{3, 7\}. Welsh–Powell và DSATUR đều cho 3 màu trên ví dụ này. Kiểm chứng bằng vét cạn k 7 phép tô với k = 1, 2, 3.
+
+\topichead{Gợi ý thuật toán}
+\begin{itemize}
+\item Chính xác: quay lui với cắt nhánh cho đồ thị ≤ 30–40 đỉnh.
+\item Xây dựng: tham lam theo bậc giảm dần (Welsh–Powell), DSATUR (Brélaz, 1979).
+\item Cách tiếp cận k cố định: tối thiểu số cạnh xung đột, giảm dần k.
+\item Metaheuristic phù hợp: TabuCol (Hertz, de Werra 1987), SA, GA lai (Galinier, Hao 1999), ACO.
+\end{itemize}
+\topichead{Yêu cầu tối thiểu (bắt buộc)}
+\begin{itemize}
+\item Bộ đọc DIMACS; hàm kiểm tra báo các cạnh xung đột và đếm số màu thực dùng.
+\item Quay lui giải đúng ví dụ nhỏ và các đồ thị myciel3, myciel4; dùng cận dưới clique để dừng sớm.
+\item Welsh–Powell và DSATUR; tìm kiếm cục bộ với k cố định (đổi màu một đỉnh xung đột; hoán đổi màu hai đỉnh), đánh giá delta bằng bảng số láng giềng theo từng màu.
+\item Các metaheuristic theo số thành viên; báo cáo số màu nhỏ nhất đạt được và thời gian.
+\end{itemize}
+\topichead{Yêu cầu nâng cao (khuyến khích)}
+\begin{itemize}
+\item TabuCol cập nhật bảng delta trong O(bậc) mỗi bước; GA lai với toán tử lai ghép phân hoạch của Galinier, Hao (1999).
+\item Xếp lịch thi trên bộ Toronto, thêm chi phí mềm về khoảng cách giữa các ca thi của cùng sinh viên (Carter và cộng sự, 1996).
+\end{itemize}
+\topichead{Dữ liệu chuẩn và gợi ý thực nghiệm}
+Bộ tô màu DIMACS (ví dụ myciel, queen, le450, DSJC); bộ lịch thi Toronto (Carter và cộng sự, 1996). Gợi ý (tên – sắc số): myciel3 – 4, myciel4 – 5, myciel5 – 6, queen5\_5 – 5, queen6\_6 – 7, queen8\_8 – 9, DSJC125.1 – 5, le450\_15c – 15; thêm DSJC250.5 (khó, tra BKS). Ngân sách gợi ý: 30 giây (n ≤ 125), 120 giây (n ≥ 250). Chỉ số: số màu (best, trung bình), số lần đạt sắc số/BKS, thời gian đạt.
+
+\topic{Đề 7. Lập lịch xưởng sửa chữa đầu máy: Job Shop (JSSP)}
+\textit{Ứng dụng: xưởng sửa chữa, sản xuất theo đơn hàng            |     Mức độ: Nâng cao}
+\topichead{Bối cảnh}
+Một xưởng sửa chữa đầu máy có các trạm chuyên môn (tháo lắp, sửa động cơ, sửa giá chuyển hướng, kiểm định, …). Mỗi đầu máy vào xưởng đi qua các trạm theo một thứ tự riêng tùy hạng mục sửa chữa; mỗi trạm chỉ làm một đầu máy tại một thời điểm và không dừng giữa chừng. Cần lập lịch để đầu máy cuối cùng hoàn thành sớm nhất, trả đầu máy về vận hành.
+
+\topichead{Phát biểu và mô hình toán học}
+Có $n$ công việc và $m$ máy; mỗi công việc gồm dãy thao tác theo thứ tự cố định, mỗi thao tác cần một máy xác định trong thời gian $p_{ij}$. Mỗi máy xử lý một thao tác tại một thời điểm, không ngắt quãng. Tối thiểu thời điểm hoàn thành cuối cùng (makespan $C_{\max}$). Gọi $S_o$ là thời điểm bắt đầu thao tác $o$, $\mu(o)$ là máy của nó:
+\[\min C_{\max}=\max_o(S_o+p_o),\]
+$S_{o'}\ge S_o+p_o$ nếu $o$ đứng ngay trước $o'$ trong cùng công việc; $S_o\ge S_{o'}+p_{o'}$ hoặc $S_{o'}\ge S_o+p_o$ với mọi $o\ne o'$ có $\mu(o)=\mu(o')$; và $S_o\ge0$.
+Mỗi lịch được xác định bởi thứ tự thao tác trên từng máy: tối đa $(n!)^m$ khả năng.
+\topichead{Tính NP-khó}
+Chứa Flow Shop làm trường hợp riêng (mọi công việc qua các máy theo cùng thứ tự), nên NP-khó mạnh khi m ≥ 3; khác Flow Shop, Job Shop đã NP-khó ngay cả khi m = 2 (Garey, Johnson, Sethi, 1976).
+
+\topichead{Dữ liệu vào/ra}
+Định dạng chuẩn (OR-Library jobshop1, dùng cả cho dữ liệu tự sinh): dòng đầu n m; n dòng, mỗi dòng gồm m cặp máy thời\_gian theo thứ tự công nghệ; máy và công việc đánh số từ 0. Tệp gốc của Taillard (1993) dùng định dạng khác: ma trận thời gian (Times) và ma trận máy (Machines, đánh số từ 1) tách riêng. Lời giải: dòng 1 là Cmax ; m dòng tiếp, dòng thứ k là thứ tự xử lý các công việc trên máy k (k = 0..m − 1); chương trình kiểm tra dựng lại lịch bán tích cực từ các thứ tự này, phát hiện chu trình (thứ tự không khả thi) và tính Cmax .
+
+\topichead{Ví dụ nhỏ (kiểm chứng: de07.py)}
+\begin{Verbatim}[fontsize=\scriptsize,breaklines=true,breakanywhere=true]
+Tệp vào vidu.txt                                         Tệp lời giải tối ưu
+3 3                                                      11
+0 3 1 2 2 2                                              0 1 2
+0 2 2 1 1 4                                              2 0 1
+1 4 2 3 0 1                                              1 2 0
+
+\end{Verbatim}
+Công việc J0 qua máy M0 (3), M1 (2), M2 (2); J1 qua M0 (2), M2 (1), M1 (4); J2 qua M1 (4), M2 (3), M0 (1). Cận dưới: tải máy M1 là 2 + 4 + 4 = 10. Tối ưu Cmax = 11: M0 làm J0 [0,3], J1 [3,5], J2 [9,10]; M1 làm J2 [0,4], J0 [4,6], J1 [6,10]; M2 làm J1 [5,6], J2 [6,9], J0 [9,11]. Kiểm chứng bằng vét cạn 1680 chuỗi thao tác (hoán vị có lặp của 0, 0, 0, 1, 1, 1, 2, 2, 2), mỗi chuỗi giải mã thành lịch bán tích cực.
+
+\topichead{Gợi ý thuật toán}
+\begin{itemize}
+\item Biểu diễn: đồ thị rời rạc (disjunctive graph); makespan là đường đi dài nhất. Mã hóa cho GA: hoán vị có lặp (operation-based).
+\item Xây dựng: quy tắc ưu tiên (SPT, MWKR) với bộ sinh lịch Giffler–Thompson.
+\item Lân cận trên đường găng (critical path): N5 của Nowicki–Smutnicki (1996).
+\item Metaheuristic phù hợp: TS, GA, SA, ACO.
+\end{itemize}
+\topichead{Yêu cầu tối thiểu (bắt buộc)}
+\begin{itemize}
+\item Bộ đọc định dạng chuẩn; bộ giải mã chuỗi thao tác thành lịch bán tích cực; hàm kiểm tra như mô tả ở trên.
+\item Thuật toán chính xác (vét cạn chuỗi thao tác hoặc nhánh cận) giải đúng ví dụ nhỏ và thể hiện tự sinh đến khoảng 12 thao tác.
+\item Giffler–Thompson với ít nhất hai quy tắc ưu tiên; lân cận đổi chỗ hai thao tác kề nhau trên cùng máy thuộc đường găng, cùng một lân cận khác.
+\item Các metaheuristic theo số thành viên; vẽ biểu đồ Gantt của lời giải tốt nhất.
+\end{itemize}
+\topichead{Yêu cầu nâng cao (khuyến khích)}
+\begin{itemize}
+\item Lân cận N5 với đánh giá nhanh dựa trên đầu/đuôi (head/tail) của thao tác; đạt hoặc gần tối ưu trên ft10.
+\end{itemize}
+\topichead{Dữ liệu chuẩn và gợi ý thực nghiệm}
+ft06, ft10 (Fisher, Thompson), la01--la40 (Lawrence), bộ Taillard (1993). Gợi ý (tên, n × m – tối ưu): ft06 6×6 – 55, la01 10×5 – 666, ft10 10×10 – 930, la16 10×10 – 945, ft20 20×5 – 1165, ta01 15×15 – 1231. Ngân sách gợi ý: 30 giây (đến 100 thao tác), 120 giây (lớn hơn). Chỉ số: best, trung bình, độ lệch chuẩn, gap\%, thời gian; biểu đồ Gantt.
+
+\topic{Đề 8. Lập lịch dây chuyền bảo dưỡng: Flow Shop hoán vị (PFSP)}
+\textit{Ứng dụng: dây chuyền bảo dưỡng toa xe, sản xuất hàng loạt       |   Mức độ: Khá}
+\topichead{Bối cảnh}
+Dây chuyền bảo dưỡng định kỳ toa xe gồm m công đoạn nối tiếp trên cùng một đường ray (kiểm tra gầm, thay má phanh, vệ sinh, thử nghiệm). Mọi toa đi qua các công đoạn theo cùng một thứ tự và không thể vượt nhau, nên thứ tự toa trên mọi công đoạn là như nhau. Cần chọn thứ tự đưa toa vào dây chuyền để toa cuối cùng hoàn thành sớm nhất.
+
+\topichead{Phát biểu và mô hình toán học}
+$n$ công việc đi qua $m$ máy theo cùng thứ tự máy; thứ tự công việc như nhau trên mọi máy. Tìm hoán vị công việc tối thiểu makespan (hoặc tổng thời gian hoàn thành). Với hoán vị $\pi$, thời điểm hoàn thành tính bằng quy hoạch động ($C_{\pi(0),i}=C_{\pi(k),0}=0$):
+\[C_{\pi(k),i}=\max\bigl(C_{\pi(k-1),i},C_{\pi(k),i-1}\bigr)+p_{\pi(k),i},\quad\min_\pi C_{\max}(\pi)=C_{\pi(n),m}.\]
+Không gian tìm kiếm có $n!$ hoán vị; đánh giá một hoán vị tốn $O(nm)$.
+\topichead{Tính NP-khó}
+Với m = 2 giải được bằng quy tắc Johnson (1954); với m ≥ 3 là NP-khó mạnh (Garey, Johnson, Sethi, 1976).
+
+\topichead{Dữ liệu vào/ra}
+Bộ Taillard: mỗi thể hiện có dòng chữ number of jobs, number of machines, initial seed, upper bound and lower bound :, dòng giá trị tương ứng, dòng chữ processing times :, rồi m dòng, mỗi dòng n số (dòng i là thời gian của mọi công việc trên máy i – ma trận máy × công việc). Cận trên trong dòng tiêu đề là giá trị tốt nhất đã biết tại thời điểm công bố; giá trị cập nhật xem trên trang của bộ dữ liệu. Tự định nghĩa: dòng 1: n m; n dòng, mỗi dòng m số (ma trận công việc × máy) – chú ý chuyển vị khi đọc bộ Taillard. Bộ VRF có định dạng riêng, đọc mô tả kèm theo. Lời giải: dòng 1 là Cmax ; dòng 2 là hoán vị công việc (đánh số từ 1).
+
+\topichead{Ví dụ nhỏ (kiểm chứng: de08.py)}
+\begin{Verbatim}[fontsize=\scriptsize,breaklines=true,breakanywhere=true]
+Tệp vào vidu.txt                                        Tệp lời giải tối ưu
+5 3                                                     27
+2 4 2                                                   5 1 2 4 3
+9 7 1
+2 4 1
+7 1 4
+1 9 3
+
+\end{Verbatim}
+Tối ưu duy nhất là π = (5, 1, 2, 4, 3) với Cmax = 27 (vét cạn 5! = 120 hoán vị). NEH sắp công việc theo tổng thời gian giảm dần 2, 5, 4, 1, 3 (tổng 17, 13, 12, 8, 7), chèn lần lượt vào vị trí tốt nhất và cho (5, 3, 2, 4, 1) với Cmax = 28 (gap 3,70\%) – NEH rất tốt nhưng không bảo đảm tối ưu.
+
+\topichead{Gợi ý thuật toán}
+\begin{itemize}
+\item Chính xác: quy tắc Johnson cho m = 2 (minh họa tham lam đúng); nhánh cận cho n ≤ 10–12.
+\item Xây dựng: NEH (Nawaz, Enscore, Ham, 1983); tăng tốc đánh giá chèn bằng kỹ thuật của Taillard.
+\item Metaheuristic phù hợp: Iterated Greedy (Ruiz, Stützle 2007), SA, TS, GA.
+\end{itemize}
+\topichead{Yêu cầu tối thiểu (bắt buộc)}
+\begin{itemize}
+\item Bộ đọc bộ Taillard (đúng chiều ma trận); hàm kiểm tra tính lại Cmax từ hoán vị.
+\item Quy tắc Johnson cho m = 2 (giải thích vì sao tham lam đúng); nhánh cận giải đúng ví dụ nhỏ và thể hiện tự sinh đến n = 10.
+\item NEH; lân cận chèn (insertion) và hoán đổi (swap).
+\item Các metaheuristic theo số thành viên; chạy ít nhất hai nhóm kích thước Taillard.
+\end{itemize}
+\topichead{Yêu cầu nâng cao (khuyến khích)}
+\begin{itemize}
+\item Kỹ thuật tăng tốc của Taillard: đánh giá mọi vị trí chèn của một công việc trong O(nm).
+\item Mục tiêu tổng thời gian hoàn thành; một số thể hiện bộ VRF.
+\end{itemize}
+\topichead{Dữ liệu chuẩn và gợi ý thực nghiệm}
+Bộ Taillard (1993), bộ VRF (Vallada, Ruiz, Framinan, 2015). Gợi ý: ta001–ta010 (20 công việc × 5 máy; ta001 tối ưu 1278), ta011–ta020 (20×10), ta021–ta030 (20×20), ta031–ta040 (50×5), ta061– ta070 (100×5); dữ liệu tự sinh n = 6..12, m = 3..5. Ngân sách gợi ý theo kích thước, ví dụ n·m/2×30 mili giây (dạng thường dùng trong các công trình về PFSP). Chỉ số: best, trung bình, độ lệch chuẩn, độ lệch phần trăm trung bình so với BKS, thời gian.
+
+\topic{Đề 9. Bố trí khu chức năng trong nhà ga: phân công bậc hai (QAP)}
+\textit{Ứng dụng: bố trí nhà ga, kho, bệnh viện; thiết kế bàn phím |            Mức độ: Nâng cao}
+\topichead{Bối cảnh}
+Khi thiết kế mặt bằng một nhà ga hành khách, cần đặt n khu chức năng (sảnh, quầy vé, phòng chờ, cửa ra tàu, khu dịch vụ, …) vào n ô vị trí. Lưu lượng hành khách đi lại giữa từng cặp khu đã được ước tính. Mục tiêu là bố trí sao cho tổng “lưu lượng × khoảng cách” (tổng quãng đường đi bộ của hành khách) nhỏ nhất.
+
+\topichead{Phát biểu và mô hình toán học}
+Gán $n$ khu chức năng vào $n$ vị trí (hoán vị $\pi$). Biết lưu lượng $f_{ij}$ giữa hai khu và khoảng cách $d_{kl}$ giữa hai vị trí; tối thiểu $\sum_{i,j}f_{ij}d_{\pi(i)\pi(j)}$. Dạng biến nhị phân $x_{ik}=1$ nếu khu $i$ đặt tại vị trí $k$:
+\[\min\sum_{i,j}\sum_{k,l}f_{ij}d_{kl}x_{ik}x_{jl}\quad\text{với}\quad\sum_kx_{ik}=1\ (\forall i),\quad\sum_ix_{ik}=1\ (\forall k),\quad x_{ik}\in\{0,1\}.\]
+Hàm mục tiêu bậc hai theo $x$; không gian tìm kiếm có $n!$ hoán vị.
+\topichead{Tính NP-khó}
+NP-khó (Sahni, Gonzalez, 1976), chứa TSP làm trường hợp riêng; nổi tiếng khó giải chính xác khi n > 30.
+
+\topichead{Dữ liệu vào/ra}
+QAPLIB (tệp .dat, dùng cả làm định dạng tự định nghĩa): số n, sau đó ma trận A (n × n), rồi ma trận B (n × n); có thể có dòng trống và số xuống dòng tùy ý, nên đọc theo từ tố. Hàm mục tiêu là $\sum_{i,j}a_{ij}b_{\pi(i)\pi(j)}$: đọc A, B đúng thứ tự và dùng đúng công thức này (không cần biết ma trận nào là lưu lượng). Lời giải theo dạng tệp .sln của QAPLIB: dòng 1: n giá\_trị; dòng 2: hoán vị π(1), . . . , π(n) (đánh số từ 1).
+
+\topichead{Ví dụ nhỏ (kiểm chứng: de09.py)}
+\begin{Verbatim}[fontsize=\scriptsize,breaklines=true,breakanywhere=true]
+Tệp vào vidu.dat (A = F, B = D)                        Tệp lời giải tối ưu
+5                                                      5 74
+0 8 3 0 2                                              4 1 2 3 5
+8 0 6 1 0
+3 6 0 7 4
+0 1 7 0 1
+2 0 4 1 0
+
+
+0 1 2 1 2
+1 0 1 2 1
+2 1 0 3 2
+1 2 3 0 1
+2 1 2 1 0
+
+\end{Verbatim}
+Khu 1–5: sảnh, quầy vé, phòng chờ, cửa ra tàu, khu dịch vụ. Năm ô vị trí trên lưới có tọa độ (0, 0), (1, 0), (2, 0), (0, 1), (1, 1), khoảng cách Manhattan. Tối ưu 74 (mỗi cặp được tính hai lần vì F , D đối xứng), đạt tại π = (4, 1, 2, 3, 5) – phòng chờ ở ô giữa (1, 0) – và tại phương án đối xứng (4, 5, 2, 3, 1). Phép gán đồng nhất π(i) = i có giá trị 112; phương án xấu nhất 128. Kiểm chứng bằng vét cạn 5! = 120 hoán vị.
+
+\topichead{Gợi ý thuật toán}
+\begin{itemize}
+\item Chính xác: nhánh cận với cận Gilmore–Lawler cho n ≤ 12.
+\item Lân cận đổi chỗ hai vị trí, đánh giá delta O(n).
+\item Metaheuristic phù hợp: Robust Tabu Search (Taillard, 1991), SA, GA lai, ACO (MAX–MIN Ant System).
+\end{itemize}
+\topichead{Yêu cầu tối thiểu (bắt buộc)}
+\begin{itemize}
+\item Bộ đọc QAPLIB và tệp .sln; kiểm tra: giá trị tính từ hoán vị trong nug12.sln phải bằng 578.
+\item Vét cạn hoặc nhánh cận giải đúng ví dụ nhỏ và thể hiện đến n = 10 (khuyến khích n = 12 với cận Gilmore–Lawler).
+\item Một heuristic xây dựng (ví dụ ghép khu có tổng lưu lượng lớn với vị trí có tổng khoảng cách nhỏ); lân cận đổi chỗ hai vị trí với delta O(n), và một lân cận khác.
+\item Các metaheuristic theo số thành viên.
+\end{itemize}
+\topichead{Yêu cầu nâng cao (khuyến khích)}
+\begin{itemize}
+\item Robust Tabu Search với bảng delta được cập nhật nhanh sau mỗi bước (Taillard, 1991); thử các thể hiện tai*a khó.
+\end{itemize}
+\topichead{Dữ liệu chuẩn và gợi ý thực nghiệm}
+QAPLIB (Burkard, Karisch, Rendl), ví dụ nug12–nug30, tai*a, chr*. Gợi ý (tên – tối ưu): chr12a – 9552, nug12 – 578, tai12a – 224416, nug20 – 2570, tai20a – 703482, nug30 – 6124; thêm tai50a, tai100a (dùng BKS trên QAPLIB). Ngân sách gợi ý: 10 giây (n ≤ 20), 60 giây (n ≤ 50), 120 giây (n = 100). Chỉ số: best, trung bình, độ lệch chuẩn, gap\%, thời gian, số lần đạt tối ưu.
+
+\topic{Đề 10. Đặt camera giám sát giao thông: bài toán phủ tập (Set Cover)}
+\textit{Ứng dụng: đặt camera, trạm phát sóng, trạm cứu hỏa                 |   Mức độ: Khá}
+\topichead{Bối cảnh}
+Cơ quan quản lý giao thông đô thị cần lắp camera để giám sát mọi nút giao trọng điểm của một quận. Các vị trí lắp đặt ứng viên (cột đèn, giá long môn, nóc tòa nhà) có chi phí khác nhau; mỗi vị trí quan sát được một số nút giao lân cận. Cần chọn tập vị trí có tổng chi phí nhỏ nhất sao cho mọi nút giao đều được ít nhất một camera quan sát.
+
+\topichead{Phát biểu và mô hình toán học}
+Có $m$ nút giao cần giám sát và $n$ vị trí đặt camera; vị trí $j$ có chi phí $c_j$ và phủ được tập nút $S_j$. Chọn tập vị trí có tổng chi phí nhỏ nhất phủ mọi nút giao. Với $x_j=1$ nếu chọn vị trí $j$:
+\[\min\sum_{j=1}^{n}c_jx_j\quad\text{với}\quad\sum_{j:\,i\in S_j}x_j\ge1\ (i=1,\ldots,m),\quad x_j\in\{0,1\}.\]
+Trong cách gọi của OR-Library, nút giao là hàng, vị trí là cột của ma trận phủ $a_{ij}=[i\in S_j]$.
+\topichead{Tính NP-khó}
+NP-đầy đủ (Karp, 1972); thuật toán tham lam đạt tỉ số xấp xỉ H(d) ≤ 1 + ln d với d = maxj |Sj | (Chvátal, 1979), và không có thuật toán đa thức đạt tỉ số (1 − ε) ln m trừ khi P = NP (Dinur, Steurer, 2014).
+
+\topichead{Dữ liệu vào/ra}
+OR-Library (dùng cả làm định dạng tự định nghĩa): dòng đầu m n; tiếp theo n chi phí cj ; sau đó với mỗi hàng i = 1..m: số cột phủ hàng i, rồi danh sách các cột đó (đánh số từ 1). Tệp cho theo hàng, nên phải dựng thêm danh sách Sj theo cột khi đọc. Số xuống dòng tùy ý, đọc theo từ tố. Lời giải: dòng 1 là tổng chi phí; dòng 2 là các vị trí được chọn (tăng dần).
+
+\topichead{Ví dụ nhỏ (kiểm chứng: de10.py)}
+\begin{Verbatim}[fontsize=\scriptsize,breaklines=true,breakanywhere=true]
+Tệp vào vidu.txt                                       Tệp lời giải tối ưu
+7 6                                                    16
+7 5 9 4 3 7                                            1 2 4
+2 1 6
+2 3 4
+3 3 4 6
+2 1 5
+2 2 3
+4 2 4 5 6
+4 1 3 4 6
+
+\end{Verbatim}
+Theo cột: S1 = \{1, 4, 7\}, S2 = \{5, 6\}, S3 = \{2, 3, 5, 7\}, S4 = \{2, 3, 6, 7\}, S5 = \{4, 6\}, S6 = \{1, 3, 6, 7\}; chi phí 7, 5, 9, 4, 3, 7. Tối ưu duy nhất: chọn \{1, 2, 4\}, chi phí 16. Tham lam Chvátal lần lượt chọn 4 (tỉ số 4/4), 5 (3/1), 2 (5/1), 1 (7/1), chi phí 19 (gap 18,75\%); bước xóa cột thừa loại vị trí 5 (nút 4 đã được vị trí 1 phủ) và đưa về 16. Kiểm chứng bằng vét cạn 26 tập vị trí.
+
+\topichead{Gợi ý thuật toán}
+\begin{itemize}
+\item Chính xác: nhánh cận hoặc quay lui với giảm cỡ dữ liệu (loại cột bị trội, hàng chỉ có một cột phủ).
+\item Xây dựng: tham lam Chvátal (chi phí trên số phần tử mới phủ); xóa cột thừa.
+\item Metaheuristic phù hợp: GA (Beasley, Chu 1996), SA, TS, GRASP, ACO.
+\end{itemize}
+\topichead{Yêu cầu tối thiểu (bắt buộc)}
+\begin{itemize}
+\item Bộ đọc OR-Library (dựng cả danh sách theo hàng và theo cột); hàm kiểm tra liệt kê hàng chưa được phủ.
+\item Quay lui/nhánh cận giải đúng ví dụ nhỏ và thể hiện tự sinh đến khoảng n = 30 cột; các phép giảm cỡ dữ liệu ở trên.
+\item Tham lam Chvátal + xóa cột thừa; lân cận bỏ một cột rồi sửa chữa (thêm cột rẻ nhất cho hàng chưa phủ), hoán đổi một cột chọn với một cột không chọn; duy trì mảng “số cột đang phủ hàng i” để đánh giá delta.
+\item Các metaheuristic theo số thành viên.
+\end{itemize}
+\topichead{Yêu cầu nâng cao (khuyến khích)}
+\begin{itemize}
+\item Cận dưới bằng nới lỏng Lagrange; tự sinh dữ liệu từ bản đồ nút giao thực tế (ví dụ trích từ OpenStreetMap, camera phủ các nút trong bán kính cho trước).
+\end{itemize}
+\topichead{Dữ liệu chuẩn và gợi ý thực nghiệm}
+OR-Library: các bộ scp4x, scp5x, scp6x, scpa–scpd, scpnre–scpnrh. Gợi ý: scp41 (200 hàng, 1000 cột, tối ưu 429) và các bài khác của scp4x–scp6x (tối ưu được công bố trong Beasley, 1987); scpa–scpd (kích thước lớn hơn); scpnre–scpnrh (lớn, dùng BKS). Ngân sách gợi ý: 30 giây (bộ 4x–6x), 120 giây (bộ lớn). Chỉ số: best, trung bình, độ lệch chuẩn, gap\%, thời gian, số thể hiện đạt tối ưu.
+
+\topic{Đề 11. Chọn vị trí kho trung chuyển: bài toán p-median}
+\textit{Ứng dụng: đặt kho, trạm sạc xe điện, trạm y tế |        Mức độ: Khá}
+\topichead{Bối cảnh}
+Một công ty logistics dự định mở p kho trung chuyển trong mạng đường bộ của một vùng. Mỗi điểm nhu cầu (khu công nghiệp, chợ đầu mối, cụm dân cư) nhận hàng từ kho gần nhất theo đường đi ngắn nhất; chi phí vận chuyển tỉ lệ với nhu cầu nhân quãng đường. Cần chọn p vị trí kho để tổng chi phí vận chuyển nhỏ nhất.
+
+\topichead{Phát biểu và mô hình toán học}
+Có $n$ điểm nhu cầu (trọng số $w_i$) và các vị trí ứng viên; chọn đúng $p$ vị trí mở kho, mỗi điểm được phục vụ bởi kho gần nhất, tối thiểu $\sum_iw_i\cdot d(i,\text{kho gần nhất})$. Với $y_j=1$ nếu mở kho tại $j$, $x_{ij}=1$ nếu $i$ được phục vụ bởi $j$:
+\[\min\sum_i\sum_jw_id_{ij}x_{ij}\quad\text{với}\quad\sum_jx_{ij}=1\ (\forall i),\quad x_{ij}\le y_j\ (\forall i,j),\quad\sum_jy_j=p,\quad x_{ij},y_j\in\{0,1\}.\]
+Với $k$ vị trí ứng viên có $\binom{k}{p}$ phương án.
+\topichead{Tính NP-khó}
+NP-khó trên đồ thị tổng quát (Kariv, Hakimi, 1979).
+
+\topichead{Dữ liệu vào/ra}
+OR-Library (pmed1–pmed40): dòng đầu n e p (số đỉnh, số cạnh, p); e dòng u v độ\_dài của đồ thị vô hướng. Mọi đỉnh vừa là điểm nhu cầu (trọng số 1) vừa là vị trí ứng viên; dij là độ dài đường đi ngắn nhất (Floyd–Warshall). Theo mô tả của OR-Library, tệp có thể chứa cạnh lặp và khi đó dùng độ dài xuất hiện sau cùng. Giá trị tối ưu nằm trong tệp pmedopt. Tự định nghĩa: như pmed nhưng thêm dòng 2 gồm trọng số w1 ..wn . Lời giải: dòng 1 là tổng chi phí; dòng 2 là p vị trí kho; dòng 3 là kho phục vụ từng đỉnh 1..n.
+
+\topichead{Ví dụ nhỏ (kiểm chứng: de11.py)}
+\begin{Verbatim}[fontsize=\scriptsize,breaklines=true,breakanywhere=true]
+Tệp vào vidu.txt                                          Tệp lời giải tối ưu
+7 9 2                                                     29
+3 2 4 1 2 3 2                                             3 6
+1 2 4                                                     3 3 3 6 6 6 6
+1 3 2
+2 3 3
+2 4 5
+3 5 6
+4 5 2
+4 6 3
+5 7 4
+6 7 2
+
+\end{Verbatim}
+Mạng 7 điểm, 9 đoạn đường, cần mở p = 2 kho. Tối ưu duy nhất: kho tại 3 và 6, chi phí 29 = 3 · 2 + 2 · 3 + 0 + 1 · 3 + 2 · 5 + 0 + 2 · 2 (điểm 1, 2 về kho 3; điểm 4, 5, 7 về kho 6; ví dụ d(5, 6) = 5 qua đỉnh 4). Tham lam thêm dần cũng tìm được \{3, 6\} trên ví dụ này. Kiểm chứng bằng Floyd–Warshall và  vét cạn 72 = 21 tổ hợp.
+
+\topichead{Gợi ý thuật toán}
+
+
+\begin{itemize}
+\item Chính xác: vét cạn kp tổ hợp (k vị trí ứng viên) cho dữ liệu nhỏ; quy hoạch động trên cây (trường hợp riêng giải được).
+\item Xây dựng: tham lam thêm dần, tham lam bớt dần; lân cận hoán đổi Teitz–Bart (1968).
+\item Metaheuristic phù hợp: VNS (Hansen, Mladenović 1997), GRASP, GA, TS.
+\end{itemize}
+\topichead{Yêu cầu tối thiểu (bắt buộc)}
+\begin{itemize}
+\item Bộ đọc pmed (xử lý cạnh lặp) và Floyd–Warshall; hàm kiểm tra tính lại chi phí từ tập kho. 
+\item Vét cạn hoặc nhánh cận giải đúng ví dụ nhỏ và thể hiện tự sinh với $\binom{n}{p}$ đến khoảng $10^7$.
+\item Tham lam thêm dần và bớt dần; lân cận hoán đổi một kho mở với một vị trí đóng, lưu kho gần nhất và gần thứ nhì của mỗi điểm để đánh giá nhanh.
+\item Các metaheuristic theo số thành viên.
+\end{itemize}
+\topichead{Yêu cầu nâng cao (khuyến khích)}
+\begin{itemize}
+\item Biến thể có giới hạn sức chứa kho (capacitated p-median) hoặc bài toán đặt kho không giới hạn sức chứa (UFLP).
+\item Dữ liệu thực: mạng đường và điểm nhu cầu của một tỉnh/thành, hiển thị kết quả trên bản đồ.
+\end{itemize}
+\topichead{Dữ liệu chuẩn và gợi ý thực nghiệm}
+OR-Library pmed1–pmed40 (Beasley, 1985); số đỉnh từ 100 (pmed1–pmed5) đến 900 (pmed38–pmed40). Gợi ý (tên – tối ưu): pmed1 – 5819, pmed2 – 4093, pmed6 – 7824, pmed11 – 7696, pmed16 – 8162, pmed21 – 9138, pmed26 – 9917, pmed31 – 10086, pmed35 – 10400, pmed40 – 5128. Ngân sách gợi ý: 10 giây (n ≤ 300), 60 giây (n > 300), không tính thời gian Floyd–Warshall. Chỉ số: best, trung bình, độ lệch chuẩn, gap\%, thời gian, số thể hiện đạt tối ưu.
+
+\topic{Đề 12. Chọn tuyến không xung đột: tập độc lập lớn nhất / clique lớn nhất}
+\textit{Ứng dụng: chọn tuyến xe không giao cắt, phân tích mạng      |   Mức độ: Khá}
+\topichead{Bối cảnh}
+Cơ quan quản lý vận tải xem xét n đề xuất tuyến xe buýt nhanh/xe đưa đón chạy giờ cao điểm. Hai tuyến xung đột nếu cùng dùng một làn ưu tiên hoặc một nút giao trong cùng khung giờ. Cần chọn được nhiều tuyến nhất cùng vận hành mà không có cặp nào xung đột (biến thể có trọng số: tối đa tổng số hành khách phục vụ).
+
+\topichead{Phát biểu và mô hình toán học}
+Mỗi tuyến xe là một đỉnh; hai tuyến xung đột (dùng chung đoạn đường cùng khung giờ) được nối cạnh. Chọn nhiều tuyến nhất đôi một không xung đột: tìm tập độc lập lớn nhất của $G$, tương đương tìm clique lớn nhất của đồ thị bù $\overline{G}$. Có thể làm phiên bản có trọng số trên đỉnh.
+\[\max\sum_{v\in V}w_vx_v\quad\text{với}\quad x_u+x_v\le1\ \forall(u,v)\in E,\quad x_v\in\{0,1\}\quad(w_v=1\text{ với bản không trọng số}).\]
+$S$ là tập độc lập của $G$ $\Leftrightarrow$ $S$ là clique của $\overline{G}$ $\Leftrightarrow$ $V\setminus S$ là phủ đỉnh của $G$.
+\topichead{Tính NP-khó}
+Bài toán clique là một trong 21 bài toán NP-đầy đủ của Karp (1972); không thể xấp xỉ trong hệ số n1−ε với mọi ε > 0 trừ khi P = NP (Håstad, 1999; Zuckerman, 2007).
+
+\topichead{Dữ liệu vào/ra}
+Định dạng DIMACS như đề 6 (dòng p edge n m hoặc p col n m, các dòng e u v, đỉnh đánh số từ 1). Bộ clique DIMACS được thiết kế cho bài toán clique: tìm clique lớn nhất trực tiếp trên đồ thị trong tệp, hoặc tìm tập độc lập lớn nhất trên đồ thị bù của nó (đồ thị bù có thể rất dày – nên dùng ma trận kề dạng bitset). Với biến thể có trọng số, nhóm tự quy định cách ghi trọng số và mô tả trong README. Lời giải: dòng 1 là kích thước (hoặc tổng trọng số); dòng 2 là danh sách đỉnh được chọn.
+
+\topichead{Ví dụ nhỏ (kiểm chứng: de12.py)}
+\begin{Verbatim}[fontsize=\scriptsize,breaklines=true,breakanywhere=true]
+Tệp vào vidu.col (đồ thị xung đột G)                  Tệp lời giải tối ưu
+p edge 8 11                                           4
+e 1 3                                                 3 4 6 7
+e 1 4
+e 1 6
+e 1 7
+e 2 3
+e 2 7
+e 3 5
+e 4 5
+e 4 8
+e 5 8
+e 6 8
+
+\end{Verbatim}
+Tập độc lập lớn nhất duy nhất là \{3, 4, 6, 7\}, α(G) = 4; đó cũng là clique lớn nhất của đồ thị bù (17 cạnh). Tham lam “chọn đỉnh có bậc nhỏ nhất trong đồ thị còn lại, xóa nó cùng các láng giềng” chọn lần lượt 2, 1, 5 và chỉ được 3 tuyến. Kiểm chứng bằng vét cạn mọi tập con từ lớn đến nhỏ.
+
+\topichead{Gợi ý thuật toán}
+\begin{itemize}
+\item Chính xác: Bron–Kerbosch có chọn chốt; nhánh cận với cận tô màu (Tomita).
+\item Lân cận: thêm/bớt/hoán đổi đỉnh (add, drop, swap); ràng buộc xử lý bằng hàm phạt hoặc giữ tính hợp lệ.
+\item Metaheuristic phù hợp: TS, SA, GA, ACO, ILS.
+\end{itemize}
+\topichead{Yêu cầu tối thiểu (bắt buộc)}
+\begin{itemize}
+\item Bộ đọc DIMACS, dựng đồ thị bù; hàm kiểm tra báo cặp đỉnh vi phạm (kề nhau trong G).
+\item Bron–Kerbosch có chọn chốt giải đúng ví dụ nhỏ và các thể hiện C125.9, hamming8-4, keller4 (hoặc báo cáo giới hạn nếu không kịp trong 10 phút).
+\item Tham lam bậc nhỏ nhất; lân cận thêm/bớt và hoán đổi (bỏ 1 đỉnh, thêm 1 hoặc 2 đỉnh), duy trì số láng giềng đang được chọn của mỗi đỉnh để đánh giá delta.
+\item Các metaheuristic theo số thành viên.
+\end{itemize}
+\topichead{Yêu cầu nâng cao (khuyến khích)}
+\begin{itemize}
+\item Nhánh cận với cận tô màu của Tomita, cài bằng bitset; biến thể có trọng số trên đỉnh.
+\end{itemize}
+\topichead{Dữ liệu chuẩn và gợi ý thực nghiệm}
+Bộ clique DIMACS (brock, C125.9, hamming, keller, p\_hat). Gợi ý (tên – kích thước clique lớn nhất ω): C125.9 – 34, brock200\_2 – 12, brock200\_1 – 21, hamming8-4 – 16, keller4 – 11, p\_hat300-1 – 8, p\_hat300-3 – 36, MANN\_a27 – 126, brock400\_1 – 27. Ngân sách gợi ý: 10 giây (n ≤ 200), 60 giây (n > 200). Chỉ số: kích thước clique (best, trung bình), số lần đạt ω, thời gian đạt.
+
+\topic{Đề 13. Xếp kiện hàng lên sàn container: đóng thùng hai chiều}
+\textit{Ứng dụng: xếp kiện lên sàn xe tải/container, cắt tấm vật liệu         |   Mức độ: Nâng cao}
+\topichead{Bối cảnh}
+Kho hàng cần xếp các kiện hàng (pallet, thùng gỗ) lên sàn container kích thước W × H; kiện không được xếp chồng lên nhau (hàng dễ vỡ) nên chỉ xét mặt sàn. Mỗi container thuê thêm làm tăng chi phí, vì vậy cần dùng ít container nhất. Bài toán cùng dạng xuất hiện khi cắt tấm kim loại, gỗ, kính thành các miếng hình chữ nhật.
+
+\topichead{Phát biểu và mô hình toán học}
+Có $n$ hình chữ nhật (kiện hàng) kích thước $w_i\times h_i$ và các thùng (sàn) kích thước $W\times H$. Xếp mọi kiện không chồng lấn, cạnh song song với cạnh thùng (cho phép hoặc không cho phép xoay $90^\circ$), dùng ít thùng nhất. Biến: thùng $b_i$ và tọa độ góc dưới trái $(x_i,y_i)$ của kiện $i$:
+\[\min\bigl|\{b_1,\ldots,b_n\}\bigr|\quad\text{với}\quad0\le x_i\le W-w_i,\quad0\le y_i\le H-h_i,\]
+\[b_i=b_j\Longrightarrow (x_i+w_i\le x_j)\lor(x_j+w_j\le x_i)\lor(y_i+h_i\le y_j)\lor(y_j+h_j\le y_i),\quad\forall i\ne j.\]
+Khi cho xoay, $(w_i,h_i)$ có thể đổi thành $(h_i,w_i)$. Cận dưới diện tích: $\left\lceil\sum_iw_ih_i/(WH)\right\rceil$.
+\topichead{Tính NP-khó}
+Tổng quát hóa bin packing một chiều (khi mọi kiện có chiều cao bằng H), mà bin packing một chiều đã NP-khó mạnh, nên bài toán hai chiều cũng NP-khó mạnh.
+
+\topichead{Dữ liệu vào/ra}
+Tự định nghĩa: dòng 1: n W H r (r = 1 nếu cho phép xoay, 0 nếu không); n dòng i w\_i h\_i. Bộ chuẩn 2BP: gồm 10 lớp (lớp I–VI của Berkey, Wang và lớp VII–X của Martello, Vigo), mỗi lớp có các kích thước n = 20, 40, 60, 80, 100; định dạng tệp khác nhau tùy nơi phân phối, cần đọc mô tả đi kèm và viết bộ chuyển đổi sang định dạng tự định nghĩa. Lời giải: dòng 1 là số thùng K; n dòng i thùng x y xoay (thùng đánh số từ 1, xoay ∈ \{0, 1\}).
+
+\topichead{Ví dụ nhỏ (kiểm chứng: de13.py)}
+\begin{Verbatim}[fontsize=\scriptsize,breaklines=true,breakanywhere=true]
+Tệp vào vidu.txt                                         Tệp lời giải tối ưu
+7 10 10 0                                                3
+1 7 4                                                    1 1 0 6 0
+2 6 6                                                    2 1 0 0 0
+3 6 3                                                    3 2 0 0 0
+4 6 3                                                    4 2 0 3 0
+5 5 5                                                    5 3 0 0 0
+6 5 3                                                    6 2 0 6 0
+7 3 5                                                    7 1 6 0 0
+
+\end{Verbatim}
+Sàn 10 × 10, không cho xoay. Tổng diện tích 155 nên cận dưới diện tích là 2, nhưng tối ưu cần 3 thùng: thùng 1 chứa kiện 2 tại (0, 0), kiện 1 tại (0, 6), kiện 7 tại (6, 0); thùng 2 chứa kiện 3, 4, 6 xếp chồng theo chiều dọc tại y = 0, 3, 6; thùng 3 chứa kiện 5. Trực giác: các kiện 1–4 rộng hơn W /2 nên không thể đặt hai kiện như vậy cạnh nhau theo chiều ngang. Kiểm chứng: vét cạn mọi cách chia kiện vào 2 thùng, mỗi thùng kiểm tra bằng quay lui trên các tọa độ chuẩn (tổng chiều rộng/chiều cao của tập con các kiện khác) và đối chiếu bằng quay lui trên mọi tọa độ nguyên.
+
+\topichead{Gợi ý thuật toán}
+\begin{itemize}
+\item Bộ giải mã đặt kiện theo thứ tự: Bottom-Left, kỹ thuật skyline, MaxRects; metaheuristic tìm kiếm trên thứ tự và hướng xoay của kiện.
+\item Metaheuristic phù hợp: GA (hoán vị + bit xoay), SA, TS, GRASP.
+\item Trực quan hóa sơ đồ xếp từng thùng là bắt buộc.
+\end{itemize}
+\topichead{Yêu cầu tối thiểu (bắt buộc)}
+\begin{itemize}
+\item Bộ đọc định dạng tự định nghĩa và bộ chuyển đổi cho dữ liệu chuẩn; hàm kiểm tra: kiện nằm trong thùng, không có cặp kiện chồng lấn, mọi kiện được xếp.
+\item Thuật toán chính xác cho dữ liệu rất nhỏ (như ví dụ, n ≤ 8) và cận dưới diện tích.
+\item Ít nhất một bộ giải mã (Bottom-Left hoặc skyline); heuristic xây dựng theo thứ tự diện tích hoặc chiều cao giảm dần; lân cận trên thứ tự (đổi chỗ, chèn) và trên hướng xoay.
+\item Các metaheuristic theo số thành viên; hình vẽ sơ đồ xếp từng thùng của lời giải tốt nhất.
+\end{itemize}
+\topichead{Yêu cầu nâng cao (khuyến khích)}
+\begin{itemize}
+\item MaxRects; so sánh hai trường hợp cho phép và không cho phép xoay trên cùng dữ liệu.
+\end{itemize}
+\topichead{Dữ liệu chuẩn và gợi ý thực nghiệm}
+Bộ 2BP của Berkey, Wang (1987) và Martello, Vigo (1998) (10 lớp dữ liệu). Gợi ý: mỗi lớp lấy vài thể hiện với n = 20, 40, 60 (tổng ít nhất 10 thể hiện); dữ liệu tự sinh n = 6..8 cho thuật toán chính xác. Ngân sách gợi ý: 10 giây (n ≤ 40), 30 giây (n ≥ 60). Chỉ số: số thùng (best, trung bình), chênh lệch so với cận dưới và với BKS công bố, tỉ lệ lấp đầy, thời gian.
+
+\topic{Đề 14. Cấu hình hệ thống: bài toán thỏa mãn cực đại (MAX-SAT)}
+\textit{Ứng dụng: kiểm định phần cứng, cấu hình sản phẩm, lập kế hoạch                    |   Mức độ: Khá}
+\topichead{Bối cảnh}
+Khi cấu hình một hệ thống điều khiển giao thông thông minh, mỗi tùy chọn (bật/tắt một chức năng, chọn một chế độ) là một biến Boolean. Các yêu cầu kỹ thuật và mong muốn của người vận hành được viết thành mệnh đề logic, mỗi mệnh đề có trọng số thể hiện mức quan trọng. Các yêu cầu có thể mâu thuẫn nhau, nên cần tìm cấu hình làm thỏa mãn tổng trọng số lớn nhất.
+
+\topichead{Phát biểu và mô hình toán học}
+Cho công thức dạng chuẩn hội (CNF) gồm $m$ mệnh đề trên $n$ biến Boolean (có thể có trọng số mệnh đề). Tìm phép gán giá trị làm thỏa mãn nhiều mệnh đề nhất (tổng trọng số lớn nhất). Gọi $P_j$, $N_j$ là tập biến xuất hiện dạng khẳng định và phủ định trong mệnh đề $C_j$ có trọng số $w_j$:
+\[\max\sum_{j=1}^{m}w_jz_j\quad\text{với}\quad z_j\le\sum_{i\in P_j}x_i+\sum_{i\in N_j}(1-x_i),\quad x_i,z_j\in\{0,1\}.\]
+Không gian tìm kiếm có $2^n$ phép gán.
+\topichead{Tính NP-khó}
+SAT là bài toán NP-đầy đủ đầu tiên (định lý Cook–Levin: Cook, 1971; Levin, 1973); MAX-SAT là NP-khó ngay cả khi mỗi mệnh đề chỉ có 2 literal (MAX-2-SAT; Garey, Johnson, Stockmeyer, 1976), trong khi 2-SAT giải được trong thời gian tuyến tính.
+
+\topichead{Dữ liệu vào/ra}
+DIMACS CNF (SATLIB): dòng c là chú thích; dòng p cnf n m; mỗi mệnh đề là dãy số nguyên khác 0 kết thúc bằng 0 (k là xk , −k là ¬xk ), một mệnh đề có thể trải nhiều dòng. Các tệp bộ uf của SATLIB kết thúc bằng dòng \% và dòng 0 – bộ đọc cần bỏ qua. WCNF (định dạng cũ của MaxSAT Evaluations, dùng làm định dạng tự định nghĩa): dòng p wcnf n m top, mỗi mệnh đề một dòng w l1 l2 ... 0; mệnh đề có trọng số ≥ top là ràng buộc cứng. Từ năm 2022, MaxSAT Evaluations dùng định dạng mới không có dòng p, mệnh đề cứng bắt đầu bằng h. Lời giải: dòng 1 là tổng trọng số thỏa mãn; dòng 2 là phép gán dạng literal (k hoặc −k cho mỗi biến).
+
+\topichead{Ví dụ nhỏ (kiểm chứng: de14.py)}
+\begin{Verbatim}[fontsize=\scriptsize,breaklines=true,breakanywhere=true]
+Tệp vào vidu.wcnf                                     Tệp lời giải tối ưu
+p wcnf 4 11 100                                       21
+3 1 2 0                                               ‐1 2 ‐3 ‐4
+2 ‐1 3 0
+2 ‐2 ‐3 0
+1 1 ‐4 0
+4 ‐1 ‐2 0
+2 2 4 0
+1 ‐3 4 0
+3 3 ‐4 0
+2 ‐1 ‐4 0
+1 2 3 4 0
+2 1 ‐2 0
+
+\end{Verbatim}
+Tổng trọng số 23, top = 100 nên không có mệnh đề cứng. Công thức không thỏa mãn được hoàn toàn; tối ưu thỏa mãn tổng trọng số 21 (vi phạm 2), đạt tại hai phép gán: x = (0, 1, 0, 0) vi phạm mệnh đề 11, và x = (1, 0, 1, 1) vi phạm mệnh đề 9. Nếu bỏ trọng số, tối đa thỏa mãn được 10/11 mệnh đề. Kiểm chứng bằng vét cạn 24 = 16 phép gán.
+
+\topichead{Gợi ý thuật toán}
+\begin{itemize}
+\item Chính xác: nhánh cận theo lược đồ DPLL (cận trên = số mệnh đề chưa bị vi phạm) cho n ≤ 40.
+\item Lân cận lật một biến, đánh giá delta bằng bảng break/make của từng biến.
+\item Metaheuristic phù hợp: WalkSAT/GSAT (Selman và cộng sự), TS, SA, GA.
+\end{itemize}
+\topichead{Yêu cầu tối thiểu (bắt buộc)}
+\begin{itemize}
+\item Bộ đọc DIMACS CNF và WCNF (định dạng cũ); hàm kiểm tra tính lại tổng trọng số và liệt kê mệnh đề bị vi phạm.
+\item Nhánh cận giải đúng ví dụ nhỏ và các thể hiện uf20-91, uuf50-218; báo cáo n lớn nhất giải được trong 10 phút.
+\item Tham lam (gán lần lượt từng biến theo giá trị thỏa mãn thêm nhiều trọng số hơn); GSAT/WalkSAT với bảng break/make cập nhật gia tăng.
+\item Các metaheuristic theo số thành viên.
+\end{itemize}
+\topichead{Yêu cầu nâng cao (khuyến khích)}
+\begin{itemize}
+\item Thể hiện có mệnh đề cứng từ MaxSAT Evaluations; đối chiếu với một bộ giải MaxSAT có sẵn (chỉ để đối chiếu).
+\end{itemize}
+\topichead{Dữ liệu chuẩn và gợi ý thực nghiệm}
+SATLIB (Hoos, Stützle, 2000), ví dụ các bộ 3-SAT ngẫu nhiên uf20–uf250; bộ thi MaxSAT Evaluations. Gợi ý: uf20-91, uf50-218, uf100-430, uf250-1065 (mọi thể hiện uf thỏa mãn được, nên tối ưu bằng số mệnh đề m); uuf50-218, uuf100-430 (không thỏa mãn được; tối ưu tính bằng thuật toán chính xác khi n nhỏ); thêm thể hiện có trọng số tự sinh (gán trọng số ngẫu nhiên cho uuf). Ngân sách gợi ý: 10 giây (n ≤ 100), 30 giây (n = 250). Chỉ số: số mệnh đề/trọng số bị vi phạm (best, trung bình), gap\%, thời gian, tỉ lệ lần chạy đạt tối ưu.
+
+\topic{Đề 15. Xếp thời khóa biểu học phần}
+\textit{Ứng dụng: xếp lịch học, lịch trực, lịch chạy tàu           | Mức độ: Nâng cao}
+\topichead{Bối cảnh}
+Mỗi học kỳ, phòng đào tạo xếp lịch học cho các học phần: mỗi học phần có số buổi trong tuần, giảng viên và sĩ số; các học phần của cùng một chương trình (cùng lớp sinh viên) không được trùng giờ; phòng có sức chứa; giảng viên có thời gian bận. Ngoài các yêu cầu bắt buộc, lịch tốt còn cần rải đều trong tuần, ít tiết lẻ và ít đổi phòng.
+
+\topichead{Phát biểu và mô hình toán học}
+Xếp các buổi học của các học phần vào (tiết, phòng) thỏa ràng buộc cứng (giảng viên/lớp không trùng giờ, sức chứa phòng, mỗi học phần đủ số buổi) và tối thiểu vi phạm ràng buộc mềm (lịch rải đều trong tuần, hạn chế tiết lẻ, ít đổi phòng, nguyện vọng giảng viên). Mô hình thu gọn theo ITC-2007: học phần $c$ có giảng viên $t_c$, số buổi $l_c$, số ngày tối thiểu $md_c$, sĩ số $s_c$; tiết $p=(\text{ngày},\text{ca})$; phòng $r$ sức chứa $cap_r$; chương trình $K$ là tập học phần; tập bận $U$. Biến $x_{cpr}\in\{0,1\}$. Ràng buộc cứng:
+\[\begin{gathered}
+\sum_{p,r}x_{cpr}=l_c\ (\forall c),\qquad\sum_cx_{cpr}\le1\ (\forall p,r),\\
+\sum_{c:\,t_c=t}\sum_rx_{cpr}\le1\ (\forall t,p),\qquad
+\sum_{c\in K}\sum_rx_{cpr}\le1\ (\forall K,p),\\
+x_{cpr}=0\text{ nếu }(c,p)\in U\text{ hoặc }cap_r<s_c.
+\end{gathered}\]
+Hàm phạt mềm (trọng số như ITC-2007), với $D_c$ là số ngày có buổi của $c$, $I$ là số buổi bị cô lập trong các chương trình, $R_c$ là số phòng mà $c$ dùng:
+\[\min f=5\sum_c\max(0,md_c-D_c)+2I+\sum_c(R_c-1).\]
+Trong đó một buổi của chương trình $K$ bị cô lập nếu trong cùng ngày không có buổi nào của $K$ ở ca liền trước hoặc liền sau.
+\topichead{Tính NP-khó}
+Chứa bài toán tô màu đồ thị làm trường hợp riêng (mỗi tiết là một màu) nên NP-khó; Even, Itai, Shamir (1976) cũng chứng minh bài toán thời khóa biểu lớp–giảng viên có ràng buộc thời gian rảnh là NP-đầy đủ.
+
+\topichead{Dữ liệu vào/ra}
+ITC-2007, Curriculum-based Course Timetabling (tệp .ctt, dùng cả làm định dạng tự định nghĩa): phần đầu gồm Name, Courses, Rooms, Days, Periods\_per\_day, Curricula, Constraints; mục COURSES: mỗi dòng gồm mã học phần, giảng viên, số buổi, số ngày tối thiểu, sĩ số; mục ROOMS: mỗi dòng gồm mã phòng, sức chứa; mục CURRICULA: mỗi dòng gồm mã chương trình, số học phần rồi danh sách mã học phần; mục UNAVAILABILITY\_CONSTRAINTS: mỗi dòng gồm mã học phần, ngày, tiết (ngày và tiết đánh số từ 0); kết thúc bằng END. Lời giải (định dạng của cuộc thi): mỗi buổi học một dòng gồm mã học phần, mã phòng, ngày, tiết. Lưu ý: trong ITC-2007, sức chứa phòng là ràng buộc mềm (phạt 1 cho mỗi sinh viên vượt sức chứa); đề này xem là ràng buộc cứng như phát biểu ở trên, nhưng khi so sánh với BKS của cuộc thi phải dùng đúng quy tắc của ITC-2007.
+
+\topichead{Ví dụ nhỏ (kiểm chứng: de15.py)}
+\begin{Verbatim}[fontsize=\scriptsize,breaklines=true,breakanywhere=true]
+Tệp vào vidu.ctt                   vidu.ctt (tiếp)                      Tệp lời giải tối ưu
+Name: ViDu                         ROOMS:                               A P1 0 0
+Courses: 4                         P1 60                                A P1 1 0
+Rooms: 2                           P2 40                                B P1 0 1
+Days: 3                                                                 B P1 2 0
+Periods_per_day: 2                 CURRICULA:                           C P2 1 1
+Curricula: 2                       K1 3 A B C                           D P1 1 1
+Constraints: 2                     K2 2 B D                             D P1 2 1
+
+COURSES:                           UNAVAILABILITY_CONSTRAINTS:
+A GV1 2 2 50                       D 0 0
+B GV2 2 2 35                       D 0 1
+C GV1 1 1 30
+D GV3 2 2 45                       END.
+
+\end{Verbatim}
+3 ngày × 2 ca, 2 phòng (P1: 60 chỗ, P2: 40 chỗ); học phần A và D chỉ vừa phòng P1; giảng viên GV3 (dạy D) bận cả ngày 0. Có 288 thời khóa biểu thỏa mọi ràng buộc cứng; phạt mềm nhỏ nhất là 6 (64 thời khóa biểu đạt): không vi phạm số ngày tối thiểu và ổn định phòng, nhưng có 3 buổi bị cô lập – buổi B (ngày 2, ca 0) với chương trình K1; buổi B (ngày 0, ca 1) và buổi D (ngày 1, ca 1) với chương trình K2. Kiểm chứng bằng quay lui liệt kê mọi thời khóa biểu khả thi.
+
+\topichead{Gợi ý thuật toán}
+\begin{itemize}
+\item Hai pha: xây dựng lời giải khả thi (tham lam ưu tiên học phần khó xếp + sửa chữa), sau đó tối ưu ràng buộc mềm.
+\item Lân cận: dời một buổi, hoán đổi hai buổi, chuỗi Kempe.
+\item Metaheuristic phù hợp: SA, TS, GA lai, VNS.
+\item Dữ liệu tự xây dựng từ thời khóa biểu thực tế của khoa (đã ẩn danh) là điểm cộng.
+\end{itemize}
+\topichead{Yêu cầu tối thiểu (bắt buộc)}
+\begin{itemize}
+\item Bộ đọc .ctt và bộ ghi lời giải; hàm kiểm tra đếm riêng từng loại vi phạm cứng và từng thành phần phạt mềm.
+\item Thuật toán chính xác (quay lui) giải đúng ví dụ nhỏ và thể hiện tự sinh khoảng 8–10 buổi học.
+\item Heuristic xây dựng ưu tiên học phần khó xếp (ít cặp (tiết, phòng) khả dụng); hai lân cận dời một buổi và hoán đổi hai buổi, đánh giá delta theo học phần, giảng viên, chương trình bị ảnh hưởng.
+\item Các metaheuristic theo số thành viên; báo cáo số vi phạm cứng (phải bằng 0) và phạt mềm.
+\end{itemize}
+\topichead{Yêu cầu nâng cao (khuyến khích)}
+\begin{itemize}
+\item Cài đúng toàn bộ quy tắc ITC-2007 (sức chứa mềm) để so sánh với BKS; lân cận chuỗi Kempe; hiển thị thời khóa biểu dạng lưới theo chương trình/phòng.
+\end{itemize}
+\topichead{Dữ liệu chuẩn và gợi ý thực nghiệm}
+ITC-2007, phần thi Curriculum-based Course Timetabling (Di Gaspero, McCollum, Schaerf). Gợi ý: comp01–comp07 (công bố từ đầu cuộc thi) và một số thể hiện trong comp08–comp21; BKS tra trên trang lưu trữ bộ dữ liệu (theo đúng quy tắc ITC-2007). Ngân sách gợi ý: 5 phút mỗi lần chạy. Chỉ số: số lần chạy đạt khả thi, phạt mềm (best, trung bình, độ lệch chuẩn), từng thành phần phạt, thời gian.
+
+\section{Kế hoạch thực hiện và hồ sơ nộp bài}
+\subsection{Lịch trình gợi ý theo tuần}
+Lịch trình dưới đây ứng với học kỳ 10 tuần; ngày cụ thể của các mốc do giảng viên thông báo. Nếu chỉ có 8 tuần, gộp tuần 3 với tuần 4 và tuần 8 với tuần 9.
+
+\begin{Verbatim}[fontsize=\tiny,breaklines=true,breakanywhere=true]
+Tuần         Công việc chính                                                      Sản phẩm / mốc
+
+    1        Lập nhóm, đọc danh sách đề, giải tay ví dụ nhỏ của các đề            Mốc 1: đăng ký đề (tên đề, thành
+             quan tâm, chọn đề.                                                   viên, dự kiến metaheuristic và
+                                                                                  người phụ trách).
+    2        Viết mô hình toán học; tìm hiểu tính NP-khó; tải bộ dữ liệu          Bộ đọc + hàm kiểm tra chạy đúng
+             chuẩn; viết bộ đọc dữ liệu, hàm mục tiêu, hàm kiểm tra.              trên ví dụ nhỏ của đề và trên một
+                                                                                  thể hiện chuẩn.
+    3        Thuật toán chính xác; đo kích thước lớn nhất giải được trong         Bảng thời gian chạy theo kích
+             10 phút.                                                             thước.
+    4        Heuristic xây dựng; tìm kiếm cục bộ với hai lân cận,                 Kết quả tham lam và leo đồi trên
+             first/best improvement, delta evaluation.                            vài thể hiện, có gap.
+    5        Hoàn thiện phần (a)–(d) của báo cáo; bắt đầu metaheuristic.          Mốc 2 – kiểm tra giữa kỳ: báo
+                                                                                  cáo tiến độ 3–5 trang và demo
+                                                                                  ngắn (đọc dữ liệu, thuật toán
+                                                                                  chính xác, tham lam, leo đồi).
+ 6–7         Cài đặt các metaheuristic (mỗi thành viên phụ trách một              Mỗi metaheuristic chạy được trên
+             thuật toán), tinh chỉnh tham số sơ bộ trên một tập thể hiện          mọi thể hiện, ghi log hội tụ và
+             riêng.                                                               CSV.
+    8        Chạy thực nghiệm đầy đủ theo kế hoạch (seed cố định); phân           Tệp kết quả thô, bảng tổng hợp,
+             tích độ nhạy tham số, kiểm định thống kê (nếu thuộc yêu              biểu đồ.
+             cầu).
+    9        Viết báo cáo, slide; “đóng băng” mã nguồn và kiểm tra tái            Bản nháp báo cáo và slide;
+             lập trên máy khác.                                                   README hoàn chỉnh.
+    10       Nộp bài, bảo vệ.                                                     Mốc 3: nộp hồ sơ theo mục 6.2;
+                                                                                  bảo vệ theo mục 7.2.
+
+\end{Verbatim}
+\subsection{Cấu trúc thư mục nộp bài}
+Toàn bộ hồ sơ nén thành một tệp NhomXX\_DeYY.zip (XX: số thứ tự nhóm, YY: số đề, hai chữ số) có cấu trúc:
+
+\begin{Verbatim}[fontsize=\tiny,breaklines=true,breakanywhere=true]
+ Cấu trúc thư mục
+ NhomXX_DeYY/
+ |‐‐ README.md                   huong dan cai dat, chay, tai lap ket qua
+ |‐‐ src/                        ma nguon (chia module: doc du lieu, kiem tra, thuat toan)
+ |‐‐ data/
+ |       |‐‐ vidu/               vi du nho trong de va loi giai toi uu
+ |       |‐‐ chuan/              bo du lieu chuan (hoac tep LINKS.txt ghi duong dan tai)
+ |       `‐‐ tusinh/             du lieu tu sinh + chuong trinh sinh (ghi seed)
+ |‐‐ results/
+ |       |‐‐ raw/                CSV moi lan chay
+
+
+
+
+
+
+
+ |    |‐‐ conv/              log hoi tu (CSV)
+ |    |‐‐ solutions/         tep loi giai tot nhat cua moi the hien
+ |    `‐‐ figures/           bieu do (PNG/PDF)
+ `‐‐ report/
+      |‐‐ BaoCao_NhomXX_DeYY.pdf
+      `‐‐ Slide_NhomXX_DeYY.pdf
+
+
+Quy ước tên tệp: chỉ dùng chữ không dấu, chữ số, dấu gạch dưới và dấu chấm (tránh lỗi khi
+chuyển giữa các hệ điều hành). Tệp lời giải: <thể_hiện>_<thuật_toán>_s<seed>.sol (ví dụ
+berlin52_SA_s7.sol); log hội tụ: <thể_hiện>_<thuật_toán>_s<seed>_conv.csv với các cột
+time_s, iter, evals, best; tệp kết quả thô results/raw/<thuật_toán>.csv với mỗi dòng là
+một lần chạy:
+
+ Các cột của tệp kết quả thô (CSV)
+ instance,n,algorithm,params,seed,run,best_value,time_s,time_to_best_s,evaluations,feasible
+
+
+Tên viết tắt thuật toán dùng thống nhất trong mã, tệp kết quả và báo cáo (ví dụ EXACT, GREEDY,
+HC_FI, HC_BI, SA, TS, GA, ACO).
+
+\end{Verbatim}
+\subsection{Yêu cầu đối với tệp README}
+\begin{enumerate}
+\item Thông tin nhóm, đề, phân công tóm tắt.
+\item Môi trường: hệ điều hành, ngôn ngữ và phiên bản, trình biên dịch/thông dịch, thư viện (kèm phiên bản hoặc tệp khai báo phụ thuộc).
+\item Lệnh biên dịch/cài đặt và lệnh chạy một thuật toán trên một thể hiện với mọi tham số dòng lệnh (thể hiện, thuật toán, seed, ngân sách, tệp ra), kèm một ví dụ cụ thể chạy được ngay.
+\item Lệnh chạy chương trình kiểm tra: kiemtra <tệp\_vào> <tệp\_lời\_giải>.
+\item Lệnh (hoặc script) chạy toàn bộ thực nghiệm và sinh lại bảng, biểu đồ trong báo cáo; danh sách seed đã dùng; thời gian chạy ước tính.
+\item Tham số mặc định của từng metaheuristic (trùng với báo cáo).
+\end{enumerate}
+\subsection{Cấu trúc báo cáo}
+Báo cáo PDF dài 20–40 trang (không kể phụ lục), cỡ chữ 12–13, có trang bìa, mục lục, đánh số trang, danh mục tài liệu tham khảo. Số trang gợi ý cho từng phần:
+
+\begin{Verbatim}[fontsize=\tiny,breaklines=true,breakanywhere=true]
+Phần                           Nội dung                                                            Số trang
+
+(a) Phát biểu bài toán         Mô tả thực tế, mô hình toán học (biến, hàm mục tiêu, ràng buộc),       2–4
+                               ví dụ nhỏ có lời giải.
+(b) Độ phức tạp                Phiên bản quyết định, lập luận NP-đầy đủ/NP-khó (nêu phép quy          2–3
+                               dẫn hoặc trích dẫn nguồn), kích thước không gian tìm kiếm.
+(c) Thuật toán chính           Vét cạn, quay lui, nhánh cận hoặc quy hoạch động: mã giả, độ           2–4
+xác                            phức tạp, giới hạn kích thước giải được.
+(d) Heuristic và tìm           Heuristic xây dựng (tham lam) và tìm kiếm cục bộ: biểu diễn lời        3–5
+kiếm cục bộ                    giải, cấu trúc lân cận, chi phí đánh giá một bước di chuyển.
+
+
+
+
+
+
+
+
+Phần                           Nội dung                                                                Số trang
+
+(e) Các metaheuristic          Nguyên lý, mã giả, biểu diễn lời giải, toán tử, tham số, cách xử lý       5–10
+                               ràng buộc, độ phức tạp mỗi vòng lặp; tài liệu gốc của thuật toán
+                               (khoảng 2–3 trang mỗi thuật toán).
+(f) Thực nghiệm                Môi trường, dữ liệu, kế hoạch thí nghiệm, bảng kết quả, biểu đồ           5–10
+                               hội tụ, so sánh, thảo luận (mục 3.3, mẫu ở mục 6.5).
+(g) Kết luận và phụ lục        Kết luận, hạn chế, hướng phát triển; tài liệu tham khảo; bảng phân            1–4
+                               công công việc (thành viên, phần việc, tỉ lệ đóng góp).
+
+
+\end{Verbatim}
+Bảng kết quả chi tiết của từng lần chạy, bảng tham số đầy đủ có thể đưa vào phụ lục.
+
+\subsection{Mẫu bảng kết quả và biểu đồ hội tụ}
+Mỗi thể hiện một nhóm dòng, mỗi thuật toán một dòng; in đậm giá trị tốt nhất của mỗi thể hiện; ghi rõ số lần chạy và ngân sách ở chú thích bảng. Gap tính theo công thức ở mục 3.3, cho cả giá trị tốt nhất và giá trị trung bình. Số liệu trong bảng dưới đây chỉ minh họa định dạng, không phải kết quả thực nghiệm.
+
+Thể hiện      n     BKS        Thuật toán    Best       Avg     Std    Gapb \%      Gapa \%     T (s)
+
+berlin52     52     7542       SA           7542      7598,4   41,7        0,00        0,75    3,1 TS           7542      7561,0   20,3        0,00        0,25    3,0
+
+eil76        76      538       SA            544       551,2    4,1        1,12        2,45    4,6 TS            538       542,6    2,9        0,00        0,86    4,5
+
+Mã LaTeX tương ứng (có thể dùng lại):
+
+Mẫu mã LaTeX của bảng kết quả \textbackslash\{\}begin\{table\}[htbp]\textbackslash\{\}centering\textbackslash\{\}small \textbackslash\{\}caption\{ếKt ảqu trên TSPLIB (30 ầln ạchy, ngân sách 0,1n giây)\} \textbackslash\{\}begin\{tabular\}\{lrrlrrrrrr\}\textbackslash\{\}toprule The hien \& \$n\$ \& BKS \& Thuat toan \& Best \& Avg \& Std \& Gap\$\_b\$\textbackslash\{\}\% \& Gap\$\_a\$\textbackslash\{\}\% \& T (s)\textbackslash\{\}\textbackslash\{\} \textbackslash\{\}midrule berlin52 \& 52 \& 7542 \& SA \& \textbackslash\{\}textbf\{7542\} \& 7598,4 \& 41,7 \& 0,00 \& 0,75 \& 3,1\textbackslash\{\}\textbackslash\{\} \&     \&    \& TS \& \textbackslash\{\}textbf\{7542\} \& 7561,0 \& 20,3 \& 0,00 \& 0,25 \& 3,0\textbackslash\{\}\textbackslash\{\} \textbackslash\{\}bottomrule \textbackslash\{\}end\{tabular\}\textbackslash\{\}end\{table\}
+
+Biểu đồ hội tụ: mỗi biểu đồ ứng với một thể hiện đại diện cho một mức kích thước. Trục hoành là thời gian chạy (giây) hoặc số lần đánh giá hàm mục tiêu (có thể dùng thang logarit); trục tung là gap\% của lời giải tốt nhất tìm được đến thời điểm đó (hoặc giá trị hàm mục tiêu, kèm đường ngang thể hiện BKS). Mỗi thuật toán là một đường, vẽ trung vị qua các lần chạy và dải tô mờ cho khoảng tứ phân vị (25\%–75\%); các đường phân biệt bằng cả màu và kiểu nét để đọc được khi in đen trắng. Ghi đầy đủ tên trục, đơn vị, chú giải và số lần chạy. Nên bổ sung biểu đồ hộp (boxplot) giá trị cuối cùng của các lần chạy để so sánh độ ổn định giữa các thuật toán.
+
+\section{Tiêu chí đánh giá}
+\begin{Verbatim}[fontsize=\tiny,breaklines=true,breakanywhere=true]
+Tiêu chí                                                                                              Tỉ trọng
+
+Mô hình hóa bài toán, lập luận tính NP-khó, phân tích không gian tìm kiếm                               10%
+Thuật toán chính xác, heuristic xây dựng và tìm kiếm cục bộ: đúng, có phân tích độ                      15%
+phức tạp
+Tìm hiểu và cài đặt metaheuristic: trình bày nguyên lý, thiết kế toán tử và biểu diễn                   30%
+phù hợp, mã nguồn rõ ràng
+Thực nghiệm: thiết kế thí nghiệm, số lần chạy, gap so với tối ưu/BKS, biểu đồ hội                       25%
+tụ, phân tích tham số, nhận xét
+Báo cáo: cấu trúc, trình bày, trích dẫn tài liệu, tái lập được kết quả                                  10%
+Thuyết trình, demo và vấn đáp (đánh giá từng thành viên)                                                10%
+
+Điểm cộng (tối đa +1): giao diện trực quan hóa quá trình tìm kiếm; kiểm định thống                    +1 điểm
+kê (với nhóm dưới 4 người); tinh chỉnh tham số tự động; đạt hoặc vượt BKS trên thể
+hiện khó; dữ liệu thực tế tự thu thập
+
+
+\end{Verbatim}
+Yêu cầu khối lượng được đánh giá tương ứng với số thành viên (mục 2.2). Điểm của từng thành viên có thể khác nhau tùy mức độ đóng góp (bảng phân công) và kết quả vấn đáp cá nhân.
+
+\subsection{Mô tả các mức đánh giá}
+Mỗi tiêu chí được xếp vào một trong bốn mức; mức đạt được của tiêu chí quy ra tỉ lệ điểm của tiêu chí đó (gợi ý: Giỏi 85–100\%, Khá 70–84\%, Trung bình 50–69\%, Không đạt dưới 50\%).
+
+\begin{Verbatim}[fontsize=\tiny,breaklines=true,breakanywhere=true]
+Tiêu chí          Giỏi                   Khá                       Trung bình             Không đạt
+
+Mô hình hóa,      Mô hình đầy đủ,        Mô hình đúng, còn         Mô hình thiếu ràng     Không có mô hình
+NP-khó (10%)      chính xác, ký hiệu     thiếu sót nhỏ về ký       buộc hoặc chưa chặt;   toán học hoặc mô
+                  nhất quán; trình bày   hiệu; NP-khó trích        NP-khó chỉ nêu kết     hình sai bản chất bài
+                  được phép quy dẫn;     dẫn đúng nguồn            luận.                  toán.
+                  tính đúng kích thước   nhưng lập luận sơ
+                  không gian tìm kiếm;   lược.
+                  ví dụ nhỏ giải đúng.
+
+Chính xác, tham Thuật toán chính xác     Đủ các thành phần,        Thiếu một thành phần   Thiếu nhiều thành
+lam, tìm kiếm   đúng, có cắt nhánh       chạy đúng; delta          bắt buộc, hoặc thuật   phần hoặc cho kết quả
+cục bộ (15%)    hiệu quả và đo giới      evaluation chưa đầy       toán chính xác chỉ     sai (không khớp ví dụ
+                hạn kích thước; hai      đủ hoặc phân tích độ      chạy được ví dụ rất    nhỏ).
+                lân cận có delta         phức tạp sơ lược.         nhỏ.
+                evaluation, so sánh
+                first/best
+                improvement có số
+                liệu.
+
+
+
+
+
+
+
+Tiêu chí          Giỏi                      Khá                      Trung bình               Không đạt
+
+Metaheuristic     Đủ số lượng; biểu         Đủ số lượng, cài đặt     Thiếu thuật toán so      Không có
+(30%)             diễn, toán tử phù hợp     đúng; thiết kế toán tử   với yêu cầu, hoặc cài    metaheuristic chạy
+                  đặc thù bài toán; xử lý   chủ yếu theo dạng        đặt có lỗi ảnh hưởng     được, hoặc không
+                  ràng buộc hợp lý; mã      tổng quát; trình bày     kết quả; trình bày chủ   phải do nhóm tự cài
+                  giả cụ thể; giải thích    nguyên lý đúng.          yếu chép lý thuyết       đặt.
+                  được vai trò từng                                  chung.
+                  tham số; mã rõ ràng,
+                  dùng chung hạ tầng.
+
+Thực nghiệm       Đủ thể hiện, số lần       Đủ dữ liệu và số lần     Thiếu thể hiện hoặc      Không có thực
+(25%)             chạy, cùng ngân sách;     chạy; bảng, biểu đồ      số lần chạy; so sánh     nghiệm có hệ thống,
+                  bảng và biểu đồ theo      đầy đủ; nhận xét còn     chưa cùng ngân sách;     hoặc số liệu không tái
+                  mẫu; phân tích tham       chung chung.             thiếu biểu đồ hội tụ.    lập được.
+                  số và (nếu thuộc yêu
+                  cầu) kiểm định thống
+                  kê; nhận xét có căn cứ
+                  số liệu.
+
+Báo cáo (10%)     Đúng cấu trúc, trình      Đúng cấu trúc, còn lỗi Thiếu phần, trích dẫn      Thiếu nhiều phần,
+                  bày mạch lạc, trích       trình bày nhỏ; tái lập chưa đầy đủ; tái lập       không trích dẫn,
+                  dẫn đầy đủ; tái lập       được phần lớn kết      khó khăn.                  không tái lập được.
+                  được kết quả từ           quả.
+                  README và seed.
+
+Thuyết trình,     Trình bày đúng giờ,       Trình bày rõ; demo       Trình bày chưa rõ        Không demo được
+demo, vấn đáp     rõ ràng; demo chạy        chạy được; trả lời       hoặc quá giờ; demo       hoặc không giải thích
+(10%)             trơn tru; trả lời đúng,   đúng phần lớn câu        lỗi một phần; trả lời    được phần mình phụ
+                  sâu các câu hỏi về        hỏi.                     được một số câu hỏi      trách.
+                  phần mình và nguyên                                cơ bản.
+                  lý chung.
+
+
+\end{Verbatim}
+\subsection{Hình thức bảo vệ}
+\begin{itemize}
+\item Thời lượng (theo lịch giảng viên công bố): trình bày 15–20 phút, bao gồm phần demo; sau đó vấn đáp khoảng 10 phút. Mọi thành viên phải có mặt và trình bày phần mình phụ trách.
+\item Nội dung demo: (1) chạy chương trình kiểm tra trên ví dụ nhỏ của đề; (2) chạy thuật toán chính xác trên ví dụ nhỏ, cho đúng giá trị tối ưu; (3) chạy một metaheuristic trên một thể hiện chuẩn với seed cho trước, hiển thị diễn biến giá trị tốt nhất; (4) tái lập một dòng trong bảng kết quả của báo cáo (thể hiện và seed do giảng viên chọn).
+\item Câu hỏi vấn đáp điển hình: – Viết lại mô hình toán học; vì sao bài toán là NP-khó? Không gian tìm kiếm lớn cỡ nào với dữ liệu của nhóm? – Thuật toán chính xác cắt nhánh thế nào, vì sao không chạy được với n lớn hơn? Chi phí đánh giá một bước lân cận khi có và không có delta evaluation? – Trong metaheuristic em phụ trách, tham số nào điều khiển khám phá hay khai thác, thay đổi nó thì kết quả ra sao (dẫn số liệu)? Ràng buộc xử lý bằng sửa chữa hay hàm phạt? – Vì sao thuật toán A tốt hơn B? Khác biệt có ý nghĩa thống kê không?
+\end{itemize}
+\section{Câu hỏi thường gặp}
+\begin{enumerate}[leftmargin=2em,itemsep=0.5em]
+\item \textbf{Thuật toán chính xác của nhóm không giải được bộ dữ liệu chuẩn, có sao không?} Không. Thuật toán chính xác chỉ yêu cầu cho dữ liệu nhỏ (ví dụ trong đề và dữ liệu tự sinh); điều quan trọng là xác định và giải thích được kích thước lớn nhất giải được trong 10 phút.
+\item \textbf{Dữ liệu tự sinh không có BKS thì tính gap thế nào?} Với thể hiện nhỏ, dùng giá trị tối ưu của thuật toán chính xác. Với thể hiện lớn, dùng giá trị tốt nhất mà mọi thuật toán của nhóm tìm được qua mọi lần chạy (ghi rõ là “tốt nhất trong thực nghiệm này”) hoặc so với một cận dưới/cận trên nếu có; phải nêu rõ cách tính trong báo cáo.
+\item \textbf{Nhóm dùng Python, chương trình chạy chậm thì làm thế nào?} Ưu tiên ngân sách theo số lần đánh giá hàm mục tiêu, cài đặt delta evaluation cẩn thận, chọn thể hiện kích thước nhỏ và vừa. Mọi công cụ tăng tốc đã dùng phải ghi trong README; thuật toán vẫn phải do nhóm tự cài đặt (mục 2).
+\item \textbf{Metaheuristic dùng hàm phạt có thể trả về lời giải không hợp lệ?} Có thể, trong quá trình tìm kiếm. Nhưng mọi lời giải đưa vào bảng kết quả phải qua hàm kiểm tra; báo cáo thêm tỉ lệ lần chạy cho lời giải hợp lệ.
+\item \textbf{Nhóm 4 người: thuật toán lai được tính như thế nào?} Bảng ở mục 2.2 ghi: 4 metaheuristic, “như nhóm 3 người; thêm một thuật toán lai (ví dụ GA + tìm kiếm cục bộ) và kiểm định thống kê”. Nhóm nêu rõ phương án dự kiến khi đăng ký đề để được giảng viên xác nhận.
+\item \textbf{Thuật toán memetic có được xem là thuật toán quần thể (yêu cầu của nhóm 2 người trở} lên) không? Bảng ở mục 3.2 xếp memetic vào nhóm “Lai”. Nếu nhóm muốn dùng memetic để đáp ứng yêu cầu “một thuật toán quần thể”, hãy hỏi giảng viên khi đăng ký đề.
+\item \textbf{Kết quả mỗi lần chạy mỗi khác, làm sao tái lập?} Mọi bộ sinh số ngẫu nhiên phải khởi tạo từ seed truyền qua dòng lệnh; ghi seed vào tệp kết quả; không dùng thời gian hệ thống làm seed. Với cùng mã nguồn, dữ liệu, seed và ngân sách theo số lần đánh giá, kết quả phải giống hệt; nếu ngân sách theo thời gian, kết quả có thể khác đôi chút và cần nêu rõ điều này.
+\item \textbf{Có được đổi đề sau khi đã đăng ký không?} Liên hệ giảng viên càng sớm càng tốt (trước mốc kiểm tra giữa kỳ) và nêu lý do; việc đổi đề do giảng viên quyết định.
+\end{enumerate}
+
+\section{Tài liệu tham khảo gợi ý}
+\begin{enumerate}[label={[\arabic*]},leftmargin=2em,itemsep=0.4em]
+\item M. R. Garey, D. S. Johnson, Computers and Intractability: A Guide to the Theory of NP- Completeness, W. H. Freeman, 1979.
+\item T. H. Cormen, C. E. Leiserson, R. L. Rivest, C. Stein, Introduction to Algorithms, 4th ed., MIT Press, 2022 (Chương 34–35: NP-đầy đủ và thuật toán xấp xỉ).
+\item E.-G. Talbi, Metaheuristics: From Design to Implementation, Wiley, 2009.
+\item M. Gendreau, J.-Y. Potvin (eds.), Handbook of Metaheuristics, 3rd ed., Springer, 2019.
+\item H. H. Hoos, T. Stützle, Stochastic Local Search: Foundations and Applications, Morgan Kaufmann, 2004.
+\item M. Dorigo, T. Stützle, Ant Colony Optimization, MIT Press, 2004.
+\item S. Luke, Essentials of Metaheuristics, 2nd ed., Lulu, 2013 (bản điện tử miễn phí của tác giả).
+\item P. Toth, D. Vigo (eds.), Vehicle Routing: Problems, Methods, and Applications, 2nd ed., SIAM, 2014.
+\end{enumerate}
+\end{document}
