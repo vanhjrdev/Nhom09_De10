@@ -3,23 +3,17 @@ import random
 import sys
 import time
 
+from scp_core import SCPInstance
+
+
 def load_instance(path):
-    with open(path) as f:
-        tok = f.read().split()
-    m, n = int(tok[0]), int(tok[1])
-    p = 2
-    cost = [int(float(x)) for x in tok[p:p + n]]
-    p += n
-    rows, cols = [], [[] for _ in range(n)]
-    for i in range(m):
-        k = int(tok[p])
-        p += 1
-        r = [int(x) - 1 for x in tok[p:p + k]]
-        p += k
-        rows.append(r)
-        for j in r:
-            cols[j].append(i)
-    return m, n, cost, rows, cols
+    inst = SCPInstance()
+    if not inst.load_from_file(path):
+        raise OSError(f"Khong mo duoc tep vao: {path}")
+    cost = inst.cost[1:]
+    rows = [[c - 1 for c in inst.row_cols[i]] for i in range(1, inst.m + 1)]
+    cols = [sorted(r - 1 for r in inst.col_rows[j]) for j in range(1, inst.n + 1)]
+    return inst.m, inst.n, cost, rows, cols
 
 
 def is_valid(inst, sol):

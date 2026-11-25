@@ -16,10 +16,10 @@ Cột đánh số từ 1, định dạng OR-Library.
 Ghi chú đối chiếu: B đã tự kiểm tra bằng nhánh cận riêng, 4 thể hiện nhỏ có tối ưu lần lượt là
 65, 136, 212, 133. Chỉ coi là chính thức khi thuật toán chính xác của A chạy ra khớp.
 
-## Dữ liệu chuẩn OR-Library (bổ sung sau khi tải)
+## Dữ liệu chuẩn OR-Library (`data/chuan/`, tải ngày 2026-11-25)
 
 | Tên tệp | Mức | Hàng m | Cột n | Nguồn tải | Tối ưu/BKS | Nguồn tối ưu/BKS |
 |---|---|---|---|---|---|---|
-| scp41 | lớn | 200 | 1000 | (điền link) | 429 (theo đề) | (điền) |
-| (điền) | lớn | | | | | |
-| (điền) | lớn | | | | | |
+| scp41.txt | lớn | 200 | 1000 | `https://people.brunel.ac.uk/~mastjjb/jeb/orlib/files/scp41.txt` | 429 (OPT) | Beasley (1987), EJOR 31:85–93 |
+| scp51.txt | lớn | 200 | 2000 | `https://people.brunel.ac.uk/~mastjjb/jeb/orlib/files/scp51.txt` | 253 (OPT) | Beasley (1987), EJOR 31:85–93 |
+| scp61.txt | lớn | 200 | 1000 | `https://people.brunel.ac.uk/~mastjjb/jeb/orlib/files/scp61.txt` | 138 (OPT) | Beasley (1987), EJOR 31:85–93 |

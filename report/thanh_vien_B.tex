@@ -62,7 +62,27 @@ Lời giải xuất phát là kết quả của tham lam Chvátal, nên mỗi l�
 $N_2$: dominated bởi \textsc{SuaChua}, tức $O(\sum_j |S_j|)$ mỗi lần; vì vậy $N_2$ đắt hơn $N_1$.
 Không dùng delta (tính lại toàn bộ) thì mỗi ứng viên tốn thêm $O(\sum_{i}|R_i|)$ để kiểm tra phủ.
 
-\paragraph{So sánh FI và BI.} [CHO SO LIEU: bảng gap\% và thời gian của \texttt{HC\_FI}, \texttt{HC\_BI} trên các thể hiện, 10 seed.]
+\paragraph{So sánh FI và BI.} Kết quả thực nghiệm trên 10 thể hiện (4 nhỏ tự sinh, 3 vừa tự sinh, 3 chuẩn OR-Library \texttt{scp41}, \texttt{scp51}, \texttt{scp61}) với 10 seed (\texttt{1..10}), ngân sách $0{,}5$ giây được tổng hợp trong bảng sau (chạy bằng \texttt{experiments/member\_b/run\_member\_b.py}, lưu tại \texttt{results/member\_b/eval\_member\_b.csv}):
+\begin{center}
+\small
+\begin{tabular}{lrrrrrr}
+\toprule
+Thể hiện (Ref) & GREEDY & HC\_FI Mean (Gap\%) & $T_{\mathrm{FI}}$ (s) & HC\_BI Mean (Gap\%) & $T_{\mathrm{BI}}$ (s) \\
+\midrule
+\texttt{nho\_10x20\_s101} (65)  & 65  & 65,00 (0,00\%)  & 0,0004 & 65,00 (0,00\%)  & 0,0003 \\
+\texttt{nho\_15x25\_s102} (136) & 136 & 136,00 (0,00\%) & 0,0003 & 136,00 (0,00\%) & 0,0007 \\
+\texttt{nho\_20x28\_s103} (212) & 216 & 212,00 (0,00\%) & 0,0004 & 212,00 (0,00\%) & 0,0008 \\
+\texttt{nho\_25x30\_s104} (133) & 133 & 133,00 (0,00\%) & 0,0004 & 133,00 (0,00\%) & 0,0004 \\
+\texttt{vua\_100x400\_s201} (211) & 213 & 211,00 (0,00\%) & 0,0121 & 211,00 (0,00\%) & 0,0142 \\
+\texttt{vua\_150x600\_s202} (261) & 272 & 269,10 (3,10\%) & 0,0274 & 268,20 (2,76\%) & 0,0302 \\
+\texttt{vua\_200x1000\_s203} (316) & 330 & 316,50 (0,16\%) & 0,0800 & 316,00 (0,00\%) & 0,1277 \\
+\texttt{scp41} (429) & 434 & 433,00 (0,93\%) & 0,0549 & 433,00 (0,93\%) & 0,0594 \\
+\texttt{scp51} (253) & 269 & 268,00 (5,93\%) & 0,1011 & 268,00 (5,93\%) & 0,1120 \\
+\texttt{scp61} (138) & 142 & 141,00 (2,17\%) & 0,0560 & 141,00 (2,17\%) & 0,0684 \\
+\bottomrule
+\end{tabular}
+\end{center}
+Cả hai biến thể đều cải thiện rõ rệt so với \texttt{GREEDY} (ví dụ trên \texttt{vua\_200x1000\_s203} giảm từ 330 xuống 316). \texttt{HC\_BI} ổn định hơn nhẹ ở các thể hiện vừa (\texttt{vua\_150x600\_s202}, \texttt{vua\_200x1000\_s203}) nhưng tốn nhiều thời gian quét mỗi vòng hơn \texttt{HC\_FI} (ví dụ $0{,}1277$s so với $0{,}0800$s trên \texttt{vua\_200x1000\_s203}). Trên \texttt{scp51} và \texttt{scp61}, cả hai bị kẹt tại cực tiểu cục bộ ($268$ và $141$), cho thấy cần metaheuristic để thoát khỏi cực tiểu cục bộ.
 
 \section{Tabu Search (phần trong mục các metaheuristic)}
 
@@ -107,5 +127,24 @@ Phép thử được hoàn tác bằng nhật ký thêm/bỏ cột (rollback), c
 \subsection{Ý nghĩa tham số và phân tích độ nhạy}
 $tenure$ điều khiển cân bằng khai thác và khám phá: nhỏ thì dễ quay lại vùng cũ (kẹt), lớn thì cấm quá nhiều cột tốt.
 Kích thước mẫu (40) đánh đổi giữa chất lượng lân cận và số vòng lặp trong cùng ngân sách.
-[CHO SO LIEU: chạy $tenure\in\{\ldots\}$ và kích thước mẫu $\in\{\ldots\}$ trên tập thể hiện dùng để chỉnh tham số, 10 seed, cùng ngân sách; trình bày bảng và nhận xét.]
-Cần ghi rõ tập thể hiện dùng để chọn tham số, tránh dùng chính tập đánh giá cuối.
+Để tránh dùng chính tập đánh giá cuối, việc tinh chỉnh được thực hiện trên tập riêng gồm hai thể hiện tự sinh bởi \texttt{src/gen\_scp.py}: \texttt{tune\_100x400\_s901} (seed 901) và \texttt{tune\_150x600\_s902} (seed 902), mỗi cấu hình chạy 10 seed (\texttt{1..10}) với ngân sách $0{,}3$ giây (kết quả chi tiết trong \texttt{results/member\_b/ts\_sensitivity.csv}):
+
+\begin{center}
+\small
+\begin{tabular}{lcrrrr}
+\toprule
+Cấu hình (\texttt{tenure}; \texttt{sample}) & \multicolumn{2}{c}{\texttt{tune\_100x400\_s901}} & \multicolumn{2}{c}{\texttt{tune\_150x600\_s902}} & Evals TB (\texttt{s902}) \\
+ & Best & Mean $\pm$ Std & Best & Mean $\pm$ Std & \\
+\midrule
+\texttt{tenure=3; sample=40}    & 274 & 274,00 $\pm$ 0,00 & 296 & 296,00 $\pm$ 0,00 & 1339,7 \\
+\texttt{tenure=5; sample=40}    & 274 & 274,00 $\pm$ 0,00 & 296 & 296,00 $\pm$ 0,00 & 1427,8 \\
+\texttt{tenure=10; sample=40}   & 274 & 274,00 $\pm$ 0,00 & 285 & 289,50 $\pm$ 4,77 & 1473,9 \\
+\texttt{tenure=15; sample=40}   & 274 & 274,00 $\pm$ 0,00 & \textbf{284} & \textbf{284,00 $\pm$ 0,00} & 1398,3 \\
+\texttt{tenure=auto; sample=40} & 274 & 274,00 $\pm$ 0,00 & 285 & 293,30 $\pm$ 4,40 & 1491,2 \\
+\texttt{tenure=auto; sample=10} & 274 & 274,10 $\pm$ 0,32 & \textbf{284} & 288,00 $\pm$ 4,37 & 1532,2 \\
+\texttt{tenure=auto; sample=20} & 274 & 274,00 $\pm$ 0,00 & 285 & 292,40 $\pm$ 5,56 & 1312,2 \\
+\texttt{tenure=auto; sample=80} & 274 & 274,00 $\pm$ 0,00 & 285 & 293,50 $\pm$ 4,50 & 1721,4 \\
+\bottomrule
+\end{tabular}
+\end{center}
+Trên \texttt{tune\_150x600\_s902}, \texttt{tenure} nhỏ ($3, 5$) bị kẹt tại $296$ do vòng lặp quay lại trạng thái cũ; khi tăng \texttt{tenure} lên $10$--$15$, thuật toán thoát cực tiểu cục bộ và đạt $284{,}00$ ($\mathrm{std}=0{,}00$ tại \texttt{tenure=15}). Với ngân sách ngắn $0{,}3$ giây, \texttt{sample} nhỏ ($10$) giúp thực hiện nhiều vòng lặp hơn mỗi giây nên đạt trung bình tốt hơn ($288{,}00$ so với $293{,}50$ của \texttt{sample=80}), trong khi ở các thể hiện chuẩn cỡ lớn (\texttt{scp51}), \texttt{TS} mặc định vẫn hạ chi phí từ $268$ (\texttt{HC}) xuống tốt nhất $256$ (trung bình $261{,}40$).

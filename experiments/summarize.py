@@ -43,6 +43,8 @@ KNOWN_OPT = {
     "nho_20x28_s103": (212, "OPT"),
     "nho_25x30_s104": (133, "OPT"),
     "scp41": (429, "OPT"),
+    "scp51": (253, "OPT"),
+    "scp61": (138, "OPT"),
 }
 
 ALGO_ORDER = ["EXACT", "GREEDY", "HC_FI", "HC_BI", "TS", "SA", "GA", "GA_LS", "GRASP"]

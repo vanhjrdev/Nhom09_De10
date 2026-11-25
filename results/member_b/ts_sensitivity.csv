@@ -1,0 +1,17 @@
+instance,config,tenure,sample,best,mean,std,mean_evals,mean_time_to_best_s
+tune_100x400_s901,tenure=3;sample=40,3,40,274,274.00,0.00,1884.5,0.0259
+tune_100x400_s901,tenure=5;sample=40,5,40,274,274.00,0.00,2179.5,0.0252
+tune_100x400_s901,tenure=10;sample=40,10,40,274,274.00,0.00,2272.1,0.0282
+tune_100x400_s901,tenure=15;sample=40,15,40,274,274.00,0.00,2335.9,0.0247
+tune_100x400_s901,tenure=auto;sample=40,auto,40,274,274.00,0.00,2410.1,0.0222
+tune_100x400_s901,tenure=auto;sample=10,auto,10,274,274.10,0.32,2452.3,0.0683
+tune_100x400_s901,tenure=auto;sample=20,auto,20,274,274.00,0.00,2204.1,0.0306
+tune_100x400_s901,tenure=auto;sample=80,auto,80,274,274.00,0.00,1957.2,0.0273
+tune_150x600_s902,tenure=3;sample=40,3,40,296,296.00,0.00,1339.7,0.1015
+tune_150x600_s902,tenure=5;sample=40,5,40,296,296.00,0.00,1427.8,0.1036
+tune_150x600_s902,tenure=10;sample=40,10,40,285,289.50,4.77,1473.9,0.2276
+tune_150x600_s902,tenure=15;sample=40,15,40,284,284.00,0.00,1398.3,0.1862
+tune_150x600_s902,tenure=auto;sample=40,auto,40,285,293.30,4.40,1491.2,0.1765
+tune_150x600_s902,tenure=auto;sample=10,auto,10,284,288.00,4.37,1532.2,0.2138
+tune_150x600_s902,tenure=auto;sample=20,auto,20,285,292.40,5.56,1312.2,0.1514
+tune_150x600_s902,tenure=auto;sample=80,auto,80,285,293.50,4.50,1721.4,0.1478

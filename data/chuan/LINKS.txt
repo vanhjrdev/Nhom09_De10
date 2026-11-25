@@ -1,0 +1,9 @@
+# Nguồn dữ liệu chuẩn OR-Library — Set Covering Problem (J. E. Beasley)
+# Trang chính thức: https://people.brunel.ac.uk/~mastjjb/jeb/orlib/scpinfo.html
+# Ngày truy cập: 2026-11-25
+# Nguồn giá trị tối ưu: J. E. Beasley, "An algorithm for set covering problems",
+# European Journal of Operational Research 31 (1987) 85-93.
+
+scp41.txt | m=200, n=1000, mật độ=2% | OPT=429 | https://people.brunel.ac.uk/~mastjjb/jeb/orlib/files/scp41.txt
+scp51.txt | m=200, n=2000, mật độ=2% | OPT=253 | https://people.brunel.ac.uk/~mastjjb/jeb/orlib/files/scp51.txt
+scp61.txt | m=200, n=1000, mật độ=5% | OPT=138 | https://people.brunel.ac.uk/~mastjjb/jeb/orlib/files/scp61.txt

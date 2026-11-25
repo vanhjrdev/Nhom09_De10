@@ -11,14 +11,14 @@
 - [ ] Ghép báo cáo chung `report/BaoCao_Nhom09_De10.pdf` và `report/Slide_Nhom09_De10.pdf`.
 
 ### Thành viên B (Hoàng Duy Khánh) — Chvátal, xóa thừa, 2 lân cận, TS, dữ liệu
-- [x] `src/greedy.py`: tham lam Chvátal + xóa cột thừa (đã vá 3 dòng khai báo thiếu `class State`, `def _pick`, `def run_cli`).
+- [x] `src/greedy.py`: tham lam Chvátal + xóa cột thừa, đã tích hợp bộ đọc chung `scp_core.py`.
 - [x] `src/local_search.py`: `HC_FI`, `HC_BI` (2 lân cận + đánh giá gia tăng qua mảng `cnt`).
 - [x] `src/tabu.py`: `TS` (Tabu Search có aspiration và rollback).
-- [x] `data/tusinh/`: 7 thể hiện tự sinh (4 nhỏ `10x20`–`25x30` seed `101..104`, 3 vừa `100x400`–`200x1000` seed `201..203`) và `DANH_MUC.md`.
-- [x] `report/thanh_vien_B.tex`.
-- [ ] Bổ sung chương trình sinh dữ liệu (`src/gen_scp.py`) vào repo.
-- [ ] Bổ sung dữ liệu chuẩn OR-Library (`scp4x`–`scp6x`, tối thiểu `scp41` hoặc `LINKS.txt`) vào `data/chuan/`.
-- [ ] Phân tích độ nhạy tham số `TS` (`tenure`, `sample`).
+- [x] `src/gen_scp.py`: chương trình sinh dữ liệu tự sinh (tái lập khớp 7/7 thể hiện trong `data/tusinh/`).
+- [x] `data/chuan/`: đã tải 3 thể hiện chuẩn OR-Library (`scp41.txt`, `scp51.txt`, `scp61.txt`) + `LINKS.txt` + cập nhật `DANH_MUC.md`.
+- [x] `experiments/member_b/run_member_b.py`: chạy đánh giá `GREEDY/HC_FI/HC_BI/TS` trên cả 10 thể hiện (`results/member_b/eval_member_b.csv`) và phân tích độ nhạy `tenure`, `sample` trên tập tinh chỉnh riêng (`results/member_b/ts_sensitivity.csv`).
+- [x] `report/thanh_vien_B.tex`: đã điền đầy đủ bảng số liệu thực nghiệm và độ nhạy tham số.
+- [ ] Làm slide phần B.
 
 ### Thành viên C (Huỳnh Xuân Huy) — GA và GA_LS
 - [x] `src/main_C.py`: `GA` và `GA_LS` (thuật toán lai).
@@ -32,15 +32,15 @@
 - [x] `experiments/summarize.py`, `statistics.py`, `plot.py`: sinh `results/summary.*`, `results/statistics.*` (Friedman + Wilcoxon signed-rank + Holm), và 15 biểu đồ SVG trong `results/figures/`.
 - [x] `results/member_d/`: lưu riêng kết quả của `GRASP` (70 nghiệm `.sol`, 70 log `_conv.csv`, `GRASP.csv`, `summary.csv`).
 - [x] `README.md`, `report/thanh_vien_D.tex`, `plan/member_D.md`.
-- [ ] Phân tích độ nhạy tham số `alpha` của `GRASP`; chuyển/xuất biểu đồ sang `PNG/PDF` đúng Mục 6.2; chạy lại trên `data/chuan/` khi B bổ sung dữ liệu chuẩn.
+- [ ] Phân tích độ nhạy tham số `alpha` của `GRASP`; chuyển/xuất biểu đồ sang `PNG/PDF` đúng Mục 6.2; chạy lại `run_all.py` trên đủ 10 thể hiện (gồm `scp41`, `scp51`, `scp61`).
 
 ## 2. Quy ước kỹ thuật đã chốt
 - **Ngôn ngữ & môi trường:** Python 3.12.9 (chỉ dùng thư viện chuẩn).
-- **Seed chạy thực nghiệm:** `1..10` (tách biệt với seed sinh dữ liệu `101..104`, `201..203`); seed mặc định CLI là `42`; `EXACT` dùng `1`.
+- **Dữ liệu chuẩn + tự sinh:** Đã đủ **10 thể hiện thuộc 3 mức kích thước** (4 nhỏ `10x20`–`25x30`, 3 vừa `100x400`–`200x1000`, 3 lớn chuẩn OR-Library `scp41`, `scp51`, `scp61`).
+- **Seed chạy thực nghiệm:** `1..10` (tách biệt với seed sinh dữ liệu `101..104`, `201..203`, và tập tinh chỉnh `901..902`); seed mặc định CLI là `42`; `EXACT` dùng `1`.
 - **4 metaheuristic + 1 lai:** `SA`, `TS`, `GA`, `GRASP` + `GA_LS`.
 
 ## 3. Việc còn thiếu theo đề bài tập lớn (trước khi đóng gói nộp)
-1. Bổ sung bộ dữ liệu chuẩn OR-Library (hoặc `LINKS.txt`) vào `data/chuan/` để đủ tối thiểu 10 thể hiện thuộc 3 mức kích thước (Mục 3.3).
-2. Bổ sung chương trình sinh dữ liệu tự sinh (`src/gen_scp.py`) theo Mục 6.2.
-3. Bổ sung phân tích độ nhạy tham số cho `SA`, `TS`, `GA`, `GRASP` (yêu cầu nhóm 4 người, Mục 2.2).
-4. Xuất biểu đồ sang `PNG/PDF` (Mục 6.2) và ghép `report/BaoCao_Nhom09_De10.pdf` (20–40 trang) + `report/Slide_Nhom09_De10.pdf`.
+1. Chạy lại `experiments/run_all.py` + `summarize.py` + `statistics.py` + `plot.py` trên đủ cả 10 thể hiện (bao gồm 3 bộ chuẩn `scp41`, `scp51`, `scp61` vừa bổ sung).
+2. Bổ sung phân tích độ nhạy tham số cho `SA` (A), `GA` (C), `GRASP` (D) (`TS` của B đã xong).
+3. Xuất biểu đồ sang `PNG/PDF` (Mục 6.2) và ghép `report/BaoCao_Nhom09_De10.pdf` (20–40 trang) + `report/Slide_Nhom09_De10.pdf`.

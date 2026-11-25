@@ -56,12 +56,13 @@ Ví dụ:  python src/tabu.py data/vidu/vidu.txt TS output.sol 42 10 conv.csv te
         python src/kiemtra.py data/vidu/vidu.txt output.sol
 ```
 
-## 6. Còn lại
-- [ ] Tải 3 thể hiện OR-Library vào `data/chuan/`, điền nguồn và tối ưu/BKS vào `data/tusinh/DANH_MUC.md`.
-- [ ] Đổi sang `scp_core.py` và kiểm tra chéo kết quả với `kiemtra.py`.
-- [ ] Chạy thực nghiệm `GREEDY`, `HC_FI`, `HC_BI`, `TS` với seed 1–10 (cùng D chốt `run_all.py`).
-- [ ] Phân tích độ nhạy `tenure`, `sample` trên tập tinh chỉnh riêng.
-- [ ] Điền số liệu vào `report/thanh_vien_B.tex`; làm slide phần B.
+## 6. Còn lại (đã hoàn thành bổ sung)
+- [x] Tải 3 thể hiện OR-Library (`scp41.txt`, `scp51.txt`, `scp61.txt`) vào `data/chuan/`, ghi `data/chuan/LINKS.txt`, cập nhật `data/tusinh/DANH_MUC.md`.
+- [x] Bổ sung `src/gen_scp.py` (đối chiếu khớp 7/7 file trong `data/tusinh/`) và đổi `greedy.py` dùng `scp_core.py`, kiểm tra chéo 100% nghiệm qua `kiemtra.py`.
+- [x] Chạy thực nghiệm `GREEDY`, `HC_FI`, `HC_BI`, `TS` trên cả 10 thể hiện (`data/tusinh/` + `data/chuan/`) với seed `1..10` (`experiments/member_b/run_member_b.py`).
+- [x] Phân tích độ nhạy `tenure`, `sample` trên tập tinh chỉnh riêng (`tune_100x400_s901`, `tune_150x600_s902`) lưu tại `results/member_b/ts_sensitivity.csv`.
+- [x] Điền đầy đủ số liệu vào `report/thanh_vien_B.tex`.
+- [ ] Làm slide phần B.
 
 ## 7. Ghi nhận việc dùng AI (theo mục 3.4 của đề)
 Mã nguồn `greedy.py`, `local_search.py`, `tabu.py`, `gen_scp.py` và bản nháp `report/thanh_vien_B.tex` được tạo với sự hỗ trợ của AI (Claude). Thành viên B cần đọc hiểu và tự giải thích được trước khi nộp.
