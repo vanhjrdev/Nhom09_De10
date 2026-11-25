@@ -23,9 +23,9 @@
 ## Các thành viên còn lại — công việc còn thiếu (theo bai_tap_lon.tex đề 10)
 
 ### A (Phan Việt Anh) — Bộ đọc, kiểm tra, chính xác, SA
-- [ ] Chạy `EXACT` trên `data/vidu/vidu.txt` → phải ra 16 / 1 2 4.
-- [ ] Tạo `data/vidu/vidu.sol` (nội dung: `16` / `1 2 4`).
-- [ ] Xác nhận `kiemtra.py` trả về `HOP LE | Tong chi phi: 16`.
+- [x] Chạy `EXACT` trên `data/vidu/vidu.txt` → phải ra 16 / 1 2 4.
+- [x] Tạo `data/vidu/vidu.sol` (nội dung: `16` / `1 2 4`).
+- [x] Xác nhận `kiemtra.py` trả về `HOP LE | Tong chi phi: 16`.
 
 ### B (Hoàng Duy Khánh) — Chvátal, xóa thừa, 2 lân cận, TS, sinh dữ liệu
 - [x] `src/greedy.py`: tham lam Chvátal + xóa cột thừa.
