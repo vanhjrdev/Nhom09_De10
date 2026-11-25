@@ -25,6 +25,10 @@
 - [x] `src/main_C.py`: `GA` và `GA_LS` (thuật toán lai).
 - [x] `experiments/member_c/run_example.py`, `run_tusinh.py`, `run_ga_sensitivity.py`, `results/member_c/ga_sensitivity.{csv,md}`.
 - [x] `report/thanh_vien_C.tex`, `report/slide_thanh_vien_C.md`, `report/bao_cao_nhom09_de10.tex`.
+- [x] Cập nhật bảng EXACT trong báo cáo với kết quả 600s trên 3 thể hiện trung gian (TIMEOUT: 212 / 273 / 373).
+- [x] Biên dịch PDF xong: `report/bao_cao_nhom09_de10.pdf` (27 trang).
+- [ ] Chạy lại EXACT 600s trên máy tester để xác nhận `n_max`, `m`, mật độ, máy (máy hiện tại không phải là tester).
+- [ ] Điền MSSV 4 thành viên và tên giảng viên vào `report/bao_cao_nhom09_de10.tex`.
 
 ### Thành viên D (Phạm Nhật Mai Thành) — GRASP, thực nghiệm, biểu đồ, kiểm định
 - [x] `src/aco_or_grasp.py`: chốt và cài đặt **GRASP** (RCL Chvátal + xóa cột thừa + local search hoán đổi 1-1 & destroy-1/repair).
@@ -43,5 +47,6 @@
 
 ## 3. Việc còn lại trước khi đóng gói nộp `Nhom09_De10.zip`
 1. Điền MSSV, tên giảng viên, tỉ lệ đóng góp, ghi chú công cụ AI vào `report/bao_cao_nhom09_de10.tex` và biên dịch bằng XeLaTeX (ví dụ trên Overleaf) thành `report/BaoCao_Nhom09_De10.pdf`.
-2. Chuyển biểu đồ trong `results/figures/` từ `.svg` sang `.png`/`.pdf` (Mục 6.2).
-3. Tạo slide thuyết trình chung `report/Slide_Nhom09_De10.pdf` (5 phút).
+2. Chạy lại EXACT với giới hạn 600 s trên các thể hiện trung gian, ghi `n_max`, `m`, mật độ, máy (máy hiện tại không phải là tester, kết quả chỉ mang tính tham khảo).
+3. Chuyển biểu đồ trong `results/figures/` từ `.svg` sang `.png`/`.pdf` (Mục 6.2).
+4. Tạo slide thuyết trình chung `report/Slide_Nhom09_De10.pdf` (5 phút).
