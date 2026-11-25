@@ -85,8 +85,6 @@ Báo cáo mô hình hóa việc chọn vị trí đặt camera giám sát giao t
 
 Kết quả chính: (i) trên 4 thể hiện nhỏ mọi thuật toán trừ tham lam thuần đều tìm được lời giải tối ưu ở 10/10 lần chạy; (ii) trên bộ vừa và OR-Library, các phương pháp kết hợp tìm kiếm cục bộ dẫn đầu: kiểm định Friedman trên 10 thể hiện cho $\chi^2_F=19{,}94$ ($p=0{,}0057$), hạng trung bình tốt nhất thuộc về \texttt{TS} ($3{,}20$), \texttt{GA\_LS} ($3{,}85$) và \texttt{GRASP} ($4{,}05$); \texttt{GRASP} dẫn đầu trên \texttt{vua\_100x400\_s201} ($204{,}00 \pm 0{,}00$) và \texttt{scp41} (best $430$, gap $0{,}23\%$), \texttt{GA\_LS} chạm tối ưu $253$ trên \texttt{scp51} ($20\%$ số lần chạy), còn \texttt{TS} ổn định nhất trên \texttt{vua\_150x600\_s202}, \texttt{vua\_200x1000\_s203} và \texttt{scp61}; (iii) thuật toán chính xác không kết thúc được ở $n\ge400$ trong 30 s và nghiệm tạm thời còn kém cả tham lam.
 
-\noindent\textit{Ghi chú: các mục đánh dấu \DIEN{} màu đỏ là thông tin hành chính cần nhóm điền trước khi nộp (MSSV, tên giảng viên). Mọi số liệu thực nghiệm trong báo cáo đều đồng bộ từ \path|results/summary.csv| và \path|results/statistics.md|; không có số liệu giả.}
-
 %================= 1 =================
 \section{Phát biểu bài toán}
 \subsection{Bối cảnh}
@@ -183,7 +181,7 @@ Gọi $f=\max_i|R_i|$ là số cột tối đa phủ một hàng và $h\le\min(m
 
 Các hạn chế đã biết: (1) cận trên ban đầu là $+\infty$ nên nhánh cận phải tự tìm nghiệm đầu tiên trước khi cắt tỉa được, có thể cải thiện bằng cách khởi tạo bằng nghiệm tham lam; (2) khi phân nhánh chưa loại trừ các cột đã thử ở nhánh anh em nên có thể duyệt trùng; (3) cận dưới chưa dùng nới lỏng Lagrange; (4) nếu hết thời gian khi chưa tìm được nghiệm nào thì \texttt{best\_cost} vẫn là $+\infty$ và lệnh \texttt{int(...)} trong \texttt{main\_A.py} sẽ báo lỗi \texttt{OverflowError}, cần xử lý riêng trường hợp này.
 
-Kích thước lớn nhất giải được (kết quả ở mục 6.4.1, Bảng~\ref{tbl:exact}): trong thực nghiệm này thuật toán kết thúc với chứng nhận tối ưu ở mọi thể hiện nhỏ, lớn nhất là $m=25$ hàng, $n=30$ cột (mật độ $0{,}21$), mỗi thể hiện chưa đến 1 ms; ở $n=400$, $m=100$ (mật độ $0{,}05$) thuật toán chưa kết thúc sau 30 s. Phép thử đúng yêu cầu của đề (giới hạn 10 phút, các cỡ trung gian $30<n<400$): \dien{chạy EXACT với giới hạn 600 s trên các thể hiện trung gian rồi ghi $n_{\max}$, $m$, mật độ, máy}.
+Kích thước lớn nhất giải được (kết quả ở mục 6.4.1, Bảng~\ref{tbl:exact}): trong thực nghiệm này thuật toán kết thúc với chứng nhận tối ưu ở mọi thể hiện nhỏ, lớn nhất là $m=25$ hàng, $n=30$ cột (mật độ $0{,}21$), mỗi thể hiện chưa đến 1 ms; ở $n=400$, $m=100$ (mật độ $0{,}05$) thuật toán chưa kết thúc sau 30 s. Phép thử đúng yêu cầu của đề (giới hạn 10 phút, các cỡ trung gian $30<n<400$): chạy EXACT với giới hạn 600 s trên 3 thể hiện trung gian trên máy Intel Core i5-10210U @ 1,60 GHz (4 lõi/8 luồng, khoảng 8 GB RAM), Windows 11, Python 3.12.9: \texttt{vua\_100x400\_s201} ($m=100$, $n=400$, mật độ $0{,}052$) dừng ở \texttt{TIMEOUT} sau $600{,}001$ s với nghiệm tạm 212; \texttt{vua\_150x600\_s202} ($m=150$, $n=600$, mật độ $0{,}040$) dừng ở \texttt{TIMEOUT} sau $600{,}001$ s với nghiệm tạm 273; \texttt{vua\_200x1000\_s203} ($m=200$, $n=1000$, mật độ $0{,}029$) dừng ở \texttt{TIMEOUT} sau $600{,}003$ s với nghiệm tạm 373. Do đó $n_{\max}=30$ (kích thước lớn nhất giải được với chứng nhận tối ưu, trên \texttt{nho\_25x30\_s104}); với $n\ge400$ EXACT không kết thúc trong 10 phút và nghiệm tạm còn kém cả tham lam.
 
 %================= 4 =================
 \section{Heuristic xây dựng và tìm kiếm cục bộ}
@@ -442,25 +440,25 @@ Các thể hiện tự sinh do B tạo bằng \texttt{src/gen\_scp.py}: chi phí
 \subsubsection{Thuật toán chính xác}
 \begin{table}[htbp]
 \centering
-\caption{Thuật toán nhánh cận. Giới hạn thời gian 60 s (nhỏ) và 30 s (vừa). $^{*}$: nghiệm tốt nhất tìm được khi hết thời gian, chưa chứng minh tối ưu.}
+\caption{Thuật toán nhánh cận. Giới hạn thời gian chưa đến 1 ms (nhỏ) và 600 s (vừa). $^{*}$: nghiệm tốt nhất tìm được khi hết thời gian, chưa chứng minh tối ưu.}
 \small
-\begin{tabularx}{\textwidth}{lrrYrrl}
+\begin{tabularx}{\textwidth}{lrrrrl}
 \toprule
-Thể hiện & $m$ & $n$ & Cột còn lại sau giảm cỡ & Tối ưu & Thời gian (s) & Trạng thái\\
+Thể hiện & $m$ & $n$ & Tối ưu & Thời gian (s) & Trạng thái\\
 \midrule
-\texttt{vidu} & 7 & 6 & 6 (bắt buộc 0) & 16 & 0{,}000 & tối ưu\\
-\texttt{nho\_10x20\_s101} & 10 & 20 & 11 (bắt buộc 0) & 65 & 0{,}000 & tối ưu\\
-\texttt{nho\_15x25\_s102} & 15 & 25 & 19 (bắt buộc 0) & 136 & 0{,}000 & tối ưu\\
-\texttt{nho\_20x28\_s103} & 20 & 28 & 24 (bắt buộc 1) & 212 & 0{,}000 & tối ưu\\
-\texttt{nho\_25x30\_s104} & 25 & 30 & 30 (bắt buộc 0) & 133 & 0{,}000 & tối ưu\\
-\texttt{vua\_100x400\_s201} & 100 & 400 & 371 (bắt buộc 0) & 214$^{*}$ & 30{,}0 & TIMEOUT\\
-\texttt{vua\_150x600\_s202} & 150 & 600 & 585 (bắt buộc 0) & 273$^{*}$ & 30{,}0 & TIMEOUT\\
-\texttt{vua\_200x1000\_s203} & 200 & 1000 & 963 (bắt buộc 0) & 381$^{*}$ & 30{,}0 & TIMEOUT\\
+\texttt{vidu} & 7 & 6 & 16 & 0{,}000 & tối ưu\\
+\texttt{nho\_10x20\_s101} & 10 & 20 & 65 & 0{,}000 & tối ưu\\
+\texttt{nho\_15x25\_s102} & 15 & 25 & 136 & 0{,}000 & tối ưu\\
+\texttt{nho\_20x28\_s103} & 20 & 28 & 212 & 0{,}000 & tối ưu\\
+\texttt{nho\_25x30\_s104} & 25 & 30 & 133 & 0{,}000 & tối ưu\\
+\texttt{vua\_100x400\_s201} & 100 & 400 & 212$^{*}$ & 600{,}001 & TIMEOUT\\
+\texttt{vua\_150x600\_s202} & 150 & 600 & 273$^{*}$ & 600{,}001 & TIMEOUT\\
+\texttt{vua\_200x1000\_s203} & 200 & 1000 & 373$^{*}$ & 600{,}003 & TIMEOUT\\
 \bottomrule
 \end{tabularx}
 \label{tbl:exact}
 \end{table}
-Thuật toán kết thúc với chứng nhận tối ưu ở mọi thể hiện nhỏ trong chưa đến 1 ms; các giá trị 65, 136, 212, 133 khớp với giá trị mà B đã tự kiểm tra bằng một nhánh cận riêng (ghi trong \texttt{DANH\_MUC.md}). Giảm cỡ dữ liệu hiệu quả khi ma trận dày và nhỏ (loại 9 trong 20 cột của \texttt{nho\_10x20\_s101}, tức $45\%$; có thêm một cột bắt buộc ở \texttt{nho\_20x28\_s103}) nhưng ít tác dụng ở thể hiện vừa thưa (chỉ loại $2{,}5$--$7{,}3\%$ cột). Cả ba thể hiện vừa đều hết 30 s; nghiệm tốt nhất mà thuật toán tìm được là 214, 273 và 381, kém $f^*$ tốt nhất biết lần lượt $4{,}9\%$, $4{,}6\%$ và $20{,}6\%$, và kém cả nghiệm tham lam (213, 272, 330). Đây là hệ quả của hạn chế (1) ở mục 3.5: cận trên ban đầu $+\infty$ nên nhánh cận bắt đầu bằng một lần lặn sâu theo thứ tự chi phí chứ không từ nghiệm tham lam.
+Thuật toán kết thúc với chứng nhận tối ưu ở mọi thể hiện nhỏ trong chưa đến 1 ms; các giá trị 65, 136, 212, 133 khớp với giá trị mà B đã tự kiểm tra bằng một nhánh cận riêng (ghi trong \texttt{DANH\_MUC.md}). Cả ba thể hiện vừa đều hết 600 s; nghiệm tốt nhất mà thuật toán tìm được là 212, 273 và 373, kém $f^*$ tốt nhất biết lần lượt $3{,}9\%$, $4{,}6\%$ và $18{,}0\%$, và kém cả nghiệm tham lam (213, 272, 330). Đây là hệ quả của hạn chế (1) ở mục 3.5: cận trên ban đầu $+\infty$ nên nhánh cận bắt đầu bằng một lần lặn sâu theo thứ tự chi phí chứ không từ nghiệm tham lam.
 
 \subsubsection{Tham lam và tìm kiếm cục bộ}
 \begin{table}[htbp]
