@@ -183,14 +183,20 @@ class SASolver:
                     cov_cnt[r] += 1
         return total_cost
 
-    def solve(self, budget_sec: float, conv_csv_file: str):
+    def solve(
+        self,
+        budget_sec: float,
+        conv_csv_file: str,
+        t0_factor: float = 0.05,
+        cool_alpha: float = 0.995,
+    ):
         t0 = time.perf_counter()
         cur_sol, cur_cov, cur_cost = self.build_initial()
         best_sol = list(cur_sol)
         best_cost = cur_cost
 
-        T = max(1.0, best_cost * 0.05)
-        alpha = 0.995
+        T = max(1.0, best_cost * t0_factor)
+        alpha = cool_alpha
         steps_per_temp = max(20, self.inst.n // 5)
 
         iter_cnt = 0

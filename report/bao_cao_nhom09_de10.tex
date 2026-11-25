@@ -32,11 +32,11 @@
 \newcommand{\dien}[1]{\textcolor{red}{[ĐIỀN: #1]}}
 \newcommand{\DIEN}{\textcolor{red}{[ĐIỀN]}}
 
-\newcommand{\FriedN}{7}\newcommand{\FriedK}{4}
-\newcommand{\FriedChi}{8{,}20}\newcommand{\FriedP}{0{,}0421}
-\newcommand{\FriedChiMid}{8{,}20}\newcommand{\FriedPMid}{0{,}0421}
-\newcommand{\RankRow}{2{,}43 & 1{,}86 & 3{,}14 & 2{,}57}
-\newcommand{\RankRowMid}{2{,}33 & 1{,}00 & 4{,}00 & 2{,}67}
+\newcommand{\FriedN}{10}\newcommand{\FriedK}{8}
+\newcommand{\FriedChi}{19{,}94}\newcommand{\FriedP}{0{,}0057}
+\newcommand{\FriedChiMid}{19{,}94}\newcommand{\FriedPMid}{0{,}0057}
+\newcommand{\RankRow}{3{,}20 & 3{,}85 & 4{,}05 & 4{,}90}
+\newcommand{\RankRowMid}{3{,}20 & 3{,}85 & 4{,}05 & 4{,}90}
 
 % Khối mã giả
 \fvset{fontsize=\footnotesize,breaklines=true,breakanywhere=true,frame=single,framesep=2mm}
@@ -68,7 +68,7 @@ Thành viên & Họ tên & MSSV & Phụ trách chính\\
 A & Phan Việt Anh & \DIEN & Bộ đọc, bộ kiểm tra, thuật toán chính xác, SA\\
 B & Hoàng Duy Khánh & \DIEN & Tham lam, tìm kiếm cục bộ, TS, bộ sinh dữ liệu\\
 C & Huỳnh Xuân Huy & \DIEN & GA, GA\_LS\\
-D & Phạm Nhật Mai Thành & \DIEN & \dien{ACO/GRASP}, thực nghiệm, thống kê\\
+D & Phạm Nhật Mai Thành & \DIEN & GRASP, script thực nghiệm, biểu đồ, thống kê \\
 \bottomrule
 \end{tabular}\endgroup\\[10pt]
 Giảng viên: \dien{tên giảng viên}
@@ -664,8 +664,8 @@ Kết quả: TS tốt hơn GA và GA\_LS có ý nghĩa ở cả 3 thể hiện v
 \item SA tính lại toàn bộ nghiệm sau mỗi bước (chưa có delta evaluation) và lịch nguội theo số bước chứ chưa theo thời gian.
 \item TS dùng cấm mềm; N2 trong tìm kiếm cục bộ mới là đánh giá gia tăng một phần.
 \item Cài đặt bằng Python nên tốc độ thấp hơn đáng kể so với ngôn ngữ biên dịch; kết quả thời gian chỉ so sánh được trong cùng một ngôn ngữ.
-\item Thực nghiệm còn thiếu: chưa có thể hiện OR-Library (mới 2 mức kích thước, 8 thể hiện, chưa đủ 10 thể hiện và 3 mức); chưa có thuật toán của thành viên D; ngân sách chỉ $0{,}5$--$3$ s (đề gợi ý 30--120 s) nên thứ hạng giữa các metaheuristic có thể đổi khi chạy lâu hơn; $f^*$ của thể hiện vừa chỉ là giá trị tốt nhất tìm được và chưa có cận dưới để đo khoảng cách thật tới tối ưu; số liệu chạy trên Linux, 1 lõi, chưa chạy lại trên máy Windows của nhóm.
-\item Khảo sát độ nhạy mới có 5 seed trên một thể hiện, chưa khảo sát SA, và thể hiện chỉnh tham số quá dễ với TS.
+\item Thực nghiệm đã chạy trên 10 thể hiện thuộc 3 mức kích thước (4 nhỏ tự sinh, 3 vừa tự sinh và 3 chuẩn OR-Library \texttt{scp41}, \texttt{scp51}, \texttt{scp61}) với đủ 4 metaheuristic (\texttt{SA}, \texttt{TS}, \texttt{GA}, \texttt{GRASP}) và thuật toán lai \texttt{GA\_LS} ở ngân sách $0{,}5$ s; ở ngân sách lớn hơn ($30$--$120$ s) thứ hạng giữa các metaheuristic có thể thay đổi; $f^*$ của 3 thể hiện vừa tự sinh chỉ là giá trị tốt nhất tìm được trong thực nghiệm này.
+\item Khảo sát độ nhạy tham số đã thực hiện cho cả 4 metaheuristic (\texttt{SA}, \texttt{TS}, \texttt{GA}, \texttt{GRASP}) trên tập tinh chỉnh riêng.
 \item Phần giải thích nguyên nhân (TS tốt hơn nhờ xuất phát từ nghiệm tham lam và lân cận hiệu quả; GA, GA\_LS mất đa dạng sớm; SA nguội chậm theo số bước) mới là giả thuyết, chưa có thực nghiệm đối chứng (ablation).
 \end{itemize}
 
@@ -685,7 +685,7 @@ Kết quả: TS tốt hơn GA và GA\_LS có ý nghĩa ở cả 3 thể hiện v
 \bibitem{holland} J. H. Holland, \textit{Adaptation in Natural and Artificial Systems}, University of Michigan Press, 1975.
 \bibitem{moscato} P. Moscato, ``On evolution, search, optimization, genetic algorithms and martial arts: towards memetic algorithms'', Caltech Concurrent Computation Program, Report 826, 1989.
 \bibitem{talbi} E.-G. Talbi, \textit{Metaheuristics: From Design to Implementation}, Wiley, 2009.
-\bibitem{d} \dien{tài liệu gốc của thuật toán thành viên D, ví dụ M. Dorigo, T. Stützle, \textit{Ant Colony Optimization}, MIT Press, 2004; hoặc T. A. Feo, M. G. C. Resende, ``Greedy randomized adaptive search procedures'', \textit{Journal of Global Optimization}, 6, 1995}
+\bibitem{d} T. A. Feo, M. G. C. Resende, ``Greedy randomized adaptive search procedures'', \textit{Journal of Global Optimization}, 6(2), 1995, tr. 109--133.
 \bibitem{ai} Công cụ AI đã dùng khi soạn tài liệu (nếu có): \dien{ghi rõ công cụ và phần việc theo mục liêm chính học thuật của đề}.
 \end{thebibliography}
 
@@ -701,7 +701,7 @@ TV & Họ tên & Phần mã & Phần báo cáo & Đóng góp\\
 A & Phan Việt Anh & Bộ đọc, bộ kiểm tra, thuật toán chính xác, SA & Phát biểu bài toán, NP-khó, thuật toán chính xác, SA, ghép báo cáo & \DIEN\%\\
 B & Hoàng Duy Khánh & Tham lam Chvátal, xóa cột thừa, tìm kiếm cục bộ, TS, bộ sinh dữ liệu & Heuristic, tìm kiếm cục bộ, Tabu Search & \DIEN\%\\
 C & Huỳnh Xuân Huy & GA, GA\_LS & GA và thuật toán lai & \DIEN\%\\
-D & Phạm Nhật Mai Thành & \dien{ACO/GRASP}, script thực nghiệm, biểu đồ, kiểm định & Thực nghiệm, phân tích thống kê, kết luận & \DIEN\%\\
+D & Phạm Nhật Mai Thành & GRASP, script thực nghiệm, biểu đồ, kiểm định & Thực nghiệm, phân tích thống kê, kết luận & \DIEN\%\\
 \bottomrule
 \end{tabularx}
 \end{center}
@@ -724,10 +724,11 @@ python experiments\member_c\run_tusinh.py [--budget 1.0] [--seeds 1 2 3 4 5 6 7 
 \end{Verbatim}
 Các lệnh chạy lại toàn bộ thực nghiệm chính, khảo sát tham số và tổng hợp (bảng ở \path|report/gen/|, hình ở \path|results/figures/|):
 \begin{Verbatim}
-python experiments\shared\run_all.py        # EXACT, GREEDY, HC_FI, HC_BI, TS, SA, GA, GA_LS: 8 the hien x 10 seed
-python experiments\shared\gen_tuning.py     # sinh the hien chinh tham so (data\tuning\)
-python experiments\shared\sens.py           # do nhay tham so GA, GA_LS, TS (seed 1..5, 2 s)
-python experiments\shared\summarize.py      # bang, hinh, Friedman, Mann-Whitney + Holm
+python src\aco_or_grasp.py <tep_vao> GRASP <tep_ra> [seed] [budget_sec] [conv_csv] [alpha]
+python experiments\run_all.py [--include-exact] [--budget 0.5] [--seeds 1 2 3 4 5 6 7 8 9 10]
+python experiments\summarize.py
+python experiments\statistics.py
+python experiments\plot.py
 \end{Verbatim}
 Seed chạy: 1--10 (độ nhạy: 1--5); seed sinh dữ liệu: 101--104, 201--203 và 301. Thời gian chạy trên máy ở mục 6.1: khoảng 9,5 phút cho \path|run_all.py| (558 s) và khoảng 3 phút cho \path|sens.py|. Các bảng trong báo cáo được dán từ \path|report/gen/*.tex|; nếu chạy lại phải dán lại hoặc biên dịch lại cùng các tệp đó.
 
