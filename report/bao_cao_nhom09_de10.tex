@@ -242,7 +242,7 @@ GRASP & Đơn lời giải & D & Feo, Resende (1995)\\
 \end{tabularx}
 \end{center}
 
-\subsection{Tôi luyện mô phỏng (SA) -- thành viên A}
+\subsection{Tôi luyện mô phỏng (SA)}
 \textbf{Nguyên lý.} SA chấp nhận nghiệm lân cận xấu hơn (tăng chi phí $\Delta>0$) với xác suất $e^{-\Delta/T}$; nhiệt độ $T$ giảm dần nên ban đầu thuật toán khám phá rộng, về sau chuyển sang khai thác vùng tốt (Kirkpatrick và cộng sự, 1983).
 
 \textbf{Biểu diễn và lân cận.} Lời giải là mảng bool chọn cột cùng mảng đếm phủ và tổng chi phí; khởi tạo bằng tham lam Chvátal cộng xóa cột thừa. Nước đi: lật ngẫu nhiên 1 cột (xác suất $0{,}7$) hoặc 2 cột (xác suất $0{,}3$), sau đó \texttt{REPAIR} (duyệt các hàng theo chỉ số, hàng nào chưa phủ thì thêm cột có $c/\text{số hàng mới phủ}$ nhỏ nhất) rồi \texttt{REMOVE\_REDUNDANT}.
@@ -267,7 +267,7 @@ SA(I, seed, budget):
 
 \textbf{Nhận xét thiết kế.} Lịch nguội hiện theo số bước chứ không theo thời gian còn lại, nên với ngân sách ngắn trên thể hiện lớn nhiệt độ có thể chưa kịp hạ. Phương án tốt hơn: đặt $T$ theo tỉ lệ thời gian đã dùng trên ngân sách.
 
-\subsection{Tìm kiếm Tabu (TS) -- thành viên B}
+\subsection{Tìm kiếm Tabu (TS)}
 \textbf{Nguyên lý.} TS luôn đi tới lân cận tốt nhất không bị cấm, kể cả khi xấu hơn nghiệm hiện tại, và dùng danh sách tabu để chặn quay lại ngay nghiệm vừa rời (Glover, 1986). Tiêu chí mong đợi (aspiration) cho phép bỏ qua lệnh cấm nếu nước đi cho nghiệm tốt hơn nghiệm tốt nhất toàn cục.
 
 \textbf{Thiết kế cho bài toán.} Lân cận là ``bỏ một cột $j$ rồi sửa chữa'' (đúng N2 ở mục 4.3). Do số cột được chọn có thể lớn, mỗi vòng chỉ lấy mẫu ngẫu nhiên tối đa \texttt{sample} cột để thử bỏ. Thuộc tính tabu là chỉ số cột vừa bị bỏ: cột đó không được thêm lại trong \texttt{tenure}\,$+\,$\texttt{randint(0,2)} vòng lặp.
@@ -291,7 +291,7 @@ TS(I, tenure, sample):
 
 \textbf{Độ phức tạp mỗi vòng.} $O(\texttt{sample}\times C_{\text{move}})$ với $C_{\text{move}}$ là chi phí một lần xóa, sửa chữa và tỉa, đều được hoàn tác bằng \texttt{rollback} nên không sao chép nghiệm. Cấm là ``mềm'': nếu mọi cột ứng viên đều bị cấm thì \texttt{REPAIR} được phép dùng lại cột bị cấm, nhờ đó thuật toán không bị kẹt, nhưng lệnh cấm đôi khi bị vi phạm.
 
-\subsection{Giải thuật di truyền (GA) -- thành viên C}
+\subsection{Giải thuật di truyền (GA)}
 \textbf{Nguyên lý.} GA duy trì một quần thể lời giải, chọn lọc cá thể tốt làm cha mẹ, lai ghép và đột biến để sinh con (Holland, 1975). Cách mã hóa nhị phân cho Set Cover được Beasley và Chu (1996) nghiên cứu; nhóm áp dụng lai ghép đều và thủ tục sửa chữa tham lam.
 
 \textbf{Biểu diễn.} Mỗi cá thể là vectơ nhị phân độ dài $n$ kèm mảng đếm phủ và chi phí; chi phí cá thể là hàm thích nghi (cực tiểu hóa).
@@ -318,7 +318,7 @@ GA(I, seed, budget, P, p_m):
 
 \textbf{Độ phức tạp mỗi thế hệ.} $P\times\bigl(O(n)\text{ cho lai ghép và đột biến}+\text{chi phí REPAIR và prune}\bigr)$.
 
-\subsection{Thuật toán lai GA\_LS (memetic) -- thành viên C}
+\subsection{Thuật toán lai GA\_LS (memetic)}
 GA\_LS là GA có thêm tìm kiếm cục bộ áp dụng cho từng cá thể con trước khi đưa vào quần thể (Moscato, 1989). Tìm kiếm cục bộ gồm ba bước:
 \begin{enumerate}
 \item Duyệt các cột đang chọn theo thứ tự ngẫu nhiên; cột nào không còn hàng nào chỉ do nó phủ (thừa) thì loại.
@@ -327,7 +327,7 @@ GA\_LS là GA có thêm tìm kiếm cục bộ áp dụng cho từng cá thể c
 \end{enumerate}
 Cách làm này thuộc loại Lamarck: kết quả của tìm kiếm cục bộ được ghi ngược vào cá thể. Nó giúp mỗi con trở thành cực tiểu cục bộ theo N1, đổi lại mỗi thế hệ tốn thêm thời gian nên trong cùng ngân sách số thế hệ ít hơn GA thuần. Trên thực nghiệm 10 thể hiện (0,5 s, 10 seed), \texttt{GA\_LS} đạt hạng trung bình Friedman 3,850 (tốt hơn 5,250 của \texttt{GA}), đạt tối ưu 253 trên \texttt{scp51} (20\%) và vượt trội có ý nghĩa thống kê theo Wilcoxon ($p_{\mathrm{Holm}} = 0{,}00059$).
 
-\subsection{GRASP -- thành viên D}
+\subsection{GRASP}
 \textbf{Nguyên lý.} GRASP (Greedy Randomized Adaptive Search Procedure; Feo và Resende, 1995) là metaheuristic đa khởi tạo lặp hai pha: \emph{xây dựng nghiệm tham lam ngẫu nhiên hóa} (RCL) và \emph{tìm kiếm cục bộ}.
 
 \textbf{Pha xây dựng và xử lý ràng buộc.} Bắt đầu từ nghiệm rỗng, duy trì số hàng chưa phủ $g_j = |S_j \cap U|$ cho mỗi cột chưa chọn $j$. Tại mỗi bước tính tỉ số $s_j = c_j / g_j$, tìm $s_{\min}, s_{\max}$ và lập danh sách ứng viên hạn chế
