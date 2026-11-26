@@ -9,7 +9,7 @@ Bài toán phủ tập có trọng số (Weighted Set Cover).
 | A | Phan Việt Anh | Bộ đọc (`scp_core.py`), bộ kiểm tra (`kiemtra.py`), `EXACT`, `SA` | Phát biểu bài toán, NP-khó, thuật toán chính xác, SA, ghép báo cáo |
 | B | Hoàng Duy Khánh | `GREEDY`, `HC_FI`, `HC_BI`, `TS`, bộ sinh dữ liệu (`gen_scp.py`) | Heuristic, tìm kiếm cục bộ, Tabu Search |
 | C | Huỳnh Xuân Huy | `GA` và `GA_LS` (GA + tìm kiếm cục bộ) | Genetic Algorithm và thuật toán lai |
-| D | Phạm Nhật Mai Thành | `GRASP`, script thực nghiệm, tổng hợp, biểu đồ, kiểm định | Thực nghiệm, phân tích thống kê, kết luận |
+| D | Mai Đàm Công Thành | `GRASP`, script thực nghiệm, tổng hợp, biểu đồ, kiểm định | Thực nghiệm, phân tích thống kê, kết luận |
 
 
 ## 2. Môi trường
