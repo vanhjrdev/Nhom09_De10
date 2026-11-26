@@ -63,11 +63,7 @@ Ví dụ:  python src/tabu.py data/vidu/vidu.txt TS output.sol 42 10 conv.csv te
 - [x] Phân tích độ nhạy `tenure`, `sample` trên tập tinh chỉnh riêng (`tune_100x400_s901`, `tune_150x600_s902`) lưu tại `results/member_b/ts_sensitivity.csv`.
 - [x] Điền đầy đủ số liệu vào `report/thanh_vien_B.tex`.
 - [ ] Làm slide phần B.
-
-## 7. Ghi nhận việc dùng AI (theo mục 3.4 của đề)
-Mã nguồn `greedy.py`, `local_search.py`, `tabu.py`, `gen_scp.py` và bản nháp `report/thanh_vien_B.tex` được tạo với sự hỗ trợ của AI (Claude). Thành viên B cần đọc hiểu và tự giải thích được trước khi nộp.
-
-## 8. Lệnh git gợi ý
+## 7. Lệnh git gợi ý
 ```bash
 git status && git pull --rebase
 git rm src/main_B.py                       # nếu đã từng commit
