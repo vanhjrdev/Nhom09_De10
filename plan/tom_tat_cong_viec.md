@@ -28,7 +28,7 @@
 - [x] Cập nhật bảng EXACT trong báo cáo với kết quả 600s trên 3 thể hiện trung gian (TIMEOUT: 212 / 273 / 373).
 - [x] Biên dịch PDF xong: `report/bao_cao_nhom09_de10.pdf` (27 trang).
 - [ ] Chạy lại EXACT 600s trên máy tester để xác nhận `n_max`, `m`, mật độ, máy (máy hiện tại không phải là tester).
-- [ ] Điền MSSV 4 thành viên và tên giảng viên vào `report/bao_cao_nhom09_de10.tex`.
+- [x] Điền MSSV 4 thành viên và tên giảng viên vào `report/bao_cao_nhom09_de10.tex` (A MSSV chua biet).
 
 ### Thành viên D (Phạm Nhật Mai Thành) — GRASP, thực nghiệm, biểu đồ, kiểm định
 - [x] `src/aco_or_grasp.py`: chốt và cài đặt **GRASP** (RCL Chvátal + xóa cột thừa + local search hoán đổi 1-1 & destroy-1/repair).
