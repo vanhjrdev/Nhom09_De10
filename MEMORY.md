@@ -3,5 +3,5 @@
 - Biên dịch PDF xong: report/bao_cao_nhom09_de10.pdf (27 trang)
 - Commit f476bca đã push lên main
 - **Cần chạy lại EXACT 600s trên các thể hiện trung gian và ghi nmax, m, mật độ, máy** (máy hiện tại không phải là tester, chỉ mang tính tham khảo)
-- MSSV da dien: B 024207005588, C 087205004266, D Mai Dam Cong Thanh 038207026777; GV: Nguyen Van Huy. A MSSV chua biet, con \DIEN.
+- MSSV da dien: A 075207008679, B 024207005588, C 087205004266, D Mai Dam Cong Thanh 038207026777; GV: Nguyen Van Huy.
 - **Còn thiếu:** Chạy lại EXACT 600s trên máy tester để xác nhận n_max, m, mật độ, máy.
