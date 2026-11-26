@@ -16,7 +16,6 @@ Bài toán phủ tập có trọng số (Weighted Set Cover).
 
 - Hệ điều hành: Windows 11 Pro
 - Ngôn ngữ: Python 3.12.9
-- Thông dịch: CPython (không cần biên dịch)
 - Thư viện: Chỉ dùng thư viện chuẩn Python (`argparse`, `collections`, `csv`, `dataclasses`, `html`, `math`, `os`, `pathlib`, `random`, `re`, `subprocess`, `sys`, `time`). Không có tệp khai báo phụ thuộc ngoài (`requirements.txt`).
 
 ## 3. Lệnh cài đặt, sinh dữ liệu và chạy một thuật toán trên một thể hiện
